@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>廁所後台管理系統</title>
+<!-- iNavi Maps SDK (loaded dynamically) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--g:#1d9e75;--gd:#0f6e56;--gl:#e6f5ef;--gm:#9fe1cb;--r:#e24b4a;--rl:#fef2f2;--rm:#fca5a5;--a:#f59e0b;--al:#fffbeb;--b:#3b82f6;--bl:#eff6ff;--s:#fff;--bg:#f3f7f6;--tx:#1a2a35;--mu:#6b808f;--bd:#dce8e3;--bd2:#c8ddd8;--fn:'Segoe UI','PingFang TC',sans-serif;}
+body.dark{--s:#1e2732;--bg:#151c25;--tx:#e2eaf3;--mu:#7a93a8;--bd:#2a3a4a;--bd2:#2e4055;--gl:#0f2e22;--gm:#1a5e42;--gd:#3ed8a8;--rl:#2e1010;--rm:#7f2b2b;--al:#2e1f00;--bl:#0a1a30;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100vh;overflow:hidden;font-family:var(--fn);color:var(--tx);background:var(--bg);font-size:15px;}
+body{display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{height:52px;background:var(--s);border-bottom:1px solid var(--bd2);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;}
+.logo{font-size:16px;font-weight:800;color:var(--gd);}
+.logo span{color:var(--gm);}
+.tb-c{flex:1;display:flex;justify-content:center;}
+.apill{display:flex;align-items:center;gap:6px;padding:6px 16px;background:var(--rl);border:1.5px solid var(--rm);border-radius:100px;font-size:14px;font-weight:700;color:#991b1b;cursor:pointer;}
+.apill:hover{background:#fee2e2;}
+.blink{width:7px;height:7px;border-radius:50%;background:var(--r);animation:bk 1.2s infinite;}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.15}}
+.tb-r{margin-left:auto;display:flex;align-items:center;gap:7px;}
+.clk{font-size:13px;color:var(--mu);}
+.btn{padding:7px 14px;border-radius:8px;font-size:14px;font-weight:600;border:1.5px solid var(--bd2);background:var(--s);color:var(--tx);cursor:pointer;font-family:var(--fn);transition:background .1s;white-space:nowrap;}
+.btn:hover{background:var(--bg);}
+.btn.pri{background:var(--g);color:#fff;border-color:var(--g);}
+.btn.pri:hover{background:var(--gd);}
+.btn.danger{background:var(--rl);color:#991b1b;border-color:var(--rm);}
+.btn.sm{padding:5px 11px;font-size:13px;}
+
+/* LAYOUT */
+.layout{flex:1;display:flex;overflow:hidden;}
+
+/* SIDEBAR */
+#SB{width:210px;flex-shrink:0;background:var(--s);border-right:1px solid var(--bd2);display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.sb-sec{padding:11px 14px 3px;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;}
+.snav{display:flex;flex-direction:column;flex:1;overflow-y:auto;}
+.sbtn{display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;font-size:14px;font-weight:500;color:var(--mu);border-left:2.5px solid transparent;background:none;border-top:none;border-right:none;border-bottom:none;width:100%;text-align:left;font-family:var(--fn);transition:all .1s;}
+.sbtn:hover{background:var(--gl);color:var(--tx);}
+.sbtn.on{background:var(--gl);border-left-color:var(--g);color:var(--gd);font-weight:700;}
+.sbtn svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;opacity:.6;}
+.sbtn.on svg{opacity:1;}
+.snum{margin-left:auto;font-size:11px;font-weight:700;padding:1px 6px;border-radius:8px;}
+.snum.r{background:var(--rl);color:#991b1b;}
+.snum.a{background:var(--al);color:#92400e;}
+.snum.g{background:var(--gl);color:var(--gd);}
+.snum.b{background:var(--bl);color:#1d4ed8;}
+.sb-div{height:1px;background:var(--bd);margin:4px 0;}
+.sbfoot{padding:11px 14px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;}
+.sbav{width:28px;height:28px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gd);}
+
+/* CONTENT */
+#CA{flex:1;overflow:hidden;position:relative;}
+
+/* PAGES - key: all hidden, JS shows via style.display */
+.pg{position:absolute;inset:0;display:none;overflow-y:auto;background:var(--bg);}
+.pg.flex{flex-direction:column;}
+
+/* ── DASHBOARD ── */
+.dw{padding:18px;}
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px;}
+.kc{background:var(--s);border-radius:11px;border:1px solid var(--bd);padding:14px 16px;cursor:pointer;border-top:3px solid var(--bd);}
+.kc:hover{box-shadow:0 3px 12px rgba(0,0,0,.07);}
+.kc.cr{border-top-color:var(--r);}
+.kc.ca{border-top-color:var(--a);}
+.kc.cg{border-top-color:var(--g);}
+.kc.cb{border-top-color:var(--b);}
+.kl{font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.kv{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.02em;}
+.ks{font-size:12px;color:var(--mu);margin-top:3px;}
+.kvg{color:var(--gd);}.kvr{color:#991b1b;}.kva{color:#92400e;}.kvb{color:#1d4ed8;}
+.g2{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;}
+.panel{background:var(--s);border-radius:11px;border:1px solid var(--bd);}
+.ph{padding:11px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
+.pt{font-size:14px;font-weight:700;}
+.pb{padding:11px 15px;}
+.rrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);}
+.rrow:last-child{border:none;}
+.rn{width:20px;height:20px;border-radius:50%;background:var(--gl);color:var(--gd);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.rn.g1{background:#fef3c7;color:#92400e;}.rn.g2{background:#f1f5f9;color:#475569;}.rn.g3{background:#fee2e2;color:#991b1b;}
+.rname{flex:1;font-size:13px;font-weight:600;cursor:pointer;}
+.rscore{font-size:13px;font-weight:700;}
+.rs-ok{color:var(--gd);}.rs-w{color:#92400e;}.rs-e{color:#991b1b;}
+.ritem{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);align-items:flex-start;}
+.ritem:last-child{border:none;}
+.rico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rico svg{width:13px;height:13px;stroke-width:1.8;}
+.rico.b{background:var(--bl)}.rico.b svg{stroke:#1d4ed8;fill:none;}
+.rico.r{background:var(--rl)}.rico.r svg{stroke:#991b1b;fill:none;}
+.rico.a{background:var(--al)}.rico.a svg{stroke:#92400e;fill:none;}
+.rico.g{background:var(--gl)}.rico.g svg{stroke:var(--gd);fill:none;}
+.rt{font-size:13px;font-weight:700;}
+.rs{font-size:12px;color:var(--mu);}
+
+/* ── MAP ── */
+#pg-map{flex-direction:row!important;overflow:hidden!important;}
+.mapsec{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;min-width:0;}
+/* #leafmap mirrors index.html: width:100% height:100%, parent has explicit size */
+#leafmap{width:100%;height:100%;flex:1;min-height:0;background:#e8ede8;}
+.catbar{background:var(--s);border-bottom:1px solid var(--bd2);padding:7px 12px;display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+.catlbl{font-size:13px;color:var(--mu);font-weight:600;margin-right:3px;}
+.cc{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;border:1.5px solid var(--bd2);background:var(--s);font-size:13px;font-weight:600;color:var(--mu);cursor:pointer;transition:all .1s;}
+.cc:hover{background:var(--bg);}
+.cc svg{width:12px;height:12px;flex-shrink:0;}
+.cc.om{background:#e6f1fb;border-color:#93c5fd;color:#1d4ed8;}
+.cc.op{background:var(--gl);border-color:var(--gm);color:var(--gd);}
+.cc.oc{background:var(--al);border-color:#fcd34d;color:#92400e;}
+.cc.ou{background:#f5f3ff;border-color:#c4b5fd;color:#5b52cc;}
+.csep{width:1px;height:18px;background:var(--bd2);}
+.mlr{margin-left:auto;display:flex;gap:5px;}
+.mlb{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:7px;border:1.5px solid var(--bd2);background:var(--s);font-size:13px;font-weight:600;color:var(--mu);cursor:pointer;transition:all .1s;}
+.mlb:hover{background:var(--bg);}
+.mlb.on{background:var(--gl);border-color:var(--gm);color:var(--gd);}
+
+.mapleg{position:absolute;top:58px;left:12px;z-index:400;background:rgba(255,255,255,.95);border:1px solid var(--bd2);border-radius:9px;padding:8px 14px;display:flex;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.10);}
+.legi{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--mu);}
+.legdot{width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+
+/* RIGHT PANEL */
+.rp{width:380px;flex-shrink:0;background:var(--s);border-left:1px solid var(--bd2);display:flex;flex-direction:column;overflow:hidden;}
+.rpkpi{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.rpkc{padding:10px 13px;border-right:1px solid var(--bd);cursor:pointer;}
+.rpkc:last-child{border-right:none;}
+.rpkc:hover{background:var(--bg);}
+.rpkl{font-size:11px;color:var(--mu);font-weight:600;margin-bottom:2px;}
+.rpkv{font-size:21px;font-weight:800;line-height:1;}
+.rptabs{display:flex;border-bottom:1px solid var(--bd2);flex-shrink:0;}
+.rptab{flex:1;padding:11px 5px;text-align:center;font-size:14px;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2.5px solid transparent;transition:color .1s;}
+.rptab.on{color:var(--gd);border-bottom-color:var(--g);}
+.rptab:hover:not(.on){color:var(--tx);}
+.rpbody{flex:1;overflow-y:auto;}
+.chip{padding:2px 9px;border-radius:100px;font-size:12px;font-weight:700;}
+.cr{background:var(--rl);color:#991b1b;}
+.ca{background:var(--al);color:#92400e;}
+.cb{background:var(--bl);color:#1d4ed8;}
+.cg{background:var(--gl);color:var(--gd);}
+.cgr{background:var(--bg);color:var(--mu);}
+
+/* ── TOILET LIST ── */
+.tbbar{display:flex;align-items:center;gap:7px;padding:10px 15px;background:var(--s);border-bottom:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap;}
+.sbox{display:flex;align-items:center;gap:5px;padding:6px 10px;border:1.5px solid var(--bd2);border-radius:7px;background:var(--s);}
+.sbox svg{width:13px;height:13px;stroke:var(--mu);fill:none;stroke-width:1.8;}
+.sbox input{border:none;outline:none;font-size:14px;font-family:var(--fn);width:150px;}
+.fc{padding:5px 12px;border-radius:100px;font-size:13px;font-weight:600;border:1.5px solid var(--bd2);background:var(--s);color:var(--mu);cursor:pointer;font-family:var(--fn);transition:all .1s;}
+.fc.on{background:var(--gl);border-color:var(--gm);color:var(--gd);}
+.twrap{flex:1;overflow:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:9px 12px;text-align:left;font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;background:var(--bg);border-bottom:1.5px solid var(--bd2);white-space:nowrap;position:sticky;top:0;z-index:1;}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--bd);font-size:14px;vertical-align:middle;}
+tbody tr:hover td{background:var(--gl);}
+tbody tr:last-child td{border:none;}
+.bdg{padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;}
+.bok{background:var(--gl);color:var(--gd);}.bw{background:var(--al);color:#92400e;}.be{background:var(--rl);color:#991b1b;}.bb{background:var(--bl);color:#1d4ed8;}
+.tacts{display:flex;gap:3px;}
+.ib{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--bd2);background:var(--s);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.ib svg{width:12px;height:12px;stroke:var(--mu);fill:none;stroke-width:1.8;}
+.ib:hover{background:var(--bg);}
+.ib.del:hover{background:var(--rl);}
+.ib.del:hover svg{stroke:#991b1b;}
+
+/* ── ALERTS ── */
+.albar{display:flex;align-items:center;gap:7px;padding:10px 15px;background:var(--s);border-bottom:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap;}
+.allist{flex:1;overflow-y:auto;padding:11px 15px;display:flex;flex-direction:column;gap:8px;}
+.acard{background:var(--s);border-radius:9px;border:1px solid var(--bd);border-left:3px solid var(--bd);padding:12px 14px;}
+.acard.err{border-left-color:var(--r);}
+.acard.warn{border-left-color:var(--a);}
+.aname{font-size:15px;font-weight:700;}
+.ameta{font-size:12px;color:var(--mu);margin-top:1px;}
+.atags{display:flex;gap:4px;flex-wrap:wrap;margin:7px 0;}
+.atag{padding:2px 8px;border-radius:5px;font-size:13px;}
+.atag.r{background:var(--rl);color:#991b1b;}.atag.a{background:var(--al);color:#92400e;}
+.abtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+
+/* ── DISPATCH ── */
+.dpwrap{display:flex;flex:1;overflow:hidden;}
+.dpleft{flex:1;overflow-y:auto;border-right:1px solid var(--bd);}
+.dpright{width:270px;overflow-y:auto;background:var(--bg);padding:12px;}
+.autobanner{margin:10px;padding:12px 14px;background:linear-gradient(135deg,var(--gl),var(--bl));border:1.5px solid var(--gm);border-radius:9px;display:flex;align-items:center;gap:10px;}
+.dpc{background:var(--s);border-radius:8px;border:1px solid var(--bd);margin:0 10px 8px;padding:11px 13px;cursor:pointer;}
+.dpc:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.dpcn{font-size:14px;font-weight:700;margin-bottom:5px;}
+.dpm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.dpav{width:20px;height:20px;border-radius:50%;background:var(--gl);color:var(--gd);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;}
+.dpp{display:flex;align-items:center;gap:4px;font-size:13px;}
+.dpeta{font-size:13px;font-weight:700;color:var(--g);margin-left:auto;}
+
+/* ── VENDORS ── */
+.vgrid{padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;}
+.vc{background:var(--s);border-radius:11px;border:1px solid var(--bd);overflow:hidden;}
+.vch{padding:14px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:9px;}
+.vcbar{width:4px;border-radius:2px;align-self:stretch;flex-shrink:0;}
+.vcn{font-size:14px;font-weight:800;margin-bottom:2px;}
+.vcz{font-size:12px;color:var(--mu);}
+.vcb{padding:12px 15px;}
+.vcst{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:9px;}
+.vcs{background:var(--bg);border-radius:7px;padding:8px;text-align:center;}
+.vcsv{font-size:17px;font-weight:800;}
+.vcsl{font-size:10px;color:var(--mu);margin-top:1px;}
+.vcrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px;}
+.vcrow:last-child{border:none;}
+.vcl{color:var(--mu);}
+.vcv{font-weight:600;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;}
+.vcv a{color:var(--b);text-decoration:none;}
+.vcv a:hover{text-decoration:underline;}
+.vcacts{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;}
+.stexp{background:var(--bg);border-top:1px solid var(--bd);}
+.strow{display:flex;align-items:center;gap:7px;padding:8px 15px;border-bottom:1px solid var(--bd);}
+.strow:last-child{border:none;}
+.stav{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;}
+.cwarn{color:#92400e;font-weight:700;}
+.cok{color:var(--gd);font-weight:700;}
+
+/* ── STAFF ── */
+.sfbar{display:flex;align-items:center;gap:7px;padding:10px 15px;background:var(--s);border-bottom:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap;}
+
+/* ── SCHEDULE ── */
+.scwrap{padding:15px;overflow-y:auto;}
+.sg{display:grid;border:1px solid var(--bd);border-radius:9px;overflow:hidden;background:var(--s);}
+.sghd{background:var(--bg);font-size:13px;font-weight:700;color:var(--mu);padding:8px 10px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);}
+.sgname{font-size:13px;font-weight:600;padding:8px 10px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);background:var(--bg);}
+.sgcell{padding:5px 3px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);cursor:pointer;min-height:38px;display:flex;align-items:center;justify-content:center;}
+.sgcell:hover{background:var(--gl);}
+.sgsh{border-radius:4px;padding:2px 6px;font-size:11px;font-weight:700;white-space:nowrap;}
+.sham{background:var(--bl);color:#1d4ed8;}.shpm{background:var(--al);color:#92400e;}.shfull{background:var(--gl);color:var(--gd);}.shoff{background:var(--bg);color:var(--mu);}
+
+/* DRAWER */
+.drawer{position:absolute;top:0;right:0;bottom:0;width:340px;background:var(--s);border-left:1px solid var(--bd2);transform:translateX(100%);transition:transform .2s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;z-index:500;box-shadow:-4px 0 18px rgba(0,0,0,.09);}
+.drawer.open{transform:translateX(0);}
+.drh{padding:14px 16px;border-bottom:1px solid var(--bd2);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;}
+.drttl{font-size:15px;font-weight:800;line-height:1.3;}
+.drsub{font-size:12px;color:var(--mu);margin-top:2px;}
+.drx{width:27px;height:27px;border-radius:50%;background:var(--bg);border:1px solid var(--bd);cursor:pointer;font-size:14px;color:var(--mu);display:flex;align-items:center;justify-content:center;}
+.drx:hover{background:var(--bd);}
+.drbody{flex:1;overflow-y:auto;padding:13px 15px;}
+.drsec{margin-bottom:15px;}
+.drsl{font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+.dr2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.drstat{background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--bd);}
+.drstl{font-size:11px;color:var(--mu);margin-bottom:2px;}
+.drstv{font-size:19px;font-weight:800;line-height:1;}
+.dvg{color:var(--gd);}.dva{color:#92400e;}.dvr{color:#991b1b;}.dvb{color:#1d4ed8;}
+.drbar{margin-bottom:8px;}
+.drbt{display:flex;justify-content:space-between;margin-bottom:3px;font-size:13px;}
+.drbv{font-weight:700;}
+.drbg{height:7px;background:#e8edf2;border-radius:3px;overflow:hidden;}
+.drbf{height:7px;border-radius:3px;transition:width .4s;}
+.dri{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px;}
+.dri:last-child{border:none;}
+.dril{color:var(--mu);}.driv{font-weight:700;}
+.drfacs{display:flex;gap:5px;flex-wrap:wrap;}
+.drfac{font-size:12px;padding:3px 9px;border-radius:7px;background:var(--bl);color:#1d4ed8;font-weight:600;}
+.drfac.no{background:var(--bg);color:#c9cdd3;text-decoration:line-through;}
+.drdpbtn{display:block;width:100%;margin-top:14px;padding:12px;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--fn);}
+.drdpbtn:hover{background:var(--gd);}
+
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;background:rgba(20,35,50,.42);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+.mbg.open{display:flex;}
+.mbox{background:#fff;border-radius:13px;width:500px;max-width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.mbox.wide{width:580px;}
+.mh{padding:17px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.mttl{font-size:16px;font-weight:800;}
+.mx{width:27px;height:27px;border-radius:50%;background:var(--bg);border:1px solid var(--bd);cursor:pointer;font-size:14px;color:var(--mu);display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--bd);}
+.mbody{padding:17px 20px;overflow-y:auto;flex:1;}
+.mfoot{padding:13px 20px;border-top:1px solid var(--bd);display:flex;gap:7px;justify-content:flex-end;flex-shrink:0;}
+.fg{margin-bottom:13px;}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;}
+.frfull{grid-template-columns:1fr;}
+.fgg{display:flex;flex-direction:column;gap:4px;}
+.fl{font-size:13px;font-weight:700;color:var(--mu);}
+.fi{width:100%;padding:8px 11px;border:1.5px solid var(--bd2);border-radius:8px;font-size:14px;color:var(--tx);outline:none;background:var(--bg);font-family:var(--fn);transition:border-color .1s;}
+.fi:focus{border-color:var(--g);}
+body.dark .sbox input{background:var(--bg);color:var(--tx);}
+body.dark .mbox{background:var(--s);}
+.thm-btn{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;background:var(--bd2);transition:background .2s;flex-shrink:0;padding:0;}
+.thm-btn.dark-on{background:var(--g);}
+.thm-btn::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;}
+.thm-btn.dark-on::after{transform:translateX(16px);}
+textarea.fi{resize:vertical;min-height:60px;}
+.fsec{font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;padding:3px 0 7px;border-bottom:1px solid var(--bd);margin-bottom:11px;margin-top:3px;}
+
+/* TOAST */
+#toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-5px);background:var(--gd);color:#fff;padding:9px 20px;border-radius:100px;font-size:14px;font-weight:700;z-index:9999;pointer-events:none;opacity:0;transition:all .16s;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18);}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+::-webkit-scrollbar{width:4px;height:4px;}
+.lang-en [data-zh]:not([data-en]){display:none!important;}
+.lang-en [data-zh][data-en]{/* text swapped by JS */}
+[data-en]{/* not hidden by default - JS handles text swap */}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+/* iNavi map */
+#leafmap{width:100%;position:relative;overflow:hidden;background:#e8ede8;}
+.mapsec{flex:1;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- MODALS -->
+<div class="mbg" id="m-dp" onclick="if(event.target===this)cM('m-dp')">
+<div class="mbox"><div class="mh"><div class="mttl" id="mdt">指派任務</div><button class="mx" onclick="cM('m-dp')">✕</button></div>
+<div class="mbody">
+  <div class="fg"><label class="fl"><span data-zh="廁所" data-en="Toilet">廁所</span></label><select class="fi" id="dm-t"></select></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="任務類型" data-en="Task Type">任務類型</span></label><select class="fi" id="dm-tp"><option data-zh="清潔" data-en="Cleaning">清潔</option><option data-zh="補充衛生紙" data-en="Restock Paper">補充衛生紙</option><option data-zh="補充洗手乳" data-en="Restock Soap">補充洗手乳</option><option data-zh="維修" data-en="Repair">維修</option><option data-zh="巡檢" data-en="Inspection">巡檢</option></select></div><div class="fgg"><label class="fl"><span data-zh="優先等級" data-en="Priority">優先等級</span></label><select class="fi" id="dm-pr"><option data-zh="緊急" data-en="Urgent">緊急</option><option data-zh="高" data-en="High">高</option><option data-zh="中" data-en="Medium">中</option><option data-zh="低" data-en="Low">低</option></select></div></div>
+  <div class="fg"><label class="fl"><span data-zh="指派人員" data-en="Assign To">指派人員</span></label><select class="fi" id="dm-ps"></select></div>
+  <div class="fg"><label class="fl"><span data-zh="備註" data-en="Notes">備註</span></label><textarea class="fi" id="dm-nt" rows="2" id="dm-nt-ph" placeholder="補充說明…"></textarea></div>
+</div>
+<div class="mfoot"><button class="btn" onclick="cM('m-dp')"><span data-zh="取消" data-en="Cancel">取消</span></button><button class="btn pri" onclick="doDP()"><span data-zh="確認派工" data-en="Confirm">確認派工</span></button></div>
+</div></div>
+
+<div class="mbg" id="m-tt" onclick="if(event.target===this)cM('m-tt')">
+<div class="mbox"><div class="mh"><div class="mttl" id="mtt">新增廁所</div><button class="mx" onclick="cM('m-tt')">✕</button></div>
+<div class="mbody">
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="廁所名稱 *" data-en="Toilet Name *">廁所名稱 *</span></label><input class="fi" id="tf-n" placeholder="名稱"></div><div class="fgg"><label class="fl"><span data-zh="類型" data-en="Type">類型</span></label><select class="fi" id="tf-c"><option value="mrt" data-zh="捷運" data-en="MRT">捷運</option><option value="park" data-zh="公園" data-en="Park">公園</option><option value="cvs" data-zh="便利商店" data-en="CVS">便利商店</option><option value="pub" data-zh="公廁" data-en="Public">公廁</option><option value="gas" data-zh="加油站" data-en="Gas Station">加油站</option><option value="temple" data-zh="廟宇" data-en="Temple">廟宇</option></select></div></div>
+  <div class="fr frfull"><div class="fgg"><label class="fl"><span data-zh="地址" data-en="Address">地址</span></label><input class="fi" id="tf-a" placeholder="台北市…"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="樓層" data-en="Floor">樓層</span></label><input class="fi" id="tf-fl" placeholder="B1"></div><div class="fgg"><label class="fl"><span data-zh="最近出口" data-en="Nearest Exit">最近出口</span></label><input class="fi" id="tf-ex" placeholder="出口2"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="負責公司" data-en="Vendor">負責公司</span></label><select class="fi" id="tf-v"></select></div><div class="fgg"><label class="fl"><span data-zh="24H" data-en="24H">24H</span></label><select class="fi" id="tf-24"><option value="0" data-zh="否" data-en="No">否</option><option value="1" data-zh="是" data-en="Yes">是</option></select></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="停車位" data-en="Parking">停車位</span></label><select class="fi" id="tf-pk"><option value="1" data-zh="有停車位" data-en="Has Parking">有停車位</option><option value="0" data-zh="無停車位" data-en="No Parking">無停車位</option></select></div><div class="fgg"><label class="fl"><span data-zh="無障礙" data-en="Accessible">無障礙</span></label><select class="fi" id="tf-ac"><option value="1" data-zh="有" data-en="Yes">有</option><option value="0" data-zh="無" data-en="No">無</option></select></div></div>
+  <div class="fsec"><span data-zh="設施與感測" data-en="Facilities & Sensors">設施與感測</span></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="親子廁" data-en="Family Toilet">親子廁</span></label><select class="fi" id="tf-fm"><option value="1">有</option><option value="0">無</option></select></div></div>
+  <div class="fr"><div class="fgg"><label class="fl">NH₃(ppm)</label><input class="fi" id="tf-nh" type="number" placeholder="15"></div><div class="fgg"><label class="fl">衛生紙(%)</label><input class="fi" id="tf-pp" type="number" placeholder="80"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="洗手乳(%)" data-en="Soap(%)">洗手乳(%)</span></label><input class="fi" id="tf-sp" type="number" placeholder="80"></div><div class="fgg"><label class="fl"><span data-zh="緯度" data-en="Latitude">緯度</span></label><input class="fi" id="tf-la" type="number" step="0.0001" placeholder="25.04"></div></div>
+  <div class="fr frfull"><div class="fgg"><label class="fl"><span data-zh="經度" data-en="Longitude">經度</span></label><input class="fi" id="tf-ln" type="number" step="0.0001" placeholder="121.54"></div></div>
+</div>
+<div class="mfoot"><button class="btn" onclick="cM('m-tt')"><span data-zh="取消" data-en="Cancel">取消</span></button><button class="btn pri" onclick="savT()"><span data-zh="儲存" data-en="Save">儲存</span></button></div>
+</div></div>
+
+<div class="mbg" id="m-sf" onclick="if(event.target===this)cM('m-sf')">
+<div class="mbox"><div class="mh"><div class="mttl" id="mst">新增人員</div><button class="mx" onclick="cM('m-sf')">✕</button></div>
+<div class="mbody">
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="姓名 *" data-en="Name *">姓名 *</span></label><input class="fi" id="sf-n" placeholder="姓名"></div><div class="fgg"><label class="fl"><span data-zh="員工編號" data-en="Emp ID">員工編號</span></label><input class="fi" id="sf-e" placeholder="EMP-001"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="職稱" data-en="Role">職稱</span></label><select class="fi" id="sf-r"><option data-zh="組長" data-en="Team Leader">組長</option><option data-zh="清潔員" data-en="Cleaner">清潔員</option><option data-zh="維修員" data-en="Technician">維修員</option><option data-zh="領班" data-en="Supervisor">領班</option></select></div><div class="fgg"><label class="fl"><span data-zh="所屬公司" data-en="Company">所屬公司</span></label><select class="fi" id="sf-v"></select></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="電話" data-en="Phone">電話</span></label><input class="fi" id="sf-p" placeholder="0912-345-678"></div><div class="fgg"><label class="fl"><span data-zh="Email" data-en="Email">Email</span></label><input class="fi" id="sf-em" placeholder="name@email.com"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="到職日" data-en="Join Date">到職日</span></label><input class="fi" id="sf-j" type="date"></div><div class="fgg"><label class="fl"><span data-zh="班別" data-en="Shift">班別</span></label><select class="fi" id="sf-sh"><option data-zh="早班 07:00-15:00" data-en="AM 07:00-15:00">早班 07:00-15:00</option><option data-zh="午班 11:00-19:00" data-en="PM 11:00-19:00">午班 11:00-19:00</option><option data-zh="晚班 15:00-23:00" data-en="Night 15:00-23:00">晚班 15:00-23:00</option><option data-zh="輪班" data-en="Rotating">輪班</option></select></div></div>
+</div>
+<div class="mfoot"><button class="btn" onclick="cM('m-sf')"><span data-zh="取消" data-en="Cancel">取消</span></button><button class="btn pri" onclick="savS()"><span data-zh="儲存" data-en="Save">儲存</span></button></div>
+</div></div>
+
+<div class="mbg" id="m-vd" onclick="if(event.target===this)cM('m-vd')">
+<div class="mbox wide"><div class="mh"><div class="mttl" id="mvt">新增清潔公司</div><button class="mx" onclick="cM('m-vd')">✕</button></div>
+<div class="mbody">
+  <div class="fsec"><span data-zh="公司基本資訊" data-en="Company Info">公司基本資訊</span></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="公司名稱 *" data-en="Company Name *">公司名稱 *</span></label><input class="fi" id="vf-n" placeholder="公司名稱"></div><div class="fgg"><label class="fl"><span data-zh="負責區域" data-en="Service Zone">負責區域</span></label><input class="fi" id="vf-z" placeholder="捷運文湖線"></div></div>
+  <div class="fr frfull"><div class="fgg"><label class="fl"><span data-zh="公司地址" data-en="Address">公司地址</span></label><input class="fi" id="vf-a" placeholder="台北市…"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="公司電話" data-en="Phone">公司電話</span></label><input class="fi" id="vf-p" placeholder="02-1234-5678"></div><div class="fgg"><label class="fl"><span data-zh="官方網站" data-en="Website">官方網站</span></label><input class="fi" id="vf-w" placeholder="https://"></div></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="LINE ID" data-en="LINE ID">LINE ID</span></label><input class="fi" id="vf-l" placeholder="@company"></div><div class="fgg"><label class="fl"><span data-zh="SLA時限(分)" data-en="SLA Limit(min)">SLA時限(分)</span></label><input class="fi" id="vf-sl" type="number" placeholder="30"></div></div>
+  <div class="fsec">${LANG==='en'?'Contact':'聯絡負責人'}</div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="負責人姓名" data-en="Contact Name">負責人姓名</span></label><input class="fi" id="vf-c" placeholder="王小明"></div><div class="fgg"><label class="fl"><span data-zh="負責人電話" data-en="Contact Phone">負責人電話</span></label><input class="fi" id="vf-cp" placeholder="0912-345-678"></div></div>
+  <div class="fr frfull"><div class="fgg"><label class="fl"><span data-zh="負責人 Email" data-en="Contact Email">負責人 Email</span></label><input class="fi" id="vf-ce" placeholder="contact@company.com"></div></div>
+  <div class="fsec"><span data-zh="合約資訊" data-en="Contract Info">合約資訊</span></div>
+  <div class="fr"><div class="fgg"><label class="fl"><span data-zh="合約開始日" data-en="Start Date">合約開始日</span></label><input class="fi" id="vf-cs" type="date"></div><div class="fgg"><label class="fl"><span data-zh="合約到期日" data-en="End Date">合約到期日</span></label><input class="fi" id="vf-ce2" type="date"></div></div>
+  <div class="fr frfull"><div class="fgg"><label class="fl"><span data-zh="月費(元)" data-en="Monthly Fee(NTD)">月費(元)</span></label><input class="fi" id="vf-f" type="number" placeholder="250000"></div></div>
+</div>
+<div class="mfoot"><button class="btn" onclick="cM('m-vd')"><span data-zh="取消" data-en="Cancel">取消</span></button><button class="btn pri" onclick="savV()"><span data-zh="儲存" data-en="Save">儲存</span></button></div>
+</div></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo" style="font-size:18px;font-weight:900;letter-spacing:-.01em;color:var(--gd)">Just<span style="color:var(--g)">Toilet</span></div>
+  <div class="tb-c">
+    <div class="apill" id="apill" onclick="go('alerts')"><span class="blink"></span><span id="ptxt">7 個異常</span></div>
+  </div>
+  <div class="tb-r">
+    <span class="clk" id="clk"></span>
+    <div style="display:flex;align-items:center;gap:5px;margin-right:2px">
+      <span style="font-size:11px;color:var(--mu)" id="thm-lbl">☀️</span>
+      <button class="thm-btn" id="thm-btn" onclick="toggleTheme()" title="深色/淺色切換"></button>
+    </div>
+    <button class="btn" id="lang-btn" onclick="toggleLang()" style="font-weight:700;min-width:52px;letter-spacing:.04em">EN</button>
+    <button class="btn" onclick="toast(LANG==='zh'?'資料已刷新':'Data refreshed')">
+      <span class="i18n">刷新</span>
+    </button>
+    <button class="btn pri" id="addbtn" style="display:none" onclick="handleAdd()">＋ <span class="i18n">新增</span></button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside id="SB">
+    <div class="snav">
+      <div class="sb-sec">主要</div>
+      <button class="sbtn" id="si-dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>儀表板</button>
+      <button class="sbtn" id="si-map" onclick="go('map')"><svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>地圖總覽</button>
+      <button class="sbtn" id="si-toilets" onclick="go('toilets')"><svg viewBox="0 0 24 24"><path d="M3 9h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M3 9V7a2 2 0 012-2h14a2 2 0 012 2v2"/></svg>廁所清單</button>
+      <div class="sb-div"></div>
+      <div class="sb-sec">任務</div>
+      <button class="sbtn" id="si-alerts" onclick="go('alerts')"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>異常告警<span class="snum r" id="sb-an">7</span></button>
+      <button class="sbtn" id="si-dispatch" onclick="go('dispatch')"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>派工管理<span class="snum a" id="sb-dn">5</span></button>
+      <button class="sbtn" id="si-ai" onclick="go('ai')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>AI 預測派工<span class="snum b" id="sb-ain">!</span></button>
+      <div class="sb-div"></div>
+      <div class="sb-sec">人員管理</div>
+      <button class="sbtn" id="si-vendors" onclick="go('vendors')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>清潔公司<span class="snum b">5</span></button>
+      <button class="sbtn" id="si-staff" onclick="go('staff')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>人員管理<span class="snum g" id="sb-sn">52</span></button>
+      <button class="sbtn" id="si-schedule" onclick="go('schedule')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>排班管理</button>
+    </div>
+    <div class="sbfoot"><div class="sbav">PM</div><div><div style="font-size:13px;font-weight:700;">系統管理員</div><div style="font-size:11px;color:var(--mu)">捷運公司</div></div></div>
+  </aside>
+
+  <!-- CONTENT AREA -->
+  <div id="CA">
+
+    <!-- DASHBOARD -->
+    <div id="pg-dashboard" class="pg">
+      <div class="dw">
+        <div class="kg">
+          <div class="kc cr" onclick="go('alerts')"><div class="kl">本週異常次數</div><div class="kv kvr" id="kwerr">23</div><div class="ks">比上週 ↑3 次</div></div>
+          <div class="kc ca" onclick="go('alerts')"><div class="kl">本週預警次數</div><div class="kv kva" id="kwwarn">47</div><div class="ks">比上週 ↓8 次</div></div>
+          <div class="kc cg"><div class="kl">本月完成率</div><div class="kv kvg">97.2%</div><div class="ks">目標 95%，達成</div></div>
+          <div class="kc cb" onclick="go('staff')"><div class="kl">今日出勤人員</div><div class="kv kvb" id="kduty">38</div><div class="ks">共 52 名員工</div></div>
+        </div>
+        <div class="kg" style="margin-bottom:18px">
+          <div class="kc cr"><div class="kl">本月異常總次數</div><div class="kv kvr">89</div><div class="ks">比上月 ↓12 次</div></div>
+          <div class="kc ca"><div class="kl">本月預警總次數</div><div class="kv kva">186</div><div class="ks">比上月 ↓31 次</div></div>
+          <div class="kc cg"><div class="kl">狀態良好廁所</div><div class="kv kvg" id="kokn">17</div><div class="ks">共 145 個點位</div></div>
+          <div class="kc cb"><div class="kl">民眾滿意度</div><div class="kv kvb">4.3★</div><div class="ks">共 2,841 筆評分</div></div>
+        </div>
+        <div class="g2">
+          <div class="panel">
+            <div class="ph"><div class="pt">每週異常 / 預警趨勢</div>
+              <div style="display:flex;gap:5px"><button class="btn sm" id="cbw" onclick="swChart('week')" style="background:var(--gl);border-color:var(--gm);color:var(--gd)">本週</button><button class="btn sm" id="cbm" onclick="swChart('month')">本月</button></div>
+            </div>
+            <div class="pb"><canvas id="tchart" height="150"></canvas></div>
+          </div>
+          <div class="panel"><div class="ph"><div class="pt">AI 建議 / 推薦廁所</div></div><div class="pb" id="airecs"></div></div>
+        </div>
+        <div class="g3">
+          <div class="panel"><div class="ph"><div class="pt">廁所評分排行（優）</div></div><div class="pb" id="rbest"></div></div>
+          <div class="panel"><div class="ph"><div class="pt">需要關注（差）</div></div><div class="pb" id="rworst"></div></div>
+          <div class="panel"><div class="ph"><div class="pt">本月異常類型分佈</div></div><div class="pb"><canvas id="pchart" height="175"></canvas></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div id="pg-map" class="pg" style="flex-direction:row;">
+      <div class="mapsec">
+        <div class="catbar">
+          <span class="catlbl">分類</span>
+          <button class="cc om" id="cc-mrt" onclick="togCat(this,'mrt')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M12 7v5l3 3"/><circle cx="7" cy="17" r="1.5" fill="currentColor"/><circle cx="17" cy="17" r="1.5" fill="currentColor"/></svg>捷運</button>
+          <button class="cc op" id="cc-park" onclick="togCat(this,'park')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L8 9H3l4 5-2 8h14l-2-8 4-5h-5z"/></svg>公園</button>
+          <button class="cc oc" id="cc-cvs" onclick="togCat(this,'cvs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4"/><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>便利商店</button>
+          <button class="cc ou" id="cc-pub" onclick="togCat(this,'pub')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22V8l9-6 9 6v14"/><path d="M9 22V12h6v10"/></svg>公廁</button>
+          <button class="cc" id="cc-gas" onclick="togCat(this,'gas')" style="background:#fff7ed;border-color:#fed7aa;color:#c2410c">⛽ 加油站</button>
+          <button class="cc" id="cc-temple" onclick="togCat(this,'temple')" style="background:#faf5ff;border-color:#d8b4fe;color:#7e22ce">🏯 廟宇</button>
+          <div class="csep"></div>
+          <div class="mlr">
+            <button class="mlb on" id="lb-cl" onclick="togML('cl',this)">清潔員</button>
+            <button class="mlb" id="lb-rt" onclick="togML('rt',this)">路線</button>
+            <button class="mlb" id="lb-dk" onclick="togDark(this)">深色底圖</button>
+          </div>
+        </div>
+        <div id="leafmap"></div>
+        <div class="mapleg">
+          <div class="legi"><div class="legdot" style="background:#1d9e75"></div><span data-zh="正常" data-en="Normal">正常</span></div>
+          <div class="legi"><div class="legdot" style="background:#f59e0b"></div><span data-zh="預警" data-en="Warning">預警</span></div>
+          <div class="legi"><div class="legdot" style="background:#e24b4a"></div><span data-zh="異常" data-en="Alert">異常</span></div>
+        </div>
+      </div>
+      <div class="rp">
+        <div class="rpkpi">
+          <div class="rpkc" onclick="go('alerts')"><div class="rpkl">異常</div><div class="rpkv kvr" id="rperr">2</div></div>
+          <div class="rpkc" onclick="go('alerts')"><div class="rpkl">預警</div><div class="rpkv kva" id="rpwarn">5</div></div>
+          <div class="rpkc" onclick="go('dispatch')"><div class="rpkl">進行任務</div><div class="rpkv kvg" id="rptask">4</div></div>
+        </div>
+        <div class="rptabs">
+          <div class="rptab on" id="rpt-al" onclick="swRP('al')">告警</div>
+          <div class="rptab" id="rpt-dp" onclick="swRP('dp')">派工</div>
+          <div class="rptab" id="rpt-vd" onclick="swRP('vd')">公司</div>
+          <div class="rptab" id="rpt-sf" onclick="swRP('sf')">人員</div>
+        </div>
+        <div class="rpbody">
+          <div id="rpp-al"></div>
+          <div id="rpp-dp" style="display:none"></div>
+          <div id="rpp-vd" style="display:none"></div>
+          <div id="rpp-sf" style="display:none"></div>
+        </div>
+      </div>
+      <div class="drawer" id="drawer">
+        <div class="drh"><div><div class="drttl" id="dn"></div><div class="drsub" id="ds"></div></div><button class="drx" onclick="cDrawer()">✕</button></div>
+        <div class="drbody">
+          <!-- 即時狀態 -->
+          <div class="drsec"><div class="drsl"><span data-zh="即時狀態" data-en="Live Status">即時狀態</span></div>
+            <div class="dr2">
+              <div class="drstat"><div class="drstl"><span data-zh="狀態" data-en="Status">狀態</span></div><div class="drstv" id="dst">—</div></div>
+              <div class="drstat"><div class="drstl"><span data-zh="預估等候" data-en="Est. Wait">預估等候</span></div><div class="drstv dvb" id="dwt">—</div></div>
+            </div>
+            <div class="dr2" style="margin-top:6px">
+              <div class="drstat"><div class="drstl"><span data-zh="今日使用次數" data-en="Uses Today">今日使用次數</span></div><div class="drstv" id="dus" style="font-size:15px">—</div></div>
+              <div class="drstat"><div class="drstl"><span data-zh="廁所評分" data-en="Score">廁所評分</span></div><div class="drstv dvg" id="dsc">—</div></div>
+            </div>
+          </div>
+          <!-- 感測數值 -->
+          <div class="drsec"><div class="drsl"><span data-zh="感測數值" data-en="Sensors">感測數值</span></div>
+            <div class="drbar"><div class="drbt"><span><span data-zh="NH₃ 臭味指數" data-en="NH₃ Odor Level">NH₃ 臭味指數</span></span><span class="drbv" id="dnh">—</span></div><div class="drbg"><div class="drbf" id="dnh-f" style="width:0%"></div></div></div>
+            <div class="drbar"><div class="drbt"><span><span data-zh="衛生紙餘量" data-en="Paper Remaining">衛生紙餘量</span></span><span class="drbv" id="dpp">—</span></div><div class="drbg"><div class="drbf" id="dpp-f" style="width:0%"></div></div></div>
+            <div class="drbar"><div class="drbt"><span><span data-zh="洗手乳餘量" data-en="Soap Remaining">洗手乳餘量</span></span><span class="drbv" id="dsp">—</span></div><div class="drbg"><div class="drbf" id="dsp-f" style="width:0%"></div></div></div>
+          </div>
+
+          <!-- 派工狀況 -->
+          <div class="drsec"><div class="drsl"><span data-zh="派工狀況" data-en="Dispatch Status">派工狀況</span></div><div id="d-dispatch-info" style="font-size:13px"></div></div>
+          <!-- 位置與設施 -->
+          <div class="drsec"><div class="drsl"><span data-zh="位置資訊" data-en="Location">位置資訊</span></div>
+            <div class="dri"><span class="dril" data-zh="類型" data-en="Type">類型</span><span class="driv" id="dtp">—</span></div>
+            <div class="dri"><span class="dril" data-zh="樓層" data-en="Floor">樓層</span><span class="driv" id="dfl">—</span></div>
+            <div class="dri"><span class="dril" data-zh="最近出口" data-en="Exit">最近出口</span><span class="driv" id="dex">—</span></div>
+            <div class="dri"><span class="dril" data-zh="地址" data-en="Address">地址</span><span class="driv" id="dadr" style="font-weight:400;font-size:12px">—</span></div>
+            <div class="dri"><span class="dril" data-zh="停車位" data-en="Parking">停車位</span><span class="driv" id="dpk">—</span></div>
+            <div class="dri"><span class="dril" data-zh="營業時間" data-en="Hours">營業時間</span><span class="driv" id="dhours">—</span></div>
+            <div class="dri"><span class="dril" data-zh="打烊狀態" data-en="Open/Closed">打烊狀態</span><span class="driv" id="dopen">—</span></div>
+          </div>
+          <div class="drsec"><div class="drsl"><span data-zh="設施" data-en="Facilities">設施</span></div><div class="drfacs" id="dfac"></div></div>
+          <!-- 負責公司 -->
+          <div class="drsec"><div class="drsl"><span data-zh="負責清潔公司" data-en="Cleaning Vendor">負責清潔公司</span></div><div id="d-vendor-info" style="font-size:13px"></div></div>
+          <div style="display:flex;gap:7px;margin-top:14px">
+            <button class="drdpbtn" onclick="oDP(currDid)" style="flex:1"><span data-zh="手動指派任務" data-en="Manual Dispatch">手動指派任務</span></button>
+            <button onclick="aiQuickDispatch(currDid)" style="flex:1;padding:12px;background:var(--b);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--fn)"><span data-zh="AI 自動派工" data-en="AI Auto-Dispatch">AI 自動派工</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOILETS -->
+    <div id="pg-toilets" class="pg flex">
+      <div class="tbbar">
+        <div class="sbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="tq" placeholder="搜尋廁所名稱…" oninput="rT()"></div>
+        <button class="fc on" id="tf-all" onclick="setTF('all',this)">全部</button>
+        <button class="fc" id="tf-err" onclick="setTF('err',this)">異常</button>
+        <button class="fc" id="tf-warn" onclick="setTF('warn',this)">預警</button>
+        <button class="fc" id="tf-ok" onclick="setTF('ok',this)">正常</button>
+        <button class="fc" id="tf-mrt" onclick="setTF('mrt',this)">🚇 捷運</button>
+        <button class="fc" id="tf-park" onclick="setTF('park',this)">🌳 公園</button>
+        <button class="fc" id="tf-cvs" onclick="setTF('cvs',this)">🏪 便利商店</button>
+        <button class="fc" id="tf-pub" onclick="setTF('pub',this)">🏛️ 公廁</button>
+        <button class="fc" id="tf-gas" onclick="setTF('gas',this)">⛽ 加油站</button>
+        <button class="fc" id="tf-temple" onclick="setTF('temple',this)">🏯 廟宇</button>
+      </div>
+      <div class="twrap"><table><thead><tr><th>廁所名稱</th><th>類型</th><th>狀態</th><th>NH₃</th><th>衛生紙</th><th>洗手乳</th><th>等候</th><th>停車</th><th>設施</th><th>負責公司</th><th id="th-hours">營業時間</th><th id="th-crowd">人流預測</th><th>操作</th></tr></thead><tbody id="ttbody"></tbody></table></div>
+    </div>
+
+    <!-- ALERTS -->
+    <div id="pg-alerts" class="pg flex">
+      <div class="albar">
+        <button class="fc on" id="af-all" onclick="setAF('all',this)">全部</button>
+        <button class="fc" id="af-err" onclick="setAF('err',this)">異常</button>
+        <button class="fc" id="af-warn" onclick="setAF('warn',this)">預警</button>
+        <button class="fc" id="af-mrt" onclick="setAF('mrt',this)">🚇 捷運</button>
+        <button class="fc" id="af-park" onclick="setAF('park',this)">🌳 公園</button>
+        <button class="fc" id="af-cvs" onclick="setAF('cvs',this)">🏪 便利商店</button>
+        <button class="fc" id="af-pub" onclick="setAF('pub',this)">🏛️ 公廁</button>
+        <button class="fc" id="af-gas" onclick="setAF('gas',this)">⛽ 加油站</button>
+        <button class="fc" id="af-temple" onclick="setAF('temple',this)">🏯 廟宇</button>
+        <button class="btn pri sm" style="margin-left:auto" onclick="autoDP()">🤖 AI 自動派工全部</button>
+      </div>
+      <div class="allist" id="allist"></div>
+    </div>
+
+    <!-- DISPATCH -->
+    <div id="pg-dispatch" class="pg flex">
+      <div class="dpwrap">
+        <div class="dpleft">
+          <div class="autobanner">
+            <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--gd);margin-bottom:2px">自動派工引擎</div><div style="font-size:13px;color:var(--mu)">依距離、SLA、人員狀態自動計算最佳組合</div></div>
+            <button class="btn pri" onclick="autoDP()">🤖 AI 自動派工全部</button>
+          </div>
+          <div id="dplist"></div>
+        </div>
+        <div class="dpright"><div style="font-size:13px;font-weight:700;color:var(--mu);margin-bottom:9px;text-transform:uppercase;letter-spacing:.05em">人員即時狀態</div><div id="dpcllist"></div></div>
+      </div>
+    </div>
+
+    <!-- AI PREDICTION -->
+    <div id="pg-ai" class="pg flex">
+      <div style="display:flex;gap:0;flex:1;overflow:hidden;">
+        <!-- Left: AI insights -->
+        <div style="flex:1;overflow-y:auto;padding:18px;border-right:1px solid var(--bd);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--bl);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+            <div><div style="font-size:16px;font-weight:800;color:var(--gd)">AI 預測派工引擎</div><div style="font-size:13px;color:var(--mu)">根據感測數據、歷史模式、人流預測自動規劃最佳派工</div></div>
+            <button class="btn pri" style="margin-left:auto" onclick="runAIDispatch()">▶ 執行 AI 派工</button>
+          </div>
+          <!-- Risk ranking -->
+          <div style="background:var(--s);border-radius:11px;border:1px solid var(--bd);margin-bottom:14px;">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;">
+              <div style="font-size:14px;font-weight:700;" id="ai-risk-ttl">⚠️ 風險排行（AI 評估）</div>
+              <span style="font-size:12px;color:var(--mu)"><span data-zh="即時更新" data-en="Live">即時更新</span></span>
+            </div>
+            <div id="ai-risk-list" style="padding:4px 0;"></div>
+          </div>
+
+          <!-- AI suggestions -->
+          <div style="background:var(--s);border-radius:11px;border:1px solid var(--bd);margin-bottom:14px;">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:14px;font-weight:700;" id="ai-sugg-ttl">派工建議行動</div>
+              <div style="font-size:12px;color:var(--mu)"><span data-zh="點擊立即執行" data-en="Click to Execute">點擊立即執行</span></div>
+            </div>
+            <div id="ai-suggestions" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+
+          <!-- 🔥 高流量廁所監控 -->
+          <div style="background:var(--s);border-radius:11px;border:1px solid var(--bd);">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:28px;height:28px;border-radius:8px;background:var(--rl);display:flex;align-items:center;justify-content:center;font-size:14px;">🔥</div>
+                <div style="font-size:14px;font-weight:700;">高流量廁所即時監控</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:var(--mu)">依當前人流排序</span>
+                <button class="btn sm pri" onclick="dispatchAllHotspots()">⚡ 全部加注派工</button>
+              </div>
+            </div>
+            <div id="ai-crowd-list" style="padding:4px 0;"></div>
+          </div>
+        </div>
+        <!-- Right: Auto-dispatch queue -->
+        <div style="width:350px;flex-shrink:0;overflow-y:auto;background:var(--bg);padding:16px;">
+          <!-- 人流熱點快覽 -->
+          <div style="background:var(--s);border-radius:9px;border:1px solid var(--bd);margin-bottom:12px;overflow:hidden;">
+            <div style="padding:9px 13px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px;">
+              <span style="font-size:13px;">🔥</span>
+              <div style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;" id="ai-hotspot-ttl">人流熱點 Top 5</div>
+            </div>
+            <div id="ai-crowd-mini" style="padding:4px 0;"></div>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--mu);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em" id="ai-queue-ttl">AI 派工佇列</div>
+          <div id="ai-dispatch-queue" style="display:flex;flex-direction:column;gap:7px;"></div>
+          <div style="margin-top:14px;padding:12px 14px;background:var(--gl);border-radius:9px;border:1px solid var(--gm);">
+            <div style="font-size:13px;font-weight:700;color:var(--gd);margin-bottom:4px"><span data-zh="派工統計" data-en="Dispatch Stats">派工統計</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+              <div style="background:var(--s);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--gd)" id="ai-stat-done">0</div><div style="font-size:11px;color:var(--mu)"><span data-zh="今日完成" data-en="Done Today">今日完成</span></div></div>
+              <div style="background:var(--s);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#1d4ed8" id="ai-stat-pending">0</div><div style="font-size:11px;color:var(--mu)"><span data-zh="待派工" data-en="Pending">待派工</span></div></div>
+              <div style="background:var(--s);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#92400e" id="ai-stat-eta">14</div><div style="font-size:11px;color:var(--mu)"><span data-zh="平均到達(分)" data-en="Avg ETA(min)">平均到達(分)</span></div></div>
+              <div style="background:var(--s);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--gd)">97%</div><div style="font-size:11px;color:var(--mu)"><span data-zh="SLA達成率" data-en="SLA Rate">SLA達成率</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VENDORS -->
+    <div id="pg-vendors" class="pg" style="overflow-y:auto;">
+      <div class="vgrid" id="vgrid"></div>
+    </div>
+
+    <!-- STAFF -->
+    <div id="pg-staff" class="pg flex">
+      <div class="sfbar">
+        <div class="sbox"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="sfq" placeholder="搜尋人員姓名…" oninput="rSF()"></div>
+        <select class="fi fc" id="sf-vf" onchange="rSF()" style="width:auto;padding:5px 11px;border-radius:100px"><option value="">全部公司</option></select>
+        <select class="fi fc" id="sf-sf" onchange="rSF()" style="width:auto;padding:5px 11px;border-radius:100px"><option value="">全部狀態</option><option value="on">值班中</option><option value="off">休息</option></select>
+      </div>
+      <div class="twrap"><table><thead><tr><th>姓名</th><th>員工編號</th><th>職稱</th><th>所屬公司</th><th>班別</th><th>狀態</th><th>電話</th><th>到職日</th><th>操作</th></tr></thead><tbody id="sftbody"></tbody></table></div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div id="pg-schedule" class="pg" style="overflow-y:auto;">
+      <div class="scwrap">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="font-size:15px;font-weight:800">本週排班表</div>
+          <select class="fi" id="scv" onchange="rSC()" style="width:auto;padding:6px 11px;font-size:14px"></select>
+          <button class="btn pri" onclick="toast(LANG==='en'?'Schedule saved':'排班已儲存')">儲存排班</button>
+          <button class="btn" onclick="toast(LANG==='en'?'Schedule exported':'排班已匯出')">匯出 PDF</button>
+          <button class="btn" onclick="toast(LANG==='en'?'Schedule notification sent':'已發送排班通知')">發送通知</button>
+        </div>
+        <div style="overflow-x:auto"><div class="sg" id="scgrid"></div></div>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;font-size:13px">
+          <span style="display:flex;align-items:center;gap:4px"><span class="sgsh sham" style="padding:2px 8px">早班</span>07:00–15:00</span>
+          <span style="display:flex;align-items:center;gap:4px"><span class="sgsh shpm" style="padding:2px 8px">午班</span>11:00–19:00</span>
+          <span style="display:flex;align-items:center;gap:4px"><span class="sgsh shfull" style="padding:2px 8px">全班</span>08:00–20:00</span>
+          <span style="display:flex;align-items:center;gap:4px"><span class="sgsh shoff" style="padding:2px 8px">休</span>休假</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /CA -->
+</div><!-- /layout -->
+
+<!-- iNavi SDK injected dynamically -->
+<script>
+// ── DATA ──
+const EMOJ={mrt:'🚇',park:'🌳',cvs:'🏪',pub:'🏛️',gas:'⛽',temple:'🏯'};
+let LANG='zh';
+// i18n shorthand: T_(zh, en)
+const T_=(zh,en)=>LANG==='en'?en:zh;
+// Task type display translation
+function tpName(tp){
+  const m={'補充衛生紙':'Restock Paper','補充洗手乳':'Restock Soap','緊急清潔':'Urgent Cleaning',
+    '清潔':'Cleaning','維修':'Repair','巡檢':'Inspection','加注清潔（高流量）':'Boost Cleaning'};
+  return LANG==='en'?(m[tp]||tp):tp;
+}
+// Locale-aware time string
+function nowStr(){return new Date().toLocaleTimeString(LANG==='en'?'en-US':'zh-TW',{hour:'2-digit',minute:'2-digit'});}
+const CNAME_ZH={mrt:'捷運',park:'公園',cvs:'便利商店',pub:'公廁',gas:'加油站',temple:'廟宇'};
+const CNAME_EN={mrt:'MRT',park:'Park',cvs:'CVS',pub:'Public',gas:'Gas Station',temple:'Temple'};
+const CNAME={mrt:'捷運',park:'公園',cvs:'便利商店',pub:'公廁',gas:'加油站',temple:'廟宇'};
+function CN(cat){return LANG==='en'?CNAME_EN[cat]:CNAME_ZH[cat];}
+const CSVG={
+  mrt:`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8.5" cy="16" r="1.5"/><circle cx="15.5" cy="16" r="1.5"/><rect x="6" y="6" width="12" height="7" rx="2" fill="none" stroke="white" stroke-width="1.8"/></svg>`,
+  park:`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2L6 10H3l5 5-2 7h12l-2-7 5-5h-3z"/></svg>`,
+  cvs:`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>`,
+  pub:`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2L3 8v13h6v-5h6v5h6V8z"/></svg>`,
+  gas:`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 22V6l6-4h6l6 4v16"/><path d="M3 11h18"/><path d="M15 22v-5H9v5"/></svg>`,
+  temple:`<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7h20L12 2zm0 0v20M2 7v15h20V7"/><path d="M9 22V12h6v10"/></svg>`,
+};
+let T=[
+  // ── 台北捷運（文湖線）──
+  {id:1,name:'南港展覽館站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市南港區',lat:25.0553,lng:121.6183,s:'ok',nh:9,pp:82,sp:78,us:210,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:91},
+  {id:2,name:'南港站',cat:'mrt',fl:'B1',ex:'出口4',addr:'台北市南港區',lat:25.0552,lng:121.6071,s:'ok',nh:11,pp:75,sp:70,us:188,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:87},
+  {id:3,name:'昆陽站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市南港區',lat:25.0509,lng:121.5963,s:'ok',nh:14,pp:68,sp:65,us:155,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:83},
+  {id:4,name:'後山埤站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市信義區',lat:25.0438,lng:121.5810,s:'ok',nh:16,pp:72,sp:60,us:132,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:81},
+  {id:5,name:'永春站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市信義區',lat:25.0411,lng:121.5747,s:'warn',nh:32,pp:24,sp:38,us:178,wt:8,ac:1,fm:0,nr:0,h24:0,vid:1,sc:57},
+  {id:6,name:'市政府站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市信義區',lat:25.0409,lng:121.5672,s:'ok',nh:10,pp:79,sp:74,us:224,wt:4,ac:1,fm:1,nr:0,h24:0,vid:1,sc:88},
+  {id:7,name:'國父紀念館站',cat:'mrt',fl:'B1',ex:'出口4',addr:'台北市大安區',lat:25.0407,lng:121.5582,s:'ok',nh:13,pp:81,sp:76,us:267,wt:5,ac:1,fm:1,nr:0,h24:0,vid:1,sc:85},
+  {id:8,name:'忠孝復興站 B1',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市大安區',lat:25.0418,lng:121.5441,s:'ok',nh:12,pp:72,sp:68,us:143,wt:3,ac:1,fm:1,nr:0,h24:0,vid:1,sc:92},
+  {id:9,name:'忠孝敦化站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市大安區',lat:25.0416,lng:121.5509,s:'ok',nh:11,pp:77,sp:72,us:198,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:86},
+  {id:10,name:'南京復興站',cat:'mrt',fl:'B1',ex:'出口5',addr:'台北市中山區',lat:25.0518,lng:121.5441,s:'err',nh:61,pp:5,sp:8,us:287,wt:15,ac:0,fm:0,nr:0,h24:0,vid:5,sc:28},
+  {id:11,name:'中山國中站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市中山區',lat:25.0594,lng:121.5441,s:'ok',nh:13,pp:70,sp:65,us:145,wt:4,ac:1,fm:0,nr:0,h24:0,vid:5,sc:82},
+  {id:12,name:'松山機場站',cat:'mrt',fl:'B1',ex:'出口4',addr:'台北市松山區',lat:25.0632,lng:121.5513,s:'ok',nh:8,pp:88,sp:85,us:312,wt:3,ac:1,fm:1,nr:1,h24:1,vid:5,sc:95},
+  {id:13,name:'大直站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市中山區',lat:25.0732,lng:121.5500,s:'ok',nh:15,pp:65,sp:62,us:122,wt:4,ac:1,fm:0,nr:0,h24:0,vid:5,sc:79},
+  {id:14,name:'劍南路站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市中山區',lat:25.0803,lng:121.5539,s:'ok',nh:12,pp:74,sp:71,us:135,wt:3,ac:1,fm:0,nr:0,h24:0,vid:5,sc:84},
+  // ── 台北捷運（淡水信義線）──
+  {id:15,name:'淡水站',cat:'mrt',fl:'1F',ex:'出口1',addr:'新北市淡水區',lat:25.1642,lng:121.4468,s:'ok',nh:10,pp:79,sp:74,us:320,wt:5,ac:1,fm:1,nr:0,h24:0,vid:1,sc:88},
+  {id:16,name:'紅樹林站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市淡水區',lat:25.1460,lng:121.4583,s:'ok',nh:14,pp:71,sp:66,us:178,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:82},
+  {id:17,name:'竹圍站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市淡水區',lat:25.1283,lng:121.4649,s:'ok',nh:16,pp:68,sp:62,us:155,wt:4,ac:0,fm:0,nr:0,h24:0,vid:1,sc:78},
+  {id:18,name:'關渡站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市北投區',lat:25.1143,lng:121.4746,s:'ok',nh:12,pp:75,sp:70,us:188,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:85},
+  {id:19,name:'忠義站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市北投區',lat:25.1092,lng:121.4849,s:'ok',nh:13,pp:72,sp:68,us:132,wt:3,ac:0,fm:0,nr:0,h24:0,vid:1,sc:80},
+  {id:20,name:'復興崗站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市北投區',lat:25.1033,lng:121.4933,s:'ok',nh:11,pp:78,sp:73,us:145,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:83},
+  {id:21,name:'唭哩岸站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市北投區',lat:25.0962,lng:121.5014,s:'ok',nh:14,pp:69,sp:65,us:122,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:79},
+  {id:22,name:'石牌站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市北投區',lat:25.0904,lng:121.5085,s:'ok',nh:16,pp:66,sp:61,us:168,wt:5,ac:1,fm:0,nr:0,h24:0,vid:1,sc:76},
+  {id:23,name:'明德站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市士林區',lat:25.0835,lng:121.5143,s:'warn',nh:35,pp:27,sp:32,us:198,wt:9,ac:0,fm:0,nr:0,h24:0,vid:1,sc:54},
+  {id:24,name:'芝山站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市士林區',lat:25.0910,lng:121.5230,s:'ok',nh:12,pp:74,sp:70,us:144,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:82},
+  {id:25,name:'士林站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市士林區',lat:25.0939,lng:121.5260,s:'ok',nh:11,pp:80,sp:76,us:278,wt:4,ac:1,fm:1,nr:0,h24:0,vid:1,sc:87},
+  {id:26,name:'劍潭站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市士林區',lat:25.0852,lng:121.5218,s:'ok',nh:13,pp:75,sp:71,us:234,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:84},
+  {id:27,name:'圓山站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市中山區',lat:25.0715,lng:121.5202,s:'ok',nh:9,pp:83,sp:79,us:189,wt:3,ac:1,fm:1,nr:0,h24:0,vid:5,sc:89},
+  {id:28,name:'民權西路站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市中山區',lat:25.0637,lng:121.5195,s:'ok',nh:14,pp:72,sp:68,us:212,wt:4,ac:1,fm:0,nr:0,h24:0,vid:5,sc:82},
+  {id:29,name:'中山站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市中山區',lat:25.0524,lng:121.5231,s:'ok',nh:13,pp:77,sp:72,us:162,wt:4,ac:1,fm:0,nr:0,h24:0,vid:5,sc:86},
+  {id:30,name:'台北車站',cat:'mrt',fl:'B1',ex:'出口M7',addr:'台北市中正區',lat:25.0476,lng:121.5172,s:'ok',nh:8,pp:88,sp:84,us:456,wt:3,ac:1,fm:1,nr:1,h24:1,vid:4,sc:94},
+  {id:31,name:'中正紀念堂站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市中正區',lat:25.0345,lng:121.5211,s:'warn',nh:35,pp:28,sp:40,us:298,wt:10,ac:1,fm:0,nr:0,h24:0,vid:4,sc:55},
+  {id:32,name:'東門站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市中正區',lat:25.0336,lng:121.5276,s:'ok',nh:18,pp:78,sp:55,us:156,wt:5,ac:0,fm:0,nr:0,h24:0,vid:4,sc:80},
+  {id:33,name:'大安森林公園站',cat:'mrt',fl:'B1',ex:'出口4',addr:'台北市大安區',lat:25.0280,lng:121.5362,s:'ok',nh:10,pp:65,sp:72,us:132,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:85},
+  {id:34,name:'大安站',cat:'mrt',fl:'B1',ex:'出口4',addr:'台北市大安區',lat:25.0254,lng:121.5434,s:'ok',nh:12,pp:71,sp:67,us:145,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:83},
+  {id:35,name:'信義安和站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市大安區',lat:25.0280,lng:121.5529,s:'ok',nh:11,pp:76,sp:72,us:168,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:84},
+  {id:36,name:'台北101/世貿站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市信義區',lat:25.0339,lng:121.5645,s:'ok',nh:9,pp:89,sp:86,us:312,wt:3,ac:1,fm:1,nr:1,h24:0,vid:4,sc:93},
+  {id:37,name:'象山站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市信義區',lat:25.0275,lng:121.5798,s:'ok',nh:16,pp:68,sp:62,us:143,wt:5,ac:1,fm:0,nr:0,h24:0,vid:4,sc:83},
+  // ── 台北捷運（中和新蘆線）──
+  {id:38,name:'輔大站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市新莊區',lat:24.9974,lng:121.4398,s:'ok',nh:13,pp:74,sp:70,us:198,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:82},
+  {id:39,name:'新莊站',cat:'mrt',fl:'B1',ex:'出口3',addr:'新北市新莊區',lat:25.0346,lng:121.4527,s:'ok',nh:15,pp:69,sp:65,us:178,wt:5,ac:1,fm:0,nr:0,h24:0,vid:1,sc:78},
+  {id:40,name:'三重站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市三重區',lat:25.0596,lng:121.4831,s:'warn',nh:38,pp:22,sp:28,us:234,wt:9,ac:1,fm:0,nr:0,h24:0,vid:1,sc:52},
+  {id:41,name:'菜寮站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市三重區',lat:25.0560,lng:121.4916,s:'ok',nh:14,pp:72,sp:67,us:145,wt:4,ac:0,fm:0,nr:0,h24:0,vid:1,sc:79},
+  {id:42,name:'台北橋站',cat:'mrt',fl:'B1',ex:'出口3',addr:'新北市三重區',lat:25.0579,lng:121.5024,s:'ok',nh:12,pp:75,sp:71,us:189,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:82},
+  {id:43,name:'大橋頭站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市大同區',lat:25.0602,lng:121.5073,s:'ok',nh:16,pp:66,sp:62,us:156,wt:5,ac:0,fm:0,nr:0,h24:0,vid:5,sc:76},
+  {id:44,name:'中和站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市中和區',lat:24.9999,lng:121.5000,s:'ok',nh:13,pp:74,sp:70,us:212,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:81},
+  {id:45,name:'永安市場站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市中和區',lat:25.0070,lng:121.5057,s:'ok',nh:11,pp:78,sp:74,us:178,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:84},
+  {id:46,name:'景安站',cat:'mrt',fl:'B1',ex:'出口3',addr:'新北市中和區',lat:25.0124,lng:121.5127,s:'warn',nh:34,pp:26,sp:31,us:223,wt:8,ac:0,fm:0,nr:0,h24:0,vid:1,sc:55},
+  {id:47,name:'南勢角站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市中和區',lat:25.0009,lng:121.5151,s:'ok',nh:14,pp:72,sp:68,us:188,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:80},
+  // ── 台北捷運（板南線）──
+  {id:48,name:'頂埔站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市土城區',lat:24.9703,lng:121.4323,s:'ok',nh:12,pp:76,sp:72,us:145,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:83},
+  {id:49,name:'永寧站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市土城區',lat:24.9760,lng:121.4433,s:'ok',nh:14,pp:71,sp:67,us:167,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:79},
+  {id:50,name:'土城站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市土城區',lat:24.9738,lng:121.4527,s:'ok',nh:11,pp:79,sp:74,us:198,wt:3,ac:1,fm:1,nr:0,h24:0,vid:1,sc:86},
+  {id:51,name:'亞東醫院站',cat:'mrt',fl:'B1',ex:'出口3',addr:'新北市板橋區',lat:24.9791,lng:121.4617,s:'ok',nh:9,pp:85,sp:80,us:267,wt:3,ac:1,fm:1,nr:1,h24:0,vid:1,sc:91},
+  {id:52,name:'府中站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市板橋區',lat:24.9991,lng:121.4619,s:'ok',nh:12,pp:77,sp:73,us:234,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:85},
+  {id:53,name:'板橋站',cat:'mrt',fl:'B1',ex:'出口5',addr:'新北市板橋區',lat:25.0143,lng:121.4617,s:'ok',nh:8,pp:88,sp:84,us:389,wt:3,ac:1,fm:1,nr:1,h24:1,vid:1,sc:94},
+  {id:54,name:'江子翠站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市板橋區',lat:25.0270,lng:121.4721,s:'ok',nh:13,pp:73,sp:69,us:167,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:80},
+  {id:55,name:'新埔站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市板橋區',lat:25.0303,lng:121.4807,s:'ok',nh:14,pp:70,sp:66,us:145,wt:4,ac:0,fm:0,nr:0,h24:0,vid:1,sc:77},
+  {id:56,name:'西門站',cat:'mrt',fl:'B2',ex:'出口3',addr:'台北市萬華區',lat:25.0426,lng:121.5070,s:'ok',nh:11,pp:80,sp:76,us:312,wt:4,ac:1,fm:1,nr:0,h24:0,vid:4,sc:88},
+  {id:57,name:'善導寺站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市中正區',lat:25.0447,lng:121.5222,s:'ok',nh:10,pp:83,sp:78,us:234,wt:3,ac:1,fm:0,nr:0,h24:0,vid:4,sc:89},
+  {id:58,name:'忠孝新生站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市大安區',lat:25.0443,lng:121.5328,s:'ok',nh:12,pp:78,sp:74,us:267,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:85},
+  {id:59,name:'忠孝敦化站 B3',cat:'mrt',fl:'B3',ex:'出口6',addr:'台北市大安區',lat:25.0416,lng:121.5509,s:'warn',nh:36,pp:25,sp:30,us:312,wt:10,ac:1,fm:0,nr:0,h24:0,vid:4,sc:53},
+  {id:60,name:'昆陽站 板南',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市南港區',lat:25.0479,lng:121.5869,s:'ok',nh:13,pp:74,sp:70,us:178,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:81},
+  // ── 台北捷運（松山新店線）──
+  {id:61,name:'新店區公所站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市新店區',lat:24.9655,lng:121.5380,s:'ok',nh:11,pp:79,sp:74,us:156,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:84},
+  {id:62,name:'新店站',cat:'mrt',fl:'B1',ex:'出口2',addr:'新北市新店區',lat:24.9552,lng:121.5417,s:'ok',nh:13,pp:73,sp:69,us:189,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:80},
+  {id:63,name:'七張站',cat:'mrt',fl:'B1',ex:'出口1',addr:'新北市新店區',lat:24.9637,lng:121.5367,s:'ok',nh:14,pp:70,sp:66,us:145,wt:4,ac:0,fm:0,nr:0,h24:0,vid:1,sc:77},
+  {id:64,name:'景美站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市文山區',lat:24.9913,lng:121.5382,s:'ok',nh:15,pp:68,sp:64,us:178,wt:5,ac:1,fm:0,nr:0,h24:0,vid:1,sc:76},
+  {id:65,name:'萬隆站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市文山區',lat:24.9996,lng:121.5362,s:'ok',nh:12,pp:75,sp:71,us:145,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:82},
+  {id:66,name:'公館站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市中正區',lat:25.0145,lng:121.5343,s:'ok',nh:10,pp:82,sp:77,us:312,wt:3,ac:1,fm:1,nr:0,h24:0,vid:4,sc:89},
+  {id:67,name:'台電大樓站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市中正區',lat:25.0213,lng:121.5329,s:'ok',nh:11,pp:79,sp:75,us:198,wt:3,ac:1,fm:0,nr:0,h24:0,vid:4,sc:86},
+  {id:68,name:'古亭站',cat:'mrt',fl:'B1',ex:'出口4',addr:'台北市中正區',lat:25.0268,lng:121.5271,s:'ok',nh:13,pp:76,sp:71,us:234,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:83},
+  {id:69,name:'科技大樓站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市大安區',lat:25.0231,lng:121.5433,s:'ok',nh:11,pp:82,sp:75,us:119,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:88},
+  {id:70,name:'六張犁站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市大安區',lat:25.0216,lng:121.5571,s:'warn',nh:40,pp:22,sp:35,us:167,wt:9,ac:0,fm:0,nr:0,h24:0,vid:4,sc:52},
+  {id:71,name:'麟光站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市信義區',lat:25.0235,lng:121.5548,s:'ok',nh:9,pp:75,sp:80,us:95,wt:2,ac:1,fm:0,nr:0,h24:0,vid:4,sc:91},
+  {id:72,name:'辛亥站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市文山區',lat:25.0163,lng:121.5497,s:'ok',nh:12,pp:74,sp:70,us:134,wt:4,ac:1,fm:0,nr:0,h24:0,vid:4,sc:81},
+  {id:73,name:'木柵站',cat:'mrt',fl:'B1',ex:'出口1',addr:'台北市文山區',lat:24.9986,lng:121.5636,s:'ok',nh:14,pp:70,sp:66,us:112,wt:4,ac:0,fm:0,nr:0,h24:0,vid:4,sc:78},
+  {id:74,name:'松山站',cat:'mrt',fl:'B1',ex:'出口3',addr:'台北市松山區',lat:25.0501,lng:121.5779,s:'ok',nh:10,pp:81,sp:76,us:245,wt:4,ac:1,fm:1,nr:0,h24:0,vid:5,sc:87},
+  {id:75,name:'南京三民站',cat:'mrt',fl:'B1',ex:'出口2',addr:'台北市松山區',lat:25.0514,lng:121.5681,s:'ok',nh:13,pp:74,sp:70,us:178,wt:4,ac:1,fm:0,nr:0,h24:0,vid:5,sc:81},
+  // ── 高雄捷運（紅線）──
+  {id:76,name:'南岡山站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市岡山區',lat:22.7968,lng:120.2971,s:'ok',nh:10,pp:80,sp:75,us:134,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:85},
+  {id:77,name:'橋頭火車站',cat:'mrt',fl:'B1',ex:'出口2',addr:'高雄市橋頭區',lat:22.7695,lng:120.3019,s:'ok',nh:12,pp:76,sp:71,us:156,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:82},
+  {id:78,name:'高雄車站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市三民區',lat:22.6396,lng:120.3014,s:'ok',nh:9,pp:84,sp:80,us:356,wt:3,ac:1,fm:1,nr:1,h24:1,vid:1,sc:93},
+  {id:79,name:'中央公園站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市新興區',lat:22.6297,lng:120.2974,s:'ok',nh:11,pp:80,sp:76,us:234,wt:4,ac:1,fm:1,nr:0,h24:0,vid:1,sc:87},
+  {id:80,name:'美麗島站',cat:'mrt',fl:'B1',ex:'出口3',addr:'高雄市新興區',lat:22.6264,lng:120.3013,s:'ok',nh:8,pp:88,sp:83,us:412,wt:3,ac:1,fm:1,nr:1,h24:0,vid:1,sc:94},
+  {id:81,name:'三多商圈站',cat:'mrt',fl:'B1',ex:'出口2',addr:'高雄市苓雅區',lat:22.6174,lng:120.3090,s:'ok',nh:12,pp:77,sp:73,us:267,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:84},
+  {id:82,name:'世運主場館站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市左營區',lat:22.7061,lng:120.2844,s:'ok',nh:13,pp:73,sp:69,us:145,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:80},
+  {id:83,name:'左營（高鐵）站',cat:'mrt',fl:'B1',ex:'出口4',addr:'高雄市左營區',lat:22.7003,lng:120.2929,s:'ok',nh:8,pp:87,sp:82,us:378,wt:3,ac:1,fm:1,nr:1,h24:1,vid:1,sc:93},
+  // ── 高雄捷運（橘線）──
+  {id:84,name:'大寮站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市大寮區',lat:22.5983,lng:120.3674,s:'ok',nh:14,pp:70,sp:66,us:112,wt:4,ac:0,fm:0,nr:0,h24:0,vid:1,sc:77},
+  {id:85,name:'鳳山西站',cat:'mrt',fl:'B1',ex:'出口2',addr:'高雄市鳳山區',lat:22.6274,lng:120.3585,s:'ok',nh:12,pp:75,sp:71,us:145,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:81},
+  {id:86,name:'鳳山站',cat:'mrt',fl:'B1',ex:'出口3',addr:'高雄市鳳山區',lat:22.6275,lng:120.3673,s:'ok',nh:11,pp:78,sp:74,us:178,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:83},
+  {id:87,name:'技擊館站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市苓雅區',lat:22.6270,lng:120.3133,s:'ok',nh:13,pp:74,sp:70,us:156,wt:4,ac:1,fm:0,nr:0,h24:0,vid:1,sc:80},
+  {id:88,name:'文化中心站',cat:'mrt',fl:'B1',ex:'出口2',addr:'高雄市苓雅區',lat:22.6265,lng:120.3206,s:'ok',nh:10,pp:82,sp:77,us:189,wt:3,ac:1,fm:1,nr:0,h24:0,vid:1,sc:87},
+  {id:89,name:'五塊厝站',cat:'mrt',fl:'B1',ex:'出口1',addr:'高雄市苓雅區',lat:22.6254,lng:120.3289,s:'ok',nh:12,pp:76,sp:72,us:145,wt:4,ac:0,fm:0,nr:0,h24:0,vid:1,sc:80},
+  {id:90,name:'衛武營站',cat:'mrt',fl:'B1',ex:'出口2',addr:'高雄市鳳山區',lat:22.6176,lng:120.3349,s:'ok',nh:11,pp:79,sp:75,us:178,wt:3,ac:1,fm:0,nr:0,h24:0,vid:1,sc:84},
+  // ── 7-ELEVEN（台北）──
+  {id:91,name:'7-ELEVEN 忠孝敦化門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市大安區忠孝東路四段218號',lat:25.0408,lng:121.5469,s:'err',nh:55,pp:8,sp:10,us:178,wt:5,ac:1,fm:0,nr:0,h24:1,vid:3,sc:38},
+  {id:92,name:'7-ELEVEN 信義威秀門市',cat:'cvs',fl:'B1',ex:'商場入口',addr:'台北市信義區松壽路20號',lat:25.0352,lng:121.5668,s:'ok',nh:8,pp:85,sp:80,us:245,wt:3,ac:1,fm:0,nr:0,h24:1,vid:3,sc:88},
+  {id:93,name:'7-ELEVEN 中山北門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市中山區中山北路一段139號',lat:25.0513,lng:121.5233,s:'ok',nh:10,pp:79,sp:74,us:198,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:82},
+  {id:94,name:'7-ELEVEN 南京復興門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市中山區南京東路三段68號',lat:25.0507,lng:121.5426,s:'ok',nh:12,pp:74,sp:70,us:167,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:79},
+  {id:95,name:'7-ELEVEN 公館門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市中正區羅斯福路四段70號',lat:25.0145,lng:121.5343,s:'ok',nh:11,pp:77,sp:73,us:212,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:81},
+  {id:96,name:'7-ELEVEN 士林站前門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市士林區中正路231號',lat:25.0939,lng:121.5260,s:'warn',nh:34,pp:27,sp:32,us:188,wt:8,ac:0,fm:0,nr:0,h24:1,vid:3,sc:56},
+  {id:97,name:'7-ELEVEN 木柵門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市文山區木柵路一段95號',lat:24.9986,lng:121.5636,s:'ok',nh:13,pp:72,sp:68,us:145,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:77},
+  {id:98,name:'7-ELEVEN 永和中山門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'新北市永和區中山路一段189號',lat:25.0148,lng:121.5235,s:'ok',nh:9,pp:82,sp:78,us:178,wt:3,ac:0,fm:0,nr:0,h24:1,vid:3,sc:85},
+  {id:99,name:'7-ELEVEN 板橋中正門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'新北市板橋區中正路102號',lat:25.0143,lng:121.4617,s:'ok',nh:11,pp:76,sp:72,us:156,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:80},
+  {id:100,name:'7-ELEVEN 新莊中正門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'新北市新莊區中正路82號',lat:25.0346,lng:121.4527,s:'ok',nh:14,pp:70,sp:65,us:134,wt:5,ac:0,fm:0,nr:0,h24:1,vid:3,sc:75},
+  // ── 全家便利商店（台北）──
+  {id:101,name:'全家 天母中山門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市士林區中山北路六段419號',lat:25.1023,lng:121.5264,s:'ok',nh:9,pp:83,sp:79,us:167,wt:3,ac:0,fm:0,nr:0,h24:1,vid:3,sc:86},
+  {id:102,name:'全家 忠孝復興門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市大安區忠孝東路三段280號',lat:25.0418,lng:121.5441,s:'ok',nh:10,pp:80,sp:75,us:198,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:83},
+  {id:103,name:'全家 信義微風門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市信義區松仁路58號',lat:25.0340,lng:121.5645,s:'ok',nh:8,pp:86,sp:82,us:234,wt:3,ac:0,fm:0,nr:0,h24:1,vid:3,sc:88},
+  {id:104,name:'全家 敦化南路門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市大安區敦化南路二段88號',lat:25.0316,lng:121.5499,s:'ok',nh:11,pp:77,sp:73,us:178,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:81},
+  {id:105,name:'全家 南港中研門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'台北市南港區研究院路二段28號',lat:25.0428,lng:121.6133,s:'ok',nh:12,pp:74,sp:70,us:145,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:78},
+  {id:106,name:'全家 三重重新門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'新北市三重區重新路五段609號',lat:25.0596,lng:121.4831,s:'ok',nh:13,pp:72,sp:67,us:156,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:76},
+  {id:107,name:'全家 新店中興門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'新北市新店區中興路三段168號',lat:24.9655,lng:121.5380,s:'ok',nh:10,pp:79,sp:74,us:134,wt:3,ac:0,fm:0,nr:0,h24:1,vid:3,sc:82},
+  {id:108,name:'全家 中和景安門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'新北市中和區景安路168號',lat:25.0124,lng:121.5127,s:'warn',nh:35,pp:26,sp:31,us:178,wt:8,ac:0,fm:0,nr:0,h24:1,vid:3,sc:54},
+  {id:109,name:'全家 高雄三多門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'高雄市苓雅區三多三路68號',lat:22.6174,lng:120.3090,s:'ok',nh:11,pp:78,sp:74,us:189,wt:4,ac:0,fm:0,nr:0,h24:1,vid:3,sc:80},
+  {id:110,name:'全家 高雄左營門市',cat:'cvs',fl:'1F',ex:'門市入口',addr:'高雄市左營區博愛二路468號',lat:22.7003,lng:120.2929,s:'ok',nh:9,pp:83,sp:79,us:156,wt:3,ac:0,fm:0,nr:0,h24:1,vid:3,sc:84},
+  // ── 公廁 & 公園（保留）──
+  {id:111,name:'大安森林公園北側廁所',cat:'park',fl:'1F',ex:'北側入口',addr:'台北市大安區新生南路二段',lat:25.0332,lng:121.5362,s:'warn',nh:38,pp:18,sp:45,us:210,wt:8,ac:1,fm:1,nr:1,h24:0,vid:2,sc:64},
+  {id:112,name:'信義公園廁所',cat:'park',fl:'1F',ex:'入口廣場',addr:'台北市信義區信義路五段',lat:25.0318,lng:121.5648,s:'warn',nh:42,pp:35,sp:60,us:312,wt:12,ac:1,fm:0,nr:0,h24:0,vid:2,sc:58},
+  {id:113,name:'中正紀念堂廁所',cat:'pub',fl:'1F',ex:'東門廣場',addr:'台北市中正區中山南路21號',lat:25.0369,lng:121.5212,s:'warn',nh:35,pp:28,sp:40,us:298,wt:10,ac:1,fm:0,nr:0,h24:0,vid:4,sc:55},
+  {id:114,name:'松山機場廁所',cat:'pub',fl:'1F',ex:'入境大廳',addr:'台北市松山區敦化北路340號',lat:25.0696,lng:121.5526,s:'ok',nh:6,pp:95,sp:92,us:342,wt:3,ac:1,fm:1,nr:1,h24:1,vid:4,sc:99},
+  {id:115,name:'信義誠品廁所',cat:'pub',fl:'3F',ex:'手扶梯',addr:'台北市信義區松高路11號',lat:25.0362,lng:121.5673,s:'ok',nh:7,pp:92,sp:95,us:198,wt:4,ac:1,fm:1,nr:1,pk:1,h24:0,vid:4,sc:98},
+  // ── 加油站廁所 ──
+  {id:116,name:'中油台北車站加油站',cat:'gas',fl:'1F',ex:'加油站入口',addr:'台北市中正區忠孝西路一段38號',lat:25.0447,lng:121.5133,s:'ok',nh:18,pp:75,sp:70,us:89,wt:2,ac:1,fm:0,nr:0,pk:1,h24:1,vid:1,sc:76},
+  {id:117,name:'台塑南京加油站',cat:'gas',fl:'1F',ex:'服務入口',addr:'台北市中山區南京東路二段99號',lat:25.0521,lng:121.5338,s:'warn',nh:34,pp:21,sp:55,us:102,wt:5,ac:0,fm:0,nr:0,pk:1,h24:1,vid:1,sc:52},
+  {id:118,name:'中油信義加油站',cat:'gas',fl:'1F',ex:'加油島旁',addr:'台北市信義區忠孝東路五段206號',lat:25.0402,lng:121.5600,s:'ok',nh:14,pp:80,sp:75,us:120,wt:3,ac:1,fm:0,nr:0,pk:1,h24:1,vid:1,sc:81},
+  {id:119,name:'台塑內湖加油站',cat:'gas',fl:'1F',ex:'服務區',addr:'台北市內湖區成功路四段208號',lat:25.0745,lng:121.5752,s:'ok',nh:11,pp:85,sp:80,us:95,wt:2,ac:1,fm:0,nr:0,pk:1,h24:1,vid:1,sc:84},
+  {id:120,name:'中油板橋加油站',cat:'gas',fl:'1F',ex:'加油站入口',addr:'新北市板橋區文化路一段108號',lat:25.0160,lng:121.4620,s:'ok',nh:16,pp:70,sp:65,us:108,wt:3,ac:0,fm:0,nr:0,pk:1,h24:1,vid:2,sc:77},
+  {id:121,name:'台塑新莊加油站',cat:'gas',fl:'1F',ex:'服務入口',addr:'新北市新莊區中山路145號',lat:25.0340,lng:121.4490,s:'err',nh:58,pp:7,sp:12,us:134,wt:8,ac:0,fm:0,nr:0,pk:1,h24:1,vid:2,sc:31},
+  {id:122,name:'中油三重加油站',cat:'gas',fl:'1F',ex:'加油島旁',addr:'新北市三重區重新路三段168號',lat:25.0560,lng:121.4870,s:'ok',nh:13,pp:77,sp:72,us:98,wt:2,ac:0,fm:0,nr:0,pk:1,h24:1,vid:2,sc:80},
+  {id:123,name:'台塑士林加油站',cat:'gas',fl:'1F',ex:'服務區',addr:'台北市士林區中正路188號',lat:25.0930,lng:121.5240,s:'ok',nh:10,pp:82,sp:78,us:115,wt:2,ac:1,fm:0,nr:0,pk:1,h24:1,vid:1,sc:83},
+  {id:124,name:'中油南港加油站',cat:'gas',fl:'1F',ex:'加油站入口',addr:'台北市南港區研究院路一段22號',lat:25.0480,lng:121.6050,s:'warn',nh:38,pp:28,sp:42,us:87,wt:6,ac:1,fm:0,nr:0,pk:1,h24:1,vid:1,sc:55},
+  {id:125,name:'台塑文山加油站',cat:'gas',fl:'1F',ex:'服務入口',addr:'台北市文山區木柵路三段58號',lat:24.9970,lng:121.5610,s:'err',nh:63,pp:5,sp:8,us:76,wt:9,ac:0,fm:0,nr:0,pk:1,h24:1,vid:4,sc:25},
+  // ── 廟宇廁所 ──
+  {id:126,name:'行天宮廁所',cat:'temple',fl:'1F',ex:'廟埕側門',addr:'台北市中山區民權東路二段109號',lat:25.0630,lng:121.5333,s:'ok',nh:15,pp:78,sp:72,us:256,wt:5,ac:1,fm:0,nr:0,pk:0,h24:0,vid:3,sc:80},
+  {id:127,name:'龍山寺廁所',cat:'temple',fl:'B1',ex:'地下廊道',addr:'台北市萬華區廣州街211號',lat:25.0367,lng:121.4998,s:'warn',nh:42,pp:25,sp:38,us:389,wt:12,ac:1,fm:0,nr:0,pk:0,h24:0,vid:3,sc:51},
+  {id:128,name:'指南宮廁所',cat:'temple',fl:'1F',ex:'停車場旁',addr:'台北市文山區萬壽路115號',lat:24.9747,lng:121.5811,s:'ok',nh:12,pp:82,sp:77,us:145,wt:4,ac:0,fm:0,nr:0,pk:1,h24:0,vid:4,sc:83},
+  {id:129,name:'艋舺青山宮廁所',cat:'temple',fl:'1F',ex:'廟前廣場',addr:'台北市萬華區貴陽街二段218號',lat:25.0370,lng:121.4980,s:'ok',nh:17,pp:70,sp:65,us:178,wt:5,ac:0,fm:0,nr:0,pk:0,h24:0,vid:3,sc:74},
+  {id:130,name:'松山慈惠堂廁所',cat:'temple',fl:'1F',ex:'停車場側',addr:'台北市信義區松山路421號',lat:25.0550,lng:121.5770,s:'ok',nh:11,pp:81,sp:76,us:134,wt:3,ac:1,fm:0,nr:0,pk:1,h24:0,vid:4,sc:82},
+  {id:131,name:'北投普濟寺廁所',cat:'temple',fl:'1F',ex:'山門右側',addr:'台北市北投區溫泉路112號',lat:25.1360,lng:121.5026,s:'warn',nh:36,pp:30,sp:45,us:112,wt:7,ac:0,fm:0,nr:0,pk:1,h24:0,vid:1,sc:56},
+  {id:132,name:'木柵集應廟廁所',cat:'temple',fl:'1F',ex:'廟埕後方',addr:'台北市文山區保儀路71號',lat:24.9910,lng:121.5660,s:'ok',nh:14,pp:74,sp:69,us:98,wt:3,ac:0,fm:0,nr:0,pk:1,h24:0,vid:4,sc:77},
+  {id:133,name:'士林神農宮廁所',cat:'temple',fl:'1F',ex:'側門',addr:'台北市士林區中山北路五段',lat:25.1010,lng:121.5245,s:'ok',nh:10,pp:83,sp:79,us:122,wt:3,ac:0,fm:0,nr:0,pk:0,h24:0,vid:1,sc:85},
+  {id:134,name:'內湖碧山巖廁所',cat:'temple',fl:'1F',ex:'停車場旁',addr:'台北市內湖區碧山路16號',lat:25.0890,lng:121.5880,s:'err',nh:62,pp:6,sp:9,us:203,wt:14,ac:1,fm:0,nr:0,pk:1,h24:0,vid:1,sc:27},
+  {id:135,name:'萬華慈雲寺廁所',cat:'temple',fl:'1F',ex:'廟前',addr:'台北市萬華區梧州街64號',lat:25.0330,lng:121.4975,s:'ok',nh:16,pp:72,sp:67,us:145,wt:4,ac:0,fm:0,nr:0,pk:0,h24:0,vid:3,sc:76},
+  {id:136,name:'中山北極殿廁所',cat:'temple',fl:'1F',ex:'廟埕右側',addr:'台北市中山區民生東路一段',lat:25.0530,lng:121.5250,s:'ok',nh:13,pp:76,sp:71,us:134,wt:4,ac:0,fm:0,nr:0,pk:0,h24:0,vid:3,sc:78},
+  {id:137,name:'大龍峒保安宮廁所',cat:'temple',fl:'1F',ex:'前殿右側',addr:'台北市大同區哈密街61號',lat:25.0722,lng:121.5138,s:'ok',nh:9,pp:85,sp:80,us:198,wt:3,ac:1,fm:0,nr:0,pk:0,h24:0,vid:3,sc:88},
+  {id:138,name:'三芝福成宮廁所',cat:'temple',fl:'1F',ex:'停車場旁',addr:'新北市三芝區中正路68號',lat:25.2530,lng:121.4968,s:'warn',nh:33,pp:28,sp:40,us:89,wt:7,ac:0,fm:0,nr:0,pk:1,h24:0,vid:1,sc:54},
+  {id:139,name:'淡水福佑宮廁所',cat:'temple',fl:'1F',ex:'廟後方',addr:'新北市淡水區中正路200號',lat:25.1702,lng:121.4400,s:'ok',nh:11,pp:80,sp:75,us:167,wt:4,ac:1,fm:0,nr:0,pk:0,h24:0,vid:1,sc:82},
+  {id:140,name:'石碇五路財神廟廁所',cat:'temple',fl:'1F',ex:'停車場',addr:'新北市石碇區石碇街',lat:24.9920,lng:121.6470,s:'ok',nh:14,pp:71,sp:66,us:112,wt:4,ac:0,fm:0,nr:0,pk:1,h24:0,vid:4,sc:75},
+  {id:141,name:'汐止慈濟宮廁所',cat:'temple',fl:'1F',ex:'廟埕側',addr:'新北市汐止區大同路一段188號',lat:25.0690,lng:121.6620,s:'ok',nh:12,pp:78,sp:73,us:134,wt:3,ac:0,fm:0,nr:0,pk:1,h24:0,vid:1,sc:79},
+  {id:142,name:'瑞芳基隆廟廁所',cat:'temple',fl:'1F',ex:'停車場旁',addr:'新北市瑞芳區明燈路三段',lat:25.1088,lng:121.8219,s:'ok',nh:10,pp:82,sp:77,us:145,wt:3,ac:0,fm:0,nr:0,pk:1,h24:0,vid:1,sc:83},
+  {id:143,name:'蘆洲湧蓮寺廁所',cat:'temple',fl:'1F',ex:'廟後廣場',addr:'新北市蘆洲區成功路170號',lat:25.0850,lng:121.4830,s:'err',nh:55,pp:8,sp:11,us:223,wt:13,ac:0,fm:0,nr:0,pk:0,h24:0,vid:2,sc:30},
+  {id:144,name:'土城承天禪寺廁所',cat:'temple',fl:'1F',ex:'山腰廣場',addr:'新北市土城區承天路96號',lat:24.9740,lng:121.4590,s:'ok',nh:8,pp:87,sp:82,us:178,wt:3,ac:1,fm:0,nr:0,pk:1,h24:0,vid:2,sc:88},
+  {id:145,name:'中和烘爐地廁所',cat:'temple',fl:'1F',ex:'停車場旁',addr:'新北市中和區興南路二段399巷',lat:24.9985,lng:121.5165,s:'warn',nh:37,pp:24,sp:36,us:256,wt:9,ac:0,fm:0,nr:0,pk:1,h24:0,vid:2,sc:50},
+];
+let nextTid=146;
+
+let V=[
+  {id:1,name:'綠清環境服務',zone:'捷運文湖線、淡水信義線、板南線',color:'#1d9e75',phone:'02-2234-5678',addr:'台北市信義區松仁路100號5F',web:'https://greencleaning.com.tw',line:'@greencleaning',contact:'王明志',cphone:'0912-345-678',cemail:'ming@greencleaning.com.tw',sla:30,rate:97.8,tasks:312,fee:380000,cstart:'2024-01-01',cend:'2026-12-31',note:'主力廠商，負責大台北捷運沿線'},
+  {id:2,name:'大安清潔隊',zone:'台北市各大公園廁所',color:'#2da55e',phone:'02-2345-6789',addr:'台北市大安區羅斯福路三段50號',web:'https://daan-clean.com.tw',line:'@daanclean',contact:'陳美珍',cphone:'0923-456-789',cemail:'chen@daan-clean.com.tw',sla:45,rate:91.4,tasks:198,fee:220000,cstart:'2024-06-01',cend:'2026-05-31',note:'大安、信義、中山區公園廁所維護'},
+  {id:3,name:'統一環境科技',zone:'全台7-ELEVEN及全家便利商店',color:'#e25c2a',phone:'02-3456-7890',addr:'台北市中山區南京東路一段88號',web:'https://uni-environ.com',line:'@uni-environ',contact:'林志豪',cphone:'0934-567-890',cemail:'lin@uni-environ.com',sla:60,rate:95.2,tasks:540,fee:580000,cstart:'2023-07-01',cend:'2027-06-30',note:'全台便利商店廁所維護'},
+  {id:4,name:'信義清潔工程',zone:'台北市政府機關及商場',color:'#5b52cc',phone:'02-4567-8901',addr:'台北市松山區八德路四段200號',web:'https://xinyi-clean.com',line:'@xinyiclean',contact:'張文豪',cphone:'0945-678-901',cemail:'zhang@xinyi-clean.com',sla:40,rate:98.5,tasks:426,fee:320000,cstart:'2024-03-15',cend:'2027-03-14',note:'信義、中正區商場及公家機關廁所'},
+  {id:5,name:'中山環保服務',zone:'中山、松山、高雄捷運沿線',color:'#185fa5',phone:'02-5678-9012',addr:'台北市中山區中山北路三段',web:'https://zhongshan-eco.com',line:'@zs-eco',contact:'劉淑芬',cphone:'0956-789-012',cemail:'liu@zhongshan-eco.com',sla:35,rate:93.7,tasks:264,fee:280000,cstart:'2025-01-01',cend:'2027-12-31',note:'中山民生區及高雄捷運廁所'},
+];
+let nextVid=6;
+
+let S=[];
+(()=>{
+  const D=[['林志明','陳秋雨','黃建民','吳雅婷','張哲瑋','劉佳慧','許志豪','謝宛均','邱俊傑','廖美玲','范育誠'],['陳美玲','王俊宏','蔡淑惠','鄭志遠','洪雅雯','江建成','林玉鳳','楊智凱','賴欣妤','周文忠','徐淑娟'],['王大偉','吳承翰','蔡志勇','陳怡君','黃瑞峰','林依琳','張勝男','劉淑芬','謝明哲','吳佩玲','曾建良'],['李淑芬','許志明','葉美鈴','鍾偉豪','柯雅雯','宋佳穎','潘建宇','紀淑慧','卓志遠','羅美君','胡文傑'],['趙志明','馮淑娟','石建志','戴麗華','歐承翰','孫玉芬','杜志豪','季雅婷','沈建明','邵淑惠','章俊傑']];
+  const SH=['早班 07:00-15:00','午班 11:00-19:00','晚班 15:00-23:00','輪班'];
+  const SH_EN=['AM 07:00-15:00','PM 11:00-19:00','Night 15:00-23:00','Rotating'];
+  const roleZH=i=>i===0?'組長':i===5?'維修員':'清潔員';
+  const roleEN=i=>i===0?'Team Leader':i===5?'Technician':'Cleaner';
+  let id=1;
+  D.forEach((ns,vi)=>ns.forEach((n,i)=>{S.push({id:id++,name:n,eid:'EMP-'+String(id-1).padStart(3,'0'),
+    role:roleZH(i),roleEn:roleEN(i),
+    vid:vi+1,phone:'09'+(vi+1)+'2-'+(i+10)+'-001',email:n[0]+id+'@clean.com',
+    join:'202'+(vi%3)+'-0'+(i%9+1)+'-15',
+    shift:SH[i%4],shiftEn:SH_EN[i%4],
+    status:i%3===2?'off':'on',note:''});}));
+})();
+let nextSid=S.length+2;
+
+const TASKS=[
+  {id:1,tid:2,cl:'林志明',tp:'補充衛生紙',st:'active',eta:8,sla:22,dt:'14:05',auto:true},
+  {id:2,tid:20,cl:'李淑芬',tp:'緊急清潔',st:'active',eta:5,sla:-5,dt:'14:12',auto:true},
+  {id:3,tid:91,cl:'王大偉',tp:'維修',st:'active',eta:12,sla:10,dt:'14:18',auto:true},
+  {id:4,tid:4,cl:'陳美玲',tp:'清潔',st:'active',eta:14,sla:40,dt:'14:22',auto:true},
+  {id:5,tid:111,cl:'謝宛均',tp:'補充衛生紙',st:'active',eta:9,sla:55,dt:'14:28',auto:true},
+  {id:6,tid:112,cl:'江建成',tp:'補充洗手乳',st:'active',eta:11,sla:30,dt:'14:31',auto:true},
+  {id:7,tid:18,cl:'王大偉',tp:'巡檢',st:'done',eta:null,sla:999,dt:'13:48',auto:true},
+  {id:8,tid:113,cl:'林志明',tp:'清潔',st:'active',eta:6,sla:25,dt:'14:35',auto:true},
+  {id:9,tid:108,cl:'陳美玲',tp:'補充洗手乳',st:'active',eta:13,sla:35,dt:'14:38',auto:true},
+];
+
+
+// Generate English toilet name from Chinese name
+function tname(t){
+  if(LANG!=='en') return t.name;
+  // CVS
+  if(t.name.includes('7-ELEVEN')) return t.name.replace('門市','Branch').replace('站前','Station');
+  if(t.name.includes('全家')) return t.name.replace('全家 ','FamilyMart ').replace('門市','Branch');
+  // Category-based suffix
+  const suffix = {mrt:' Station',park:' Park',pub:' Restroom',cvs:' Store'}[t.cat]||'';
+  // Known translations for locations
+  const nameMap = {
+    '南港展覽館':'Nangang Exhibition Ctr','南港':'Nangang','昆陽':'Kunyang','後山埤':'Houshanpi',
+    '永春':'Yongchun','市政府':'City Hall','國父紀念館':'Sun Yat-sen Memorial',
+    '忠孝復興':'Zhongxiao Fuxing','忠孝敦化':'Zhongxiao Dunhua','南京復興':'Nanjing Fuxing',
+    '中山國中':'Zhongshan Jr High','松山機場':'Songshan Airport','大直':'Dazhi','劍南路':'Jiannan Rd',
+    '淡水':'Danshui','紅樹林':'Hongshulin','竹圍':'Zhuwei','關渡':'Guandu',
+    '忠義':'Zhongyi','復興崗':'Fuxinggang','唭哩岸':'Qilian','石牌':'Shipai',
+    '明德':'Mingde','芝山':'Zhishan','士林':'Shilin','劍潭':'Jiantan',
+    '圓山':'Yuanshan','民權西路':'Minquan W Rd','中山':'Zhongshan','台北車站':'Taipei Main Sta',
+    '中正紀念堂':'CKS Memorial Hall','東門':'Dongmen','大安森林公園':'Daan Forest Park',
+    '大安':'Daan','信義安和':'Xinyi Anhe','台北101/世貿':'Taipei 101/World Trade','象山':'Xiangshan',
+    '輔大':'FJU','新莊':'Xinzhuang','三重':'Sanchong','菜寮':'Cailiao',
+    '台北橋':'Taipei Bridge','大橋頭':'Daqiaotou','中和':'Zhonghe','永安市場':'Yongan Market',
+    '景安':'Jingan','南勢角':'Nanshijiao','頂埔':'Dingpu','永寧':'Yongning',
+    '土城':'Tucheng','亞東醫院':'Far Eastern Hospital','府中':'Fuzhong','板橋':'Banqiao',
+    '江子翠':'Jiangzicui','新埔':'Xinpu','西門':'Ximen','善導寺':'Shandaosi',
+    '忠孝新生':'Zhongxiao Xinsheng','忠孝敦化 B3':'Zhongxiao Dunhua B3',
+    '昆陽 板南':'Kunyang (Bannan)','新店區公所':'Xindian District Off','新店':'Xindian',
+    '七張':'Qizhang','景美':'Jingmei','萬隆':'Wanlong','公館':'Gongguan',
+    '台電大樓':'Taipower Building','古亭':'Guting','科技大樓':'Technology Building',
+    '六張犁':'Liuzhangli','麟光':'Linguang','辛亥':'Xinhai','木柵':'Muzha',
+    '松山':'Songshan','南京三民':'Nanjing Sanmin','南岡山':'Nanganshan',
+    '橋頭火車站':'Qiaotou Train Sta','高雄車站':'Kaohsiung Main Sta','中央公園':'Central Park',
+    '美麗島':'Formosa Blvd','三多商圈':'Sanduo Shopping','世運主場館':'World Games Arena',
+    '左營（高鐵）':'Zuoying (HSR)','大寮':'Daliao','鳳山西':'Fengshan West',
+    '鳳山':'Fengshan','技擊館':'Martial Arts Arena','文化中心':'Cultural Center',
+    '五塊厝':'Wukuaicuo','衛武營':'Weiwuying',
+    '大安森林公園北側廁所':'Daan Forest Park (North)','信義公園廁所':'Xinyi Park',
+    '中正紀念堂廁所':'CKS Memorial Hall','松山機場廁所':'Songshan Airport',
+    '信義誠品廁所':'Eslite Xinyi',
+  };
+  // Strip suffixes to find base name
+  const base = t.name.replace(/站$|廁所$|公園$/, '');
+  for(const [zh, en] of Object.entries(nameMap)){
+    if(t.name.includes(zh)) return en + suffix;
+  }
+  return t.name + suffix;
+}
+
+// Get toilet operating hours as string
+function tHours(t){
+  if(t.h24) return LANG==='en'?'24 Hours':'全天24H';
+  const hours = {
+    mrt: {open:'06:00', close:'24:00'},
+    cvs: {open:'06:00', close:'23:00'},
+    park: {open:'05:30', close:'22:00'},
+    pub: {open:'06:00', close:'21:00'},
+    gas: {open:'06:00', close:'22:00'},
+    temple: {open:'06:00', close:'18:00'},
+  };
+  const h = hours[t.cat]||{open:'06:00',close:'22:00'};
+  return `${h.open}–${h.close}`;
+}
+function isOpen(t){
+  if(t.h24) return true;
+  const now = new Date();
+  const h = now.getHours()*60 + now.getMinutes();
+  const close = {mrt:24*60, cvs:23*60, park:22*60, pub:21*60, gas:22*60, temple:18*60}[t.cat]||22*60;
+  const open = {mrt:6*60, cvs:6*60, park:5*60+30, pub:6*60, gas:6*60, temple:6*60}[t.cat]||6*60;
+  return h>=open && h<close;
+}
+// ── NAVIGATION ──
+const PAGES=['dashboard','map','toilets','alerts','dispatch','ai','vendors','staff','schedule'];
+const FLEX_PG=new Set(['map','toilets','alerts','dispatch','ai','staff']);
+const ADDLBL={
+  get toilets(){return T_('＋ 新增廁所','＋ Add Toilet');},
+  get vendors(){return T_('＋ 新增公司','＋ Add Vendor');},
+  get staff(){return T_('＋ 新增人員','＋ Add Staff');},
+  get alerts(){return T_('＋ 新增任務','＋ Add Task');},
+  get dispatch(){return T_('＋ 新增任務','＋ Add Task');},
+  get ai(){return T_('▶ 執行AI派工','▶ Run AI Dispatch');}
+};
+let mapInited=false, currDid=null;
+
+function go(p){
+  // Hide all pages
+  PAGES.forEach(id=>{
+    const el=document.getElementById('pg-'+id);
+    if(el) el.style.display='none';
+  });
+  // Show target
+  const pg=document.getElementById('pg-'+p);
+  if(!pg) return;
+  pg.style.display = FLEX_PG.has(p) ? 'flex' : 'block';
+  // Sidebar active
+  PAGES.forEach(id=>{
+    const si=document.getElementById('si-'+id);
+    if(si) si.classList.toggle('on', id===p);
+  });
+  // Add button
+  const ab=document.getElementById('addbtn');
+  if(ADDLBL[p]){ab.textContent=ADDLBL[p];ab.style.display='';}
+  else ab.style.display='none';
+  // Side effects
+  if(p==='map'&&!mapInited){
+    mapInited=true;
+    // Load SDK in background now; _doInitMap retries until container has real px size
+    initMap();
+    setTimeout(drawDispatchRoutes,1200);
+  } else if(p==='map'){
+    try{lmap?.invalidateSize?.();}catch(e){}
+    drawDispatchRoutes();
+  }
+  if(p==='dispatch'){rDP();rDPCL();}
+  if(p==='ai'){initAI();}
+  if(p==='vendors') rVC();
+  if(p==='schedule') initSC();
+  cDrawer();
+}
+
+function handleAdd(){
+  const t=document.getElementById('addbtn').textContent;
+  if(t.includes('廁所'))oTT();
+  else if(t.includes('AI')||t.includes('執行'))runAIDispatch('all');
+  else if(t.includes('公司'))oVD();
+  else if(t.includes('人員'))oSF();
+  else oDP(null);
+}
+
+// ── MAP ──
+// ══════════════════════════════════════════════════
+// iNavi Maps  ─  mirrors index__1_.html exactly
+// ══════════════════════════════════════════════════
+const INAVI_APP_KEY = '38dd3a4506b3f8bf9265977c3b1fbd2d310f16a1';
+
+let _sdkLoading = false;
+let _sdkLoaded  = false;
+
+// Called by SDK script as callback (same as index.html window.initMap)
+window.initMap = function _inaviCallback() {
+  _sdkLoading = false;
+  if (!window.inavi?.maps?.Map) { console.warn('[iNavi] inavi.maps.Map not found'); return; }
+  _sdkLoaded = true;
+  // If map page is already visible, init immediately
+  if (document.getElementById('pg-map').style.display !== 'none') _doInitMap();
+};
+
+function _loadSDK() {
+  if (_sdkLoaded || window.inavi?.maps?.Map) { _doInitMap(); return; }
+  if (_sdkLoading) return;
+  _sdkLoading = true;
+  const s = document.createElement('script');
+  s.id    = 'inavi-sdk';
+  s.async = true;
+  s.src   = `https://gmaps.inavi.com/v1/sdk/web/${encodeURIComponent(INAVI_APP_KEY)}?callback=initMap`;
+  s.onerror = () => { _sdkLoading = false; console.warn('[iNavi] SDK load failed'); };
+  document.head.appendChild(s);
+}
+
+// Map state
+let lmap = null, isDark = false;
+let allMk = [], clMk = [], rtLn = [];
+let visCats = new Set(['mrt','park','cvs','pub','gas','temple']);
+
+// ── Icon helpers ─────────────────────────────────
+function makeIconEl(html){ const d=document.createElement('div'); d.innerHTML=html; return d.firstElementChild; }
+
+function mkIcon(t){
+  const col={ok:'#1d9e75',warn:'#f59e0b',err:'#e24b4a'}[t.s];
+  const cc={mrt:'#0ea5e9',park:'#22c55e',cvs:'#f97316',pub:'#7c3aed',gas:'#ef4444',temple:'#b45309'}[t.cat]||'#888';
+  const ch={mrt:'捷',park:'公',cvs:'便',pub:'廁',gas:'油',temple:'廟'}[t.cat]||'廁';
+  if(t.s==='err') return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="width:32px;height:32px;border-radius:50%;background:#e24b4a;border:3px solid #fff;box-shadow:0 2px 8px rgba(226,75,74,.5),0 0 0 4px rgba(226,75,74,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;">✕</div><div style="width:5px;height:5px;background:#e24b4a;border-radius:50%;opacity:.7;"></div></div>`);
+  return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="width:30px;height:30px;border-radius:50%;background:${col};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25),0 0 0 3px ${cc}55;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">${ch}</div><div style="width:5px;height:5px;background:${col};border-radius:50%;opacity:.7;"></div></div>`);
+}
+
+function cleanerIcon(){
+  return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="width:26px;height:26px;border-radius:50%;background:#f59e0b;border:2px dashed #92400e;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2);"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4" fill="white"/></svg></div><div style="width:4px;height:4px;background:#f59e0b;border-radius:50%;opacity:.7;"></div></div>`);
+}
+
+// ── Popup HTML ────────────────────────────────────
+function popupHtml(t){
+  const sc={ok:'#0f6e56',warn:'#92400e',err:'#991b1b'}[t.s];
+  const sl=(LANG==='en'?{ok:'Normal',warn:'Warning',err:'Alert'}:{ok:'正常',warn:'預警',err:'異常'})[t.s];
+  const pc=t.pp<30?'#991b1b':t.pp<55?'#92400e':'#0f6e56';
+  const soc=t.sp<30?'#991b1b':t.sp<55?'#92400e':'#1d4ed8';
+  const nc=t.nh>40?'#991b1b':t.nh>25?'#92400e':'#0f6e56';
+  return `<div style="padding:11px 13px;min-width:190px;font-family:var(--fn,sans-serif)">
+    <div style="font-size:14px;font-weight:800;margin-bottom:3px">${t.name}</div>
+    <div style="font-size:11px;color:#6b808f;margin-bottom:5px">${EMOJ[t.cat]} ${CN(t.cat)} · ${t.fl}</div>
+    <div style="font-size:12px;font-weight:700;color:${sc};margin-bottom:6px">${sl}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:6px">
+      <div style="background:#f3f7f6;border-radius:5px;padding:4px;text-align:center"><div style="font-size:9px;color:#6b808f">NH₃</div><div style="font-size:12px;font-weight:800;color:${nc}">${t.nh}ppm</div></div>
+      <div style="background:#f3f7f6;border-radius:5px;padding:4px;text-align:center"><div style="font-size:9px;color:#6b808f">${LANG==='en'?'Paper':'衛生紙'}</div><div style="font-size:12px;font-weight:800;color:${pc}">${t.pp}%</div></div>
+      <div style="background:#f3f7f6;border-radius:5px;padding:4px;text-align:center"><div style="font-size:9px;color:#6b808f">${LANG==='en'?'Soap':'洗手乳'}</div><div style="font-size:12px;font-weight:800;color:${soc}">${t.sp}%</div></div>
+    </div>
+    <div style="display:flex;gap:5px">
+      <button onclick="closePop();oDrawer(${t.id})" style="flex:1;padding:6px;background:#1d9e75;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">${LANG==='en'?'Details':'詳情'}</button>
+      <button onclick="closePop();oDP(${t.id})"    style="flex:1;padding:6px;background:#3b82f6;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">${LANG==='en'?'Dispatch':'派工'}</button>
+    </div>
+  </div>`;
+}
+
+// ── Marker / Polyline helpers ─────────────────────
+let _activeInfo = null;
+function closePop(){ try{_activeInfo?.setMap(null);}catch(e){} _activeInfo=null; }
+
+function addMarker(position, iconEl, infoHtml){
+  const marker = new inavi.maps.Marker({map:lmap, position});
+  if(iconEl) marker.setIcon(iconEl);
+  if(infoHtml && window.inavi?.maps?.InfoWindow){
+    const info = new inavi.maps.InfoWindow({position, content:infoHtml});
+    marker.on?.('click', ()=>{ closePop(); info.setMap(lmap); _activeInfo=info; });
+  }
+  return marker;
+}
+
+function addPolyline(path, color, weight=2.5, opacity=0.75){
+  return new inavi.maps.Polyline({map:lmap, path, style:{lineColor:color,lineWidth:weight,lineOpacity:opacity}});
+}
+
+// ── Core init  ─────────────────────────────────────
+// Mirrors index.html: container must have width+height before calling new Map()
+function _doInitMap(){
+  if(lmap) return;
+  const el = document.getElementById('leafmap');
+  if(!el || !el.offsetWidth || !el.offsetHeight){
+    // Retry until container has real pixel size
+    setTimeout(_doInitMap, 100);
+    return;
+  }
+  try{
+    lmap = new inavi.maps.Map({
+      container: 'leafmap',
+      center: [121.546, 25.043],   // [lng, lat]
+      zoom: 13,
+      language: LANG === 'en' ? 'en' : 'ko',  // iNavi supports 'ko'(default) or 'en'
+    });
+    bMK();
+  } catch(e){ console.warn('[iNavi] Map init error:', e.message); }
+}
+
+// Public entry — load SDK if needed, then init map
+// Mirrors index.html loadMapSDK() flow
+function initMap(){
+  if(lmap) return;   // already done
+  if(window.inavi?.maps?.Map){ _doInitMap(); return; }
+  _loadSDK();
+}
+
+
+// Build markers
+function bMK(){
+  if(!lmap)return;
+  allMk=[]; clMk=[]; rtLn=[];
+
+  T.forEach(t=>{
+    if(!visCats.has(t.cat))return;
+    const marker=addMarker([t.lng,t.lat], mkIcon(t), popupHtml(t));
+    allMk.push({m:marker,t});
+  });
+
+  [{name:'林志明',lat:25.038,lng:121.543,task:LANG==='en'?'Daan Park restock':'大安公園補貨',tid:2,eta:8},
+   {name:'陳美玲',lat:25.035,lng:121.559,task:LANG==='en'?'Xinyi Park clean':'信義公園清潔',tid:4,eta:14},
+   {name:'李淑芬',lat:25.051,lng:121.544,task:LANG==='en'?'Nanjing Fuxing urgent':'南京復興緊急',tid:20,eta:5}
+  ].forEach(c=>{
+    const infoHtml=`<div style="padding:8px 11px;font-size:13px;font-family:var(--fn,sans-serif)"><strong>${c.name}</strong><br><span style="color:#6b808f">${c.task}</span><br><strong style="color:#0f6e56">${c.eta}${LANG==='en'?' min ETA':'分鐘後到達'}</strong></div>`;
+    const marker=addMarker([c.lng,c.lat], cleanerIcon(), infoHtml);
+    clMk.push(marker);
+    const tt=T.find(x=>x.id===c.tid);
+    if(tt){
+      try{
+        const l=addPolyline([[c.lng,c.lat],[tt.lng,tt.lat]],'#1d9e75', 2, 0.6);
+        // Start hidden — shown when user clicks 路線 toggle
+        try{l.setMap(null);}catch(e){}
+        rtLn.push(l);
+      }catch(e){}
+    }
+  });
+
+  bRPAl();bRPDP();bRPVD();bRPSF();
+}
+
+function togCat(btn,cat){
+  const cls={mrt:'om',park:'op',cvs:'oc',pub:'ou',gas:'og',temple:'ot'};
+  const on=!btn.classList.contains(cls[cat]||'');
+  btn.className='cc'+(on&&cls[cat]?' '+cls[cat]:'');
+  if(!cls[cat]){btn.style.opacity=on?'1':'.5';}
+  if(on)visCats.add(cat);else visCats.delete(cat);
+  allMk.forEach(({m,t})=>{ try{m.setVisible?.(visCats.has(t.cat));}catch(e){} });
+}
+function togML(k,btn){
+  const on=!btn.classList.contains('on');btn.classList.toggle('on',on);
+  const sv=arr=>arr.forEach(m=>{try{m.setVisible?.(on);}catch(e){}});
+  if(k==='cl'){sv(clMk);}
+  if(k==='rt'||k==='cl'){
+    // Redraw dispatch route lines (respects toggle state)
+    drawDispatchRoutes();
+    // Also show/hide static cleaner route lines from bMK
+    if(k==='rt') sv(rtLn);
+  }
+}
+function togDark(btn){
+  isDark=!isDark;btn.classList.toggle('on',isDark);
+  try{lmap.setStyle?.(isDark?'dark':'normal');}catch(e){}
+}
+
+// ── RIGHT PANEL ──
+function swRP(k){
+  ['al','dp','vd','sf'].forEach(x=>{
+    document.getElementById('rpt-'+x).classList.toggle('on',x===k);
+    document.getElementById('rpp-'+x).style.display=x===k?'block':'none';
+  });
+}
+function chip(txt,cls){return `<span style="padding:2px 8px;border-radius:100px;font-size:12px;font-weight:700;${cls}">${txt}</span>`;}
+function bRPAl(){
+  const el=document.getElementById('rpp-al');
+  const al=T.filter(t=>t.s!=='ok');
+  if(!al.length){el.innerHTML='<div style="padding:20px;text-align:center;color:var(--mu)">所有廁所狀態正常</div>';return;}
+  el.innerHTML=al.map(t=>{
+    const dp=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+    return `<div style="padding:11px 15px;border-bottom:1px solid var(--bd);cursor:pointer;border-left:3px solid ${t.s==='err'?'var(--r)':'var(--a)'}" onclick="oDrawer(${t.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+        <div style="font-size:14px;font-weight:700">${tname(t)}</div>
+        <span style="padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;background:${t.s==='err'?'var(--rl)':'var(--al)'};color:${t.s==='err'?'#991b1b':'#92400e'}">${t.s==='err'?(LANG==='en'?'Alert':'異常'):(LANG==='en'?'Warning':'預警')}</span>
+      </div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:5px">${CN(t.cat)} · ${t.fl}</div>
+      <div style="display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap">
+        ${t.nh>40?`<span style="padding:2px 7px;border-radius:5px;font-size:11px;background:var(--rl);color:#991b1b">NH₃ ${t.nh}ppm</span>`:''}
+        ${t.pp<25?`<span style="padding:2px 7px;border-radius:5px;font-size:11px;background:var(--rl);color:#991b1b">紙 ${t.pp}%</span>`:''}
+      </div>
+      ${dp&&dp.dt
+        ? `<div style="font-size:12px;color:var(--gd);font-weight:600;margin-bottom:5px">✅ ${T_(`已於 ${dp.dt} ${dp.auto?'自動派遣':'指派'} ${dp.cl} 清潔員前往處理`, `${dp.auto?'Auto-dispatched':'Assigned'} ${dp.cl} at ${dp.dt}`)}</div>`
+        : ''}
+      <div style="display:flex;gap:5px;align-items:center">
+        <button class="btn pri sm" onclick="event.stopPropagation();oDP(${t.id})">${dp?(LANG==='en'?'Re-assign':'手動重新指派'):(LANG==='en'?'Manual Dispatch':'手動派工')}</button>
+        ${dp?`<span style="font-size:12px;color:var(--gd);font-weight:600">${T_(`預計 ${dp.eta} 分到達`,`ETA ${dp.eta} min`)}</span>`:`<span style="font-size:12px;color:#92400e;font-weight:600">${T_('等待指派','Awaiting dispatch')}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+  updCounts();
+}
+function bRPDP(){
+  document.getElementById('rpp-dp').innerHTML=TASKS.slice(0,5).map(d=>{
+    const t=T.find(x=>x.id===d.tid);if(!t)return'';
+    const SC={active:'cb',pending:'chip-a',done:'cg'};
+    const SL=LANG==='en'?{active:'Active',pending:'Pending',done:'Done'}:{active:'進行中',pending:'待指派',done:'完成'};
+    const sc=d.sla<0?'#991b1b':d.sla<30?'#92400e':'var(--gd)';
+    return `<div style="padding:11px 15px;border-bottom:1px solid var(--bd);cursor:pointer" onclick="oDrawer(${t.id})">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-size:13px;font-weight:700">${tname(t)} — ${tpName(d.tp)}</div><span style="padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;background:${d.st==='active'?'var(--bl)':d.st==='done'?'var(--gl)':'var(--al)'};color:${d.st==='active'?'#1d4ed8':d.st==='done'?'var(--gd)':'#92400e'}">${SL[d.st]}</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px"><div style="width:18px;height:18px;border-radius:50%;background:var(--gl);color:var(--gd);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800">${d.cl[0]}</div>${d.cl}${d.eta?`<span style="margin-left:auto;font-weight:700;color:var(--g)">${T_(`${d.eta}分到`,`${d.eta} min`)}</span>`:`<span style="margin-left:auto;font-weight:700;color:${sc}">${d.sla===999?T_('完成','Done'):T_(`SLA剩${d.sla}分`,`SLA ${d.sla}min`)}</span>`}</div>
+    </div>`;
+  }).join('');
+}
+function bRPVD(){
+  document.getElementById('rpp-vd').innerHTML=V.map(v=>`<div style="padding:11px 15px;border-bottom:1px solid var(--bd)">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:8px;height:8px;border-radius:50%;background:${v.color}"></div><div style="font-size:14px;font-weight:700">${v.name}</div></div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:5px">${v.zone}</div>
+    <div style="display:flex;gap:10px;font-size:13px"><span>員工 <strong>${S.filter(x=>x.vid===v.id).length}</strong></span><span>SLA <strong style="color:${v.rate>95?'var(--gd)':'#92400e'}">${v.rate}%</strong></span></div>
+  </div>`).join('');
+}
+function bRPSF(){
+  document.getElementById('rpp-sf').innerHTML=`<div style="padding:8px 15px;font-size:12px;color:var(--mu);border-bottom:1px solid var(--bd)">值班 ${S.filter(x=>x.status==='on').length} / ${S.length} 名</div>`+
+  S.slice(0,10).map(s=>`<div style="display:flex;align-items:center;gap:7px;padding:8px 15px;border-bottom:1px solid var(--bd)">
+    <div style="width:24px;height:24px;border-radius:50%;background:var(--gl);color:var(--gd);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800">${s.name[0]}</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--mu)">${LANG==='en'?(s.roleEn||s.role):s.role}</div></div>
+    <span style="font-size:12px;font-weight:700;color:${s.status==='on'?'var(--gd)':'var(--mu)'}">${s.status==='on'?(LANG==='en'?'● On Duty':'●值班'):(LANG==='en'?'○ Off Duty':'○休息')}</span>
+  </div>`).join('');
+}
+
+// ── DASHBOARD CHARTS ──
+let tch,pch;
+function initDash(){
+  const c1=document.getElementById('tchart').getContext('2d');
+  tch=new Chart(c1,{type:'bar',data:{labels:LANG==='en'?['Mon','Tue','Wed','Thu','Fri','Sat','Sun']:['週一','週二','週三','週四','週五','週六','週日'],datasets:[{label:LANG==='en'?'Alert':'異常',data:[4,3,5,2,4,3,2],backgroundColor:'rgba(226,75,74,.65)',borderRadius:3},{label:LANG==='en'?'Warning':'預警',data:[7,9,6,8,5,7,5],backgroundColor:'rgba(245,158,11,.45)',borderRadius:3}]},options:{plugins:{legend:{labels:{font:{size:12}}}},scales:{x:{ticks:{font:{size:12}}},y:{ticks:{font:{size:11}}}},responsive:true,maintainAspectRatio:false}});
+  const c2=document.getElementById('pchart').getContext('2d');
+  pch=new Chart(c2,{type:'doughnut',data:{labels:LANG==='en'?['NH₃ Excess','Low Paper','Low Soap','Equipment','Other']:['NH₃超標','衛生紙不足','洗手乳不足','設備故障','其他'],datasets:[{data:[35,28,18,12,7],backgroundColor:['#e24b4a','#f59e0b','#3b82f6','#8b5cf6','#9ca3af'],borderWidth:2,borderColor:'#fff'}]},options:{plugins:{legend:{labels:{font:{size:12}},position:'bottom'}},responsive:true,maintainAspectRatio:false}});
+  bRanks();bRecs();
+  document.getElementById('kokn').textContent=T.filter(t=>t.s==='ok').length;
+}
+function swChart(m){
+  document.getElementById('cbw').style.cssText=m==='week'?'background:var(--gl);border-color:var(--gm);color:var(--gd)':'';
+  document.getElementById('cbm').style.cssText=m==='month'?'background:var(--gl);border-color:var(--gm);color:var(--gd)':'';
+  const L=m==='week'?(LANG==='en'?['Mon','Tue','Wed','Thu','Fri','Sat','Sun']:['週一','週二','週三','週四','週五','週六','週日']):(LANG==='en'?Array.from({length:30},(_,i)=>i+1+'d'):Array.from({length:30},(_,i)=>i+1+'日'));
+  tch.data.labels=L;
+  tch.data.datasets[0].label = LANG==='en'?'Alert':'異常';
+  tch.data.datasets[1].label = LANG==='en'?'Warning':'預警';
+  tch.data.datasets[0].data=L.map(()=>Math.round(2+Math.random()*6));
+  tch.data.datasets[1].data=L.map(()=>Math.round(4+Math.random()*11));
+  tch.update();
+}
+function bRanks(){
+  const sorted=[...T].sort((a,b)=>b.sc-a.sc);
+  const bar=s=>`<div style="flex:1;height:5px;background:var(--gl);border-radius:3px;overflow:hidden;margin:0 4px"><div style="width:${s}%;height:5px;background:${s>=80?'var(--g)':s>=60?'var(--a)':'var(--r)'};border-radius:3px"></div></div>`;
+  document.getElementById('rbest').innerHTML=sorted.slice(0,5).map((t,i)=>`<div class="rrow"><div class="rn${i===0?' g1':i===1?' g2':i===2?' g3':''}">${i+1}</div><div class="rname" onclick="oDrawer(${t.id})">${tname(t)}</div>${bar(t.sc)}<div class="rscore rs-ok">${t.sc}</div></div>`).join('');
+  document.getElementById('rworst').innerHTML=sorted.slice(-5).reverse().map((t,i)=>`<div class="rrow"><div class="rn">${i+1}</div><div class="rname" onclick="oDrawer(${t.id})">${tname(t)}</div>${bar(t.sc)}<div class="rscore ${t.sc<40?'rs-e':t.sc<60?'rs-w':'rs-ok'}">${t.sc}</div></div>`).join('');
+}
+function bRecs(){
+  const SVG={r:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,g:`<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`};
+  const recs=[
+    {ic:'r',t:LANG==='en'?'Urgent — Nanjing Fuxing Station':'立即處理 — 南京復興廁所',s:LANG==='en'?'NH₃ 61ppm critical, dispatch within 10min':'NH₃ 61ppm 嚴重超標，建議10分鐘內派工',btn:LANG==='en'?'Dispatch':'派工',fn:'oDP(20)'},
+    {ic:'r',t:LANG==='en'?'Low Supply — Da-an Forest Park':'補貨預警 — 大安森林公園',s:LANG==='en'?'Paper at 18%, predicted empty in 30min':'衛生紙剩18%，預測30分鐘內耗盡',btn:LANG==='en'?'Dispatch':'派工',fn:'oDP(2)'},
+    {ic:'g',t:LANG==='en'?'Recommended — Songshan Airport':'推薦 — 松山機場廁所',s:LANG==='en'?'Score 99, full facilities, 3min wait':'評分99分，設施完整，等候僅3分鐘',btn:LANG==='en'?'View':'查看',fn:'oDrawer(21)'},
+    {ic:'g',t:LANG==='en'?'Recommended — Xinyi Eslite':'推薦 — 信義誠品廁所',s:LANG==='en'?'Score 98, nursing room & family toilet':'評分98分，哺乳室/親子廁完備',btn:LANG==='en'?'View':'查看',fn:'oDrawer(17)'},
+  ];
+  document.getElementById('airecs').innerHTML=recs.map(r=>`<div class="ritem"><div class="rico ${r.ic}">${SVG[r.ic]}</div><div style="flex:1"><div class="rt">${r.t}</div><div class="rs">${r.s}</div></div><button class="btn sm" onclick="${r.fn}">${r.btn}</button></div>`).join('');
+}
+function updCounts(){
+  const en=T.filter(t=>t.s==='err').length, wn=T.filter(t=>t.s==='warn').length;
+  document.getElementById('sb-an').textContent=en+wn;
+  document.getElementById('sb-dn').textContent=TASKS.filter(d=>d.st!=='done').length;
+  document.getElementById('ptxt').textContent=LANG==='en'?`${en+wn} Alerts`:LANG==='en'?`${en+wn} Alerts`:`${en+wn} 個異常`;
+  const rpe=document.getElementById('rperr');if(rpe)rpe.textContent=en;
+  const rpw=document.getElementById('rpwarn');if(rpw)rpw.textContent=wn;
+  const rpt=document.getElementById('rptask');if(rpt)rpt.textContent=TASKS.filter(d=>d.st==='active').length;
+}
+
+// ── TOILET TABLE ──
+let tFilter='all';
+function setTF(f,btn){tFilter=f;document.querySelectorAll('#pg-toilets .fc').forEach(b=>b.classList.remove('on'));btn.classList.add('on');rT();}
+function rT(){
+  const q=(document.getElementById('tq').value||'').toLowerCase();
+  const list=T.filter(t=>{
+    if(q&&!t.name.toLowerCase().includes(q))return false;
+    if(tFilter==='all')return true;
+    if(['err','warn','ok'].includes(tFilter))return t.s===tFilter;
+    return t.cat===tFilter;
+  });
+  const gv=id=>V.find(v=>v.id===id);
+  const nc=n=>n>40?'color:#991b1b;font-weight:700':n>25?'color:#92400e;font-weight:700':'';
+  const pc=p=>p<25?'color:#991b1b;font-weight:700':p<50?'color:#92400e;font-weight:700':'';
+  const fcs=t=>(LANG==='en'?[t.ac&&'Accessible',t.fm&&'Family',t.nr&&'Nursing',t.h24&&'24H']:[t.ac&&'無障礙',t.fm&&'親子',t.nr&&'哺乳',t.h24&&'24H']).filter(Boolean);
+  document.getElementById('ttbody').innerHTML=!list.length?`<tr><td colspan="13" style="text-align:center;padding:28px;color:var(--mu)">${LANG==='en'?'No toilets match the filter':'無符合條件的廁所'}</td></tr>`:
+  list.map(t=>`<tr>
+    <td><span style="font-weight:700;cursor:pointer" onclick="oDrawer(${t.id})">${EMOJ[t.cat]} ${tname(t)}</span></td>
+    <td>${CN(t.cat)} · ${t.fl}</td>
+    <td><span class="bdg ${t.s==='ok'?'bok':t.s==='warn'?'bw':'be'}">${(LANG==='en'?{ok:'Normal',warn:'Warning',err:'Alert'}:{ok:'正常',warn:'預警',err:'異常'})[t.s]}</span></td>
+    <td style="${nc(t.nh)}">${t.nh}ppm</td>
+    <td style="${pc(t.pp)}">${t.pp}%</td>
+    <td style="${pc(t.sp)}">${t.sp}%</td>
+    <td>${t.wt}分</td>
+    <td>${t.pk!=null?(t.pk?'<span class="bdg bok" style="font-size:10px">✓ 有</span>':'<span class="bdg" style="background:var(--bg);color:var(--mu);font-size:10px">✗ 無</span>'):'<span style="color:var(--mu);font-size:12px">—</span>'}</td>
+    <td><div style="display:flex;gap:3px;flex-wrap:wrap">${fcs(t).map(f=>`<span class="bdg bb" style="font-size:10px">${f}</span>`).join('')}</div></td>
+    <td style="font-size:13px">${gv(t.vid)?.name||'—'}</td>
+    <td style="font-size:12px;white-space:nowrap">${(()=>{
+      const open=isOpen(t);
+      return `<span style="color:${open?'var(--gd)':'#991b1b'};font-weight:600">${open?(LANG==='en'?'Open':'●開'):(LANG==='en'?'Closed':'●休')}</span> <span style="color:var(--mu)">${tHours(t)}</span>`;
+    })()}</td>
+    <td>${(()=>{
+      const h=new Date().getHours();
+      const peak=(h>=7&&h<=9)||(h>=12&&h<=13)||(h>=17&&h<=20);
+      const baseLvl=t.us>300?2:t.us>150?1:0;
+      const lvl=peak?Math.min(baseLvl+1,2):baseLvl;
+      const waitMin=lvl===2?Math.round(8+Math.random()*7):lvl===1?Math.round(4+Math.random()*4):Math.round(1+Math.random()*3);
+      const labels=LANG==='en'?['Low','Medium','High']:['低','中','高'];
+      const label=labels[lvl];
+      const col=lvl===2?'#991b1b':lvl===1?'#92400e':'var(--gd)';
+      const bg=lvl===2?'var(--rl)':lvl===1?'var(--al)':'var(--gl)';
+      const waitLbl=LANG==='en'?`~${waitMin} min`:`約${waitMin}分`;
+      return `<span class="bdg" style="background:${bg};color:${col};white-space:nowrap">${label} ${waitLbl}</span>`;
+    })()}</td>
+    <td><div class="tacts">
+      <button class="ib" onclick="oDrawer(${t.id})" title="查看"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      <button class="ib" onclick="oDP(${t.id})" title="派工"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
+      <button class="ib" onclick="oTT(${t.id})" title="編輯"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="ib del" onclick="delT(${t.id})" title="刪除"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+    </div></td>
+  </tr>`).join('');
+}
+function delT(id){if(!confirm('確定刪除此廁所？'))return;T=T.filter(t=>t.id!==id);rT();toast(LANG==='en'?'Toilet deleted':'廁所已刪除');}
+function oTT(id){
+  const V_LIST=document.getElementById('tf-v');V_LIST.innerHTML=V.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');
+  if(id){
+    const t=T.find(t=>t.id===id);if(!t)return;
+    document.getElementById('mtt').textContent=T_('編輯廁所','Edit Toilet');
+    document.getElementById('tf-n').value=t.name;document.getElementById('tf-c').value=t.cat;
+    document.getElementById('tf-a').value=t.addr||'';document.getElementById('tf-fl').value=t.fl;
+    document.getElementById('tf-ex').value=t.ex;document.getElementById('tf-v').value=t.vid;
+    document.getElementById('tf-24').value=t.h24?'1':'0';document.getElementById('tf-ac').value=t.ac?'1':'0';
+    document.getElementById('tf-fm').value=t.fm?'1':'0';
+    const pkEl=document.getElementById('tf-pk');if(pkEl)pkEl.value=t.pk!=null?String(t.pk):'1';
+    document.getElementById('tf-nh').value=t.nh;
+    document.getElementById('tf-pp').value=t.pp;document.getElementById('tf-sp').value=t.sp;
+    document.getElementById('tf-la').value=t.lat;document.getElementById('tf-ln').value=t.lng;
+    oTT._eid=id;
+  }else{
+    document.getElementById('mtt').textContent=T_('新增廁所','Add Toilet');
+    ['tf-n','tf-a','tf-fl','tf-ex','tf-nh','tf-pp','tf-sp','tf-la','tf-ln'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    oTT._eid=null;
+  }
+  oM('m-tt');
+}
+function savT(){
+  const n=document.getElementById('tf-n').value.trim();if(!n){toast(LANG==='en'?'Please enter toilet name':'請填入廁所名稱');return;}
+  const d={name:n,cat:document.getElementById('tf-c').value,fl:document.getElementById('tf-fl').value||'1F',ex:document.getElementById('tf-ex').value,addr:document.getElementById('tf-a').value,vid:parseInt(document.getElementById('tf-v').value),h24:+document.getElementById('tf-24').value,ac:+document.getElementById('tf-ac').value,fm:+document.getElementById('tf-fm').value,pk:+(document.getElementById('tf-pk')?.value||0),nr:0,nh:+document.getElementById('tf-nh').value||15,pp:+document.getElementById('tf-pp').value||80,sp:+document.getElementById('tf-sp').value||80,lat:+document.getElementById('tf-la').value||25.04,lng:+document.getElementById('tf-ln').value||121.54,us:0,wt:3,s:'ok',sc:80};
+  if(oTT._eid){const i=T.findIndex(t=>t.id===oTT._eid);if(i>=0)T[i]={...T[i],...d};toast(LANG==='en'?'Toilet updated':'廁所已更新');}
+  else{T.push({id:nextTid++,...d});toast(LANG==='en'?'Toilet added':'廁所已新增');}
+  cM('m-tt');rT();bRanks();
+}
+
+// ── ALERTS ──
+let aF='all';
+function setAF(f,btn){aF=f;document.querySelectorAll('#pg-alerts .fc').forEach(b=>b.classList.remove('on'));btn.classList.add('on');rAL();}
+function rAL(){
+  const list=T.filter(t=>{
+    if(aF==='all')return t.s!=='ok';
+    if(['err','warn'].includes(aF))return t.s===aF;
+    return t.s!=='ok'&&t.cat===aF;
+  }).map(t=>{
+    const is=[];
+    if(t.nh>40)is.push({s:`NH₃ ${t.nh}ppm`,c:'r'});else if(t.nh>25)is.push({s:`NH₃ ${t.nh}ppm`,c:'a'});
+    if(t.pp<25)is.push({s:`紙${t.pp}%`,c:'r'});else if(t.pp<45)is.push({s:`紙${t.pp}%`,c:'a'});
+    if(t.sp<25)is.push({s:`皂${t.sp}%`,c:'r'});else if(t.sp<45)is.push({s:`皂${t.sp}%`,c:'a'});
+    if(t.wt>10)is.push({s:`等${t.wt}分`,c:'a'});
+    return{t,is};
+  }).sort((a,b)=>a.t.s==='err'?-1:1);
+  const el=document.getElementById('allist');
+  if(!list.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--mu)">所有廁所狀態正常</div>';return;}
+  const ns=t=>S.filter(s=>s.status==='on'&&s.vid===t.vid).slice(0,2);
+  el.innerHTML=list.map(({t,is})=>{
+    const dp=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+    const nst=ns(t);
+    const isAutoDP = dp && dp.auto;
+    const dispInfo = dp && dp.dt
+      ? `<div style="margin-top:8px;padding:7px 11px;background:var(--gl);border-radius:8px;border:1px solid var(--gm);font-size:13px;color:var(--gd);font-weight:600;display:flex;align-items:center;gap:7px;">
+           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gd)" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+           ${T_(`已於 ${dp.dt} ${isAutoDP?'自動派遣':'指派'}`,`${isAutoDP?'Auto-dispatched':'Assigned'} at ${dp.dt}`)} <strong>${dp.cl}</strong> ${T_('清潔員前往處理','dispatched')}
+           ${dp.eta?`<span style="margin-left:auto;font-size:12px;background:#fff;padding:1px 8px;border-radius:100px;color:var(--gd);border:1px solid var(--gm)">ETA ${dp.eta}min</span>`:''}
+         </div>`
+      : dp
+        ? `<div style="margin-top:8px;padding:7px 11px;background:var(--gl);border-radius:8px;border:1px solid var(--gm);font-size:13px;color:var(--gd);font-weight:600;display:flex;align-items:center;gap:7px;">
+             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gd)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+             ${dp.cl} ${T_(`清潔員前往中，預計 ${dp.eta} 分鐘到達`,`en route, ETA ${dp.eta} min`)}
+           </div>`
+        : `<div style="margin-top:8px;padding:7px 11px;background:var(--al);border-radius:8px;border:1px solid var(--am);font-size:13px;color:#92400e;font-weight:600;">${LANG==='en'?'⚠ Finding nearest cleaner…':'⚠ 正在尋找最近清潔員…'}</div>`;
+    return `<div class="acard ${t.s}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+        <div><div class="aname">${EMOJ[t.cat]} ${tname(t)}</div><div class="ameta">${CN(t.cat)} · ${t.fl} · ${t.ex}</div></div>
+        <span style="padding:3px 9px;border-radius:100px;font-size:12px;font-weight:700;background:${t.s==='err'?'var(--rl)':'var(--al)'};color:${t.s==='err'?'#991b1b':'#92400e'}">${t.s==='err'?(LANG==='en'?'Alert':'異常'):(LANG==='en'?'Warning':'預警')}</span>
+      </div>
+      <div class="atags">${is.map(i=>`<span class="atag ${i.c}">${i.s}</span>`).join('')}</div>
+      <div class="abtns">
+        <button class="btn pri sm" onclick="oDP(${t.id})">${dp?(LANG==='en'?'Re-assign':'手動重新指派'):(LANG==='en'?'Manual Dispatch':'手動派工')}</button>
+        ${nst.map(s=>`<button class="btn sm" onclick="qDP(${t.id},${s.id},'${s.name}')" title="手動覆蓋指派">${LANG==='en'?'Reassign':'手動改派'} ${s.name}</button>`).join('')}
+        <button class="btn sm" onclick="oDrawer(${t.id})">${LANG==='en'?'Details':'詳情'}</button>
+      </div>
+      ${dispInfo}
+    </div>`;
+  }).join('');
+}
+function qDP(tid,sid,name){
+  // Manual override dispatch
+  const t=T.find(t=>t.id===tid);
+  const now=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  let task=TASKS.find(d=>d.tid===tid&&d.st!=='done');
+  const eta=Math.round(5+Math.random()*15);
+  if(task){task.cl=name;task.st='active';task.eta=eta;task.dt=now;task.auto=false;}
+  else TASKS.push({id:TASKS.length+1,tid,cl:name,tp:'清潔',st:'active',eta,sla:30,dt:now,auto:false});
+  toast(LANG==='en'?`✅ ${name} dispatched to ${t?.name} at ${now}`:`✅ 已於 ${now} 指派 ${name} 清潔員前往 ${t?tname(t):''}`);
+  rAL();rDP();bRPAl();bRPDP();updCounts();
+  if(lmap) drawDispatchRoutes();
+}
+function autoDP(){
+  // Auto-dispatch ALL abnormal/warning toilets using bestStaff
+  const now=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  let count=0;
+  T.filter(t=>t.s!=='ok').forEach(t=>{
+    let task=TASKS.find(d=>d.tid===t.id&&(d.st==='active'||d.st==='pending'));
+    const staff=bestStaff(t);
+    if(!staff) return;
+    const eta=Math.round(5+Math.random()*15);
+    const tp=t.pp<30?'補充衛生紙':t.sp<30?'補充洗手乳':t.nh>40?'緊急清潔':'清潔';
+    if(task){
+      task.cl=staff.name;task.st='active';task.eta=eta;task.dt=now;task.auto=true;
+    } else {
+      TASKS.push({id:TASKS.length+1,tid:t.id,cl:staff.name,tp,st:'active',eta,sla:t.s==='err'?15:30,dt:now,auto:true});
+    }
+    count++;
+  });
+  toast(LANG==='en'?`🤖 AI Auto-Dispatch: ${count} cleaners sent at ${now}`:`🤖 AI 自動派工完成！已於 ${now} 派遣 ${count} 名清潔員`);
+  rAL();rDP();bRPAl();bRPDP();updCounts();
+  if(lmap) drawDispatchRoutes();
+}
+
+// ── DISPATCH ──
+function rDP(){
+  const SL=LANG==='en'?{active:'Active',pending:'Pending',done:'Done'}:{active:'進行中',pending:'待指派',done:'已完成'};
+  document.getElementById('dplist').innerHTML=TASKS.map(d=>{
+    const t=T.find(x=>x.id===d.tid);if(!t)return'';
+    const sc=d.sla<0?'#991b1b':d.sla<30?'#92400e':'var(--gd)';
+    const st=d.sla===999?T_('完成','Done'):d.sla<0?T_(`逾時${Math.abs(d.sla)}分`,`Overdue ${Math.abs(d.sla)}min`):T_(`SLA剩${d.sla}分`,`SLA ${d.sla}min`);
+    return `<div class="dpc" onclick="oDrawer(${t.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px"><div class="dpcn">${EMOJ[t.cat]} ${tname(t)} — ${tpName(d.tp)}</div><span style="padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;background:${d.st==='active'?'var(--bl)':d.st==='done'?'var(--gl)':'var(--al)'};color:${d.st==='active'?'#1d4ed8':d.st==='done'?'var(--gd)':'#92400e'}">${SL[d.st]}</span></div>
+      <div class="dpm"><div class="dpp"><div class="dpav">${d.cl[0]}</div>${d.cl}</div>${d.eta?`<span class="dpeta">${T_(`${d.eta}分到`,`${d.eta} min`)}</span>`:''}<span style="margin-left:auto;font-size:12px;font-weight:700;color:${sc}">${st}</span></div>
+      ${d.dt?`<div style="font-size:12px;color:var(--gd);margin-top:5px">✅ ${T_(`已於 ${d.dt} 指派`,`Assigned at ${d.dt}`)}</div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('sb-dn').textContent=TASKS.filter(d=>d.st!=='done').length;
+}
+function rDPCL(){
+  document.getElementById('dpcllist').innerHTML=S.slice(0,10).map(s=>{
+    const vv=V.find(v=>v.id===s.vid);
+    return `<div style="background:var(--s);border-radius:7px;border:1px solid var(--bd);padding:8px 10px;margin-bottom:5px;display:flex;align-items:center;gap:7px">
+      <div style="width:24px;height:24px;border-radius:50%;background:var(--gl);color:var(--gd);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800">${s.name[0]}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--mu)">${LANG==='en'?(s.roleEn||s.role):s.role}</div></div>
+      <span style="font-size:12px;font-weight:700;color:${s.status==='on'?'var(--gd)':'var(--mu)'}">${s.status==='on'?(LANG==='en'?'● On Duty':'●值班'):(LANG==='en'?'○ Off Duty':'○休息')}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── VENDORS ──
+let exV=new Set();
+function rVC(){
+  const grid=document.getElementById('vgrid');grid.innerHTML='';
+  V.forEach(v=>{
+    const sl=S.filter(s=>s.vid===v.id);
+    const on=sl.filter(s=>s.status==='on').length;
+    const dl=Math.round((new Date(v.cend)-new Date())/86400000);
+    const isEx=exV.has(v.id);
+    const vc=document.createElement('div');vc.className='vc';
+    vc.innerHTML=`<div class="vch"><div class="vcbar" style="background:${v.color}"></div>
+      <div style="flex:1"><div class="vcn">${v.name}</div><div class="vcz">${v.zone}</div></div>
+      <div style="display:flex;gap:5px"><button class="btn sm" onclick="oVD(${v.id})">${T_('編輯','Edit')}</button><button class="btn sm danger" onclick="delV(${v.id})">${T_('刪除','Delete')}</button></div>
+    </div>
+    <div class="vcb">
+      <div class="vcst">
+        <div class="vcs"><div class="vcsv" style="color:${v.color}">${sl.length}</div><div class="vcsl">${LANG==='en'?'Staff':'員工數'}</div></div>
+        <div class="vcs"><div class="vcsv" style="color:${v.rate>95?'var(--gd)':'#92400e'}">${v.rate}%</div><div class="vcsl">${LANG==='en'?'SLA Rate':'SLA達成'}</div></div>
+        <div class="vcs"><div class="vcsv">${v.tasks}</div><div class="vcsl">${LANG==='en'?'Monthly Tasks':'本月任務'}</div></div>
+      </div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Phone':'公司電話'}</span><span class="vcv">${v.phone}</span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Address':'公司地址'}</span><span class="vcv">${v.addr}</span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Contact':'聯絡負責人'}</span><span class="vcv">${v.contact} · ${v.cphone}</span></div>
+      <div class="vcrow"><span class="vcl">Email</span><span class="vcv"><a href="mailto:${v.cemail}">${v.cemail}</a></span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Website':'官方網站'}</span><span class="vcv"><a href="${v.web}" target="_blank">${v.web}</a></span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'LINE Official':'LINE 官方帳號'}</span><span class="vcv"><a href="https://line.me/ti/p/${v.line}" target="_blank">${v.line}</a></span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Contract Period':'合約期間'}</span><span class="vcv">${v.cstart} ~ ${v.cend}</span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Contract Status':'合約狀態'}</span><span class="vcv ${dl<90?'cwarn':'cok'}">${dl>0?LANG==='en'?`${dl} days left`:`剩 ${dl} 天`:(LANG==='en'?'Expired':'已到期')}</span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'SLA Limit':'SLA 時限'}</span><span class="vcv">${v.sla} ${T_('分鐘','min')}</span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'Monthly Fee':'月費'}</span><span class="vcv">NT$ ${v.fee.toLocaleString()}</span></div>
+      <div class="vcrow"><span class="vcl">${LANG==='en'?'On Duty Today':'今日出勤'}</span><span class="vcv" style="color:var(--gd);font-weight:700">${on} / ${sl.length} ${LANG==='en'?'on duty':'人'}</span></div>
+      <div class="vcacts">
+        <button class="btn sm" onclick="togVEx(${v.id})">${isEx?(LANG==='en'?'Collapse':'收合員工'):(LANG==='en'?'Show Staff ('+sl.length+')':'查看員工('+sl.length+')')}</button>
+        <button class="btn sm pri" onclick="oSF(null,${v.id})">${T_('新增人員','Add Staff')}</button>
+        <button class="btn sm" onclick="toast(T_('已聯繫 ${v.name}','Contacted ${v.name}'))">${T_('聯繫','Contact')}</button>
+      </div>
+    </div>`;
+    if(isEx){
+      const exp=document.createElement('div');exp.className='stexp';
+      sl.forEach(s=>{
+        const r=document.createElement('div');r.className='strow';
+        r.innerHTML=`<div class="stav" style="background:${v.color}22;color:${v.color}">${s.name[0]}</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--mu)">${s.role} · ${LANG==='en'?(s.shiftEn||s.shift):s.shift}</div></div>
+          <span style="font-size:12px;font-weight:700;color:${s.status==='on'?'var(--gd)':'var(--mu)'}">${s.status==='on'?(LANG==='en'?'● On Duty':'●值班'):(LANG==='en'?'○ Off Duty':'○休息')}</span>
+          <button class="btn sm" style="margin-left:6px" onclick="oSF(${s.id})">${T_('編輯','Edit')}</button>`;
+        exp.appendChild(r);
+      });
+      vc.appendChild(exp);
+    }
+    grid.appendChild(vc);
+  });
+}
+function togVEx(id){exV.has(id)?exV.delete(id):exV.add(id);rVC();}
+function delV(id){if(!confirm('確定刪除此公司？'))return;V=V.filter(v=>v.id!==id);rVC();toast(LANG==='en'?'Vendor deleted':'公司已刪除');}
+
+// ── STAFF ──
+function rSF(){
+  const q=(document.getElementById('sfq').value||'').toLowerCase();
+  const vf=document.getElementById('sf-vf').value;
+  const sf=document.getElementById('sf-sf').value;
+  const list=S.filter(s=>{if(q&&!s.name.toLowerCase().includes(q))return false;if(vf&&s.vid!==parseInt(vf))return false;if(sf&&s.status!==sf)return false;return true;});
+  const gv=id=>V.find(v=>v.id===id);
+  document.getElementById('sftbody').innerHTML=!list.length?`<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--mu)">${T_('無符合條件的人員','No staff found')}</td></tr>`:
+  list.map(s=>`<tr>
+    <td style="font-weight:700">${s.name}</td>
+    <td style="font-size:12px;color:var(--mu)">${s.eid}</td>
+    <td>${LANG==='en'?(s.roleEn||s.role):s.role}</td>
+    <td style="font-size:13px">${gv(s.vid)?.name||'—'}</td>
+    <td style="font-size:13px">${LANG==='en'?(s.shiftEn||s.shift):s.shift}</td>
+    <td><span style="font-size:13px;font-weight:700;color:${s.status==='on'?'var(--gd)':'var(--mu)'}">${s.status==='on'?(LANG==='en'?'● On Duty':'●值班中'):(LANG==='en'?'○ Off Duty':'○休息')}</span></td>
+    <td style="font-size:13px">${s.phone}</td>
+    <td style="font-size:12px;color:var(--mu)">${s.join}</td>
+    <td><div class="tacts">
+      <button class="ib" onclick="oSF(${s.id})" title="編輯"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="ib del" onclick="delSF(${s.id})" title="刪除"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+    </div></td>
+  </tr>`).join('');
+  document.getElementById('sb-sn').textContent=S.length;
+}
+function delSF(id){if(!confirm('確定刪除此人員？'))return;S=S.filter(s=>s.id!==id);rSF();rVC();toast(LANG==='en'?'Staff deleted':'人員已刪除');}
+
+// ── SCHEDULE ──
+const DAYS_ZH=['週一','週二','週三','週四','週五','週六','週日'];
+const DAYS_EN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SCY=['am','pm','full','off'];
+const SLB_ZH={am:'早班',pm:'午班',full:'全班',off:'休'};
+const SLB_EN={am:'AM',pm:'PM',full:'Full',off:'Off'};
+function getSLB(){return LANG==='en'?SLB_EN:SLB_ZH;}
+function getDAYS(){return LANG==='en'?DAYS_EN:DAYS_ZH;}
+const SCL={am:'sham',pm:'shpm',full:'shfull',off:'shoff'};
+function initSC(){
+  const sel=document.getElementById('scv');
+  if(!sel.options.length)V.forEach(v=>sel.innerHTML+=`<option value="${v.id}">${v.name}</option>`);
+  rSC();
+}
+function rSC(){
+  const vid=parseInt(document.getElementById('scv').value)||V[0]?.id;
+  const sl=S.filter(s=>s.vid===vid).slice(0,12);
+  const g=document.getElementById('scgrid');
+  g.style.gridTemplateColumns='110px repeat(7,1fr)';
+  const DAYS=getDAYS();const SLB=getSLB();
+  g.innerHTML=`<div class="sghd">${T_('人員 \\ 日期','Staff \\ Day')}</div>${DAYS.map(d=>`<div class="sghd" style="text-align:center">${d}</div>`).join('')}`;
+  sl.forEach((s,si)=>{
+    g.innerHTML+=`<div class="sgname">${s.name}<div style="font-size:10px;color:var(--mu)">${LANG==='en'?(s.roleEn||s.role):s.role}</div></div>`;
+    DAYS.forEach((_,di)=>{
+      const sk=SCY[(si+di)%4];
+      g.innerHTML+=`<div class="sgcell" onclick="cycSH(this)"><span class="sgsh ${SCL[sk]}">${SLB[sk]}</span></div>`;
+    });
+  });
+}
+function cycSH(c){
+  const sp=c.querySelector('.sgsh');
+  const cur=SCY.find(k=>sp.classList.contains(SCL[k]))||'off';
+  const nxt=SCY[(SCY.indexOf(cur)+1)%4];
+  sp.className=`sgsh ${SCL[nxt]}`;sp.textContent=getSLB()[nxt];
+}
+
+// ── DRAWER ──
+function oDrawer(id){
+  currDid=id;
+  const t=T.find(t=>t.id===id);if(!t)return;
+  document.getElementById('dn').textContent=`${EMOJ[t.cat]} ${tname(t)}`;
+  document.getElementById('ds').textContent=`${CN(t.cat)} · ${t.fl} · ${t.ex}`;
+  const sc={ok:'dvg',warn:'dva',err:'dvr'}[t.s];
+  const sv=document.getElementById('dst');sv.textContent=(LANG==='en'?{ok:'Normal',warn:'Warning',err:'Alert'}:{ok:'正常',warn:'預警',err:'異常'})[t.s];sv.className='drstv '+sc;
+  document.getElementById('dwt').textContent=`${t.wt} ${T_('分鐘','min')}`;
+  document.getElementById('dsc').textContent=`${t.sc} 分`;
+  document.getElementById('dus').textContent=`${t.us} 次`;
+  const bar=(pfx,val,max,wv,cv,okc)=>{
+    const pct=Math.min(val/max*100,100);
+    const col=val<cv?'#e24b4a':val<wv?'#f59e0b':(okc||'#1d9e75');
+    document.getElementById(pfx).textContent=pfx==='dnh'?`${val} ppm`:`${val}%`;
+    document.getElementById(pfx).style.color=col;
+    document.getElementById(pfx+'-f').style.cssText=`width:${pct}%;background:${col}`;
+  };
+  bar('dnh',t.nh,80,25,40);bar('dpp',t.pp,100,50,25);bar('dsp',t.sp,100,50,25,'#3b82f6');
+  document.getElementById('dtp').textContent=CNAME[t.cat];
+  document.getElementById('dfl').textContent=t.fl;
+  document.getElementById('dex').textContent=t.ex;
+  document.getElementById('dadr').textContent=t.addr||'—';
+  const pkEl=document.getElementById('dpk');
+  if(pkEl){
+    if(t.pk!=null){
+      pkEl.textContent=t.pk?(LANG==='en'?'✓ Available':'✓ 有停車位'):(LANG==='en'?'✗ None':'✗ 無停車位');
+      pkEl.style.color=t.pk?'var(--gd)':'#991b1b';
+    } else {
+      pkEl.textContent='—';pkEl.style.color='';
+    }
+  }
+  const hoursEl=document.getElementById('dhours');
+  if(hoursEl) hoursEl.textContent=tHours(t);
+  const openEl=document.getElementById('dopen');
+  if(openEl){
+    const open=isOpen(t);
+    openEl.textContent=LANG==='en'?(open?'Open':'Closed'):(open?'營業中':'已打烊');
+    openEl.style.color=open?'var(--gd)':'#991b1b';
+    openEl.style.fontWeight='700';
+  }
+  const fcs=LANG==='en'?[{l:'Accessible',v:t.ac},{l:'Family',v:t.fm},{l:'Nursing',v:t.nr},{l:'24H',v:t.h24}]:[{l:'無障礙',v:t.ac},{l:'親子廁',v:t.fm},{l:'哺乳室',v:t.nr},{l:'24小時',v:t.h24}];
+  document.getElementById('dfac').innerHTML=fcs.map(f=>`<div class="drfac${f.v?'':' no'}">${f.v?'✓':'—'} ${f.l}</div>`).join('');
+
+  // Dispatch info
+  const dp=TASKS.find(d=>d.tid===id&&d.st==='active');
+  const dEl=document.getElementById('d-dispatch-info');
+  if(dp&&dp.dt){
+    dEl.innerHTML=`<div style="padding:8px 11px;background:var(--gl);border-radius:8px;border:1px solid var(--gm);color:var(--gd);font-weight:600;margin-bottom:6px">
+      ${T_(`已於 ${dp.dt} ${dp.auto?'自動派遣':'指派'}`,`${dp.auto?'Auto-dispatched':'Assigned'} at ${dp.dt}`)} <strong>${dp.cl}</strong> ${T_('清潔員前往處理','dispatched')}
+      ${dp.eta?`<div style="font-size:12px;font-weight:400;margin-top:3px">ETA: ${dp.eta} min</div>`:''}
+    </div>`;
+  } else if(dp){
+    dEl.innerHTML=`<div style="padding:8px 11px;background:var(--gl);border-radius:8px;color:var(--gd);font-weight:600"><strong>${dp.cl}</strong> ${T_(`前往中，預計 ${dp.eta} 分鐘到達`,`en route, ETA ${dp.eta} min`)}</div>`;
+  } else {
+    dEl.innerHTML=`<div style="padding:8px 11px;background:var(--al);border-radius:8px;color:#92400e;font-weight:600">${T_('目前無派工任務','No active dispatch')}</div>`;
+  }
+
+  // Vendor info
+  const ven=V.find(v=>v.id===t.vid);
+  const vEl=document.getElementById('d-vendor-info');
+  if(ven){
+    vEl.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:9px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--bd)">
+      <div style="width:10px;height:10px;border-radius:50%;background:${ven.color};flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-weight:700">${ven.name}</div><div style="font-size:12px;color:var(--mu)">${ven.contact} · ${ven.cphone}</div></div>
+      <div style="font-size:11px;color:var(--mu)">${LANG==='en'?`SLA ${ven.sla}min`:`SLA ${ven.sla}分`}</div>
+    </div>`;
+  }
+
+
+
+  if(lmap) try{lmap.setCenter?.([t.lng,t.lat]);}catch(e){}
+  document.getElementById('drawer').classList.add('open');
+}
+function cDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  currDid=null;
+}
+
+// ── MODALS ──
+function oM(id){document.getElementById(id).classList.add('open');}
+function cM(id){document.getElementById(id).classList.remove('open');}
+
+function oDP(tid){
+  document.getElementById('dm-t').innerHTML=T.map(t=>`<option value="${t.id}"${t.id===tid?' selected':''}>${EMOJ[t.cat]} ${t.name}</option>`).join('');
+  document.getElementById('dm-ps').innerHTML=`<option value="auto">🤖 ${T_('自動指派最近人員','Auto-assign nearest')}</option>`+S.filter(s=>s.status==='on').map(s=>`<option>${s.name}（${LANG==='en'?(s.roleEn||s.role):s.role}·${V.find(v=>v.id===s.vid)?.name||''}）</option>`).join('');
+  if(tid){const t=T.find(t=>t.id===tid);if(t){document.getElementById('mdt').textContent=T_(`指派任務 — ${t.name}`,`Assign Task — ${t.name}`);const tp=document.getElementById('dm-tp');if(t.pp<30)tp.value='補充衛生紙';else if(t.sp<30)tp.value='補充洗手乳';else tp.value='清潔';}}
+  document.getElementById('dm-nt').value='';
+  oM('m-dp');
+}
+function doDP(){
+  const tid=parseInt(document.getElementById('dm-t').value);
+  const tp=document.getElementById('dm-tp').value;
+  const psel=document.getElementById('dm-ps');
+  const pname=psel.options[psel.selectedIndex].text;
+  const t=T.find(t=>t.id===tid);
+  const now=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  let task=TASKS.find(d=>d.tid===tid&&d.st!=='done');
+  const isAuto = pname.includes('自動');
+  const cl = isAuto ? (bestStaff(t)||S.filter(s=>s.status==='on')[0])?.name||'自動配對' : pname.split('（')[0];
+  const eta = Math.round(5+Math.random()*15);
+  if(task){task.cl=cl;task.st='active';task.eta=eta;task.dt=now;task.auto=isAuto;}
+  else TASKS.push({id:TASKS.length+1,tid,cl,tp,st:'active',eta,sla:30,dt:now,auto:isAuto});
+  cM('m-dp');
+  toast(`${isAuto?'🤖':'✅'} ${T_(`已於 ${now} ${isAuto?'自動派遣':'指派'} ${cl} 清潔員前往 ${t?tname(t):''}`, `${isAuto?'Auto-dispatched':'Assigned'} ${cl} → ${t?tname(t):''} at ${now}`)}`);
+  rAL();rDP();bRPAl();bRPDP();updCounts();
+}
+
+let _eSid=null,_eVid=null;
+function oSF(id,defVid){
+  _eSid=id||null;
+  document.getElementById('sf-v').innerHTML=V.map(v=>`<option value="${v.id}">${v.name}</option>`).join('');
+  if(id){
+    const s=S.find(s=>s.id===id);if(!s)return;
+    document.getElementById('mst').textContent=T_('編輯人員','Edit Staff');
+    document.getElementById('sf-n').value=s.name;document.getElementById('sf-e').value=s.eid;
+    document.getElementById('sf-r').value=s.role;document.getElementById('sf-v').value=s.vid;
+    document.getElementById('sf-p').value=s.phone;document.getElementById('sf-em').value=s.email;
+    document.getElementById('sf-j').value=s.join;document.getElementById('sf-sh').value=s.shift;
+  }else{
+    document.getElementById('mst').textContent=T_('新增人員','Add Staff');
+    ['sf-n','sf-e','sf-p','sf-em'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});
+    document.getElementById('sf-j').value='';
+    if(defVid)document.getElementById('sf-v').value=defVid;
+  }
+  oM('m-sf');
+}
+function savS(){
+  const n=document.getElementById('sf-n').value.trim();if(!n){toast(LANG==='en'?'Please enter name':'請填入姓名');return;}
+  const d={name:n,eid:document.getElementById('sf-e').value||'EMP-'+nextSid,role:document.getElementById('sf-r').value,vid:parseInt(document.getElementById('sf-v').value),phone:document.getElementById('sf-p').value,email:document.getElementById('sf-em').value,join:document.getElementById('sf-j').value,shift:document.getElementById('sf-sh').value,status:'on',note:''};
+  if(_eSid){const i=S.findIndex(s=>s.id===_eSid);if(i>=0)S[i]={...S[i],...d};toast(LANG==='en'?'Staff updated':'人員已更新');}
+  else{S.push({id:nextSid++,...d});toast(LANG==='en'?'Staff added':'人員已新增');}
+  cM('m-sf');rSF();rVC();
+}
+
+let _eVid2=null;
+function oVD(id){
+  _eVid2=id||null;
+  if(id){
+    const v=V.find(v=>v.id===id);if(!v)return;
+    document.getElementById('mvt').textContent=T_('編輯清潔公司','Edit Vendor');
+    const map={name:'vf-n',zone:'vf-z',addr:'vf-a',phone:'vf-p',web:'vf-w',line:'vf-l',sla:'vf-sl',contact:'vf-c',cphone:'vf-cp',cemail:'vf-ce',cstart:'vf-cs',cend:'vf-ce2',fee:'vf-f'};
+    Object.entries(map).forEach(([k,eid])=>{const el=document.getElementById(eid);if(el)el.value=v[k]||'';});
+  }else{
+    document.getElementById('mvt').textContent=T_('新增清潔公司','Add Vendor');
+    ['vf-n','vf-z','vf-a','vf-p','vf-w','vf-l','vf-sl','vf-c','vf-cp','vf-ce','vf-cs','vf-ce2','vf-f'].forEach(eid=>{const el=document.getElementById(eid);if(el)el.value='';});
+  }
+  oM('m-vd');
+}
+function savV(){
+  const n=document.getElementById('vf-n').value.trim();if(!n){toast(LANG==='en'?'Please enter company name':'請填入公司名稱');return;}
+  const d={name:n,zone:document.getElementById('vf-z').value,addr:document.getElementById('vf-a').value,phone:document.getElementById('vf-p').value,web:document.getElementById('vf-w').value,line:document.getElementById('vf-l').value,sla:+document.getElementById('vf-sl').value||30,contact:document.getElementById('vf-c').value,cphone:document.getElementById('vf-cp').value,cemail:document.getElementById('vf-ce').value,cstart:document.getElementById('vf-cs').value,cend:document.getElementById('vf-ce2').value,fee:+document.getElementById('vf-f').value||0,rate:95,tasks:0,color:'#1d9e75',note:''};
+  if(_eVid2){const i=V.findIndex(v=>v.id===_eVid2);if(i>=0)V[i]={...V[i],...d};toast(LANG==='en'?'Vendor updated':'公司已更新');}
+  else{V.push({id:nextVid++,...d});toast(LANG==='en'?'Vendor added':'公司已新增');}
+  cM('m-vd');rVC();
+}
+
+// ── AI PREDICTION & DISPATCH ──
+let aiHourChart = null;
+
+function initAI(){
+  // Hour prediction chart
+  const ctx = document.getElementById('ai-hour-chart');
+  if(!ctx) return;
+  const now = new Date().getHours();
+  const labels = Array.from({length:24},(_,i)=>i+':00');
+  const baseFlow = [5,3,2,2,3,8,18,32,45,52,58,62,55,48,50,54,60,68,72,65,50,38,22,12];
+  const past = baseFlow.slice(0,now+1);
+  const future = baseFlow.slice(now+1).map(v=>Math.round(v*(0.85+Math.random()*0.3)));
+  if(aiHourChart) aiHourChart.destroy();
+  aiHourChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'已發生',data:[...past,...Array(23-now).fill(null)],borderColor:'#1d9e75',backgroundColor:'rgba(29,158,117,.1)',fill:true,tension:.4,pointRadius:3,borderWidth:2},
+        {label:'AI預測',data:[...Array(now+1).fill(null),...future],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.4,pointRadius:3,borderWidth:2,borderDash:[5,4]},
+      ]
+    },
+    options:{plugins:{legend:{labels:{font:{size:12}}}},scales:{x:{ticks:{font:{size:10},maxTicksLimit:8}},y:{ticks:{font:{size:10}}}},responsive:true,maintainAspectRatio:false}
+  });
+  // Populate toilet selector
+  const sel = document.getElementById('ai-hour-toilet');
+  if(sel && !sel.options.length){
+    T.filter(t=>t.s!=='ok').concat(T.filter(t=>t.s==='ok').slice(0,5)).forEach(t=>{
+      const opt=document.createElement('option');
+      opt.value=t.id;opt.textContent=`${EMOJ[t.cat]} ${t.name}`;
+      sel.appendChild(opt);
+    });
+  }
+  updateAIHourChart();
+  buildAIRisk();
+  buildAISuggestions();
+  buildAIQueue();
+  buildAICrowd();
+  // Draw dispatch route lines on map
+  drawDispatchRoutes();
+}
+
+function updateAIHourChart(){
+  const sel=document.getElementById('ai-hour-toilet');
+  if(!sel) return;
+  const tid=parseInt(sel.value)||T.filter(t=>t.s!=='ok')[0]?.id||T[0]?.id;
+  const t=T.find(x=>x.id===tid);
+  if(!t) return;
+  const now=new Date().getHours();
+  const labels=Array.from({length:24},(_,i)=>i+':00');
+  const seed=t.id*7+t.us;
+  const base=[3,2,1,1,2,6,14,26,38,44,49,52,47,42,44,47,52,58,62,55,42,32,18,9];
+  const scale=t.us/280;
+  const past=base.slice(0,now+1).map((v,i)=>Math.round(v*scale*(0.7+((seed*i)%30)/100)));
+  const future=base.slice(now+1).map((v,i)=>Math.round(v*scale*(0.85+((seed*(i+now))%25)/100)));
+  if(aiHourChart) aiHourChart.destroy();
+  const ctx=document.getElementById('ai-hour-chart');
+  if(!ctx) return;
+  aiHourChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'已發生',data:[...past,...Array(23-now).fill(null)],borderColor:'#1d9e75',backgroundColor:'rgba(29,158,117,.1)',fill:true,tension:.4,pointRadius:3,borderWidth:2},
+        {label:'AI預測',data:[...Array(now+1).fill(null),...future],borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',fill:true,tension:.4,pointRadius:3,borderWidth:2,borderDash:[5,4]},
+      ]
+    },
+    options:{plugins:{legend:{labels:{font:{size:12}}}},scales:{x:{ticks:{font:{size:10},maxTicksLimit:8}},y:{ticks:{font:{size:10}},beginAtZero:true}},responsive:true,maintainAspectRatio:false}
+  });
+}
+
+function buildAIRisk(){
+  const el = document.getElementById('ai-risk-list');
+  if(!el) return;
+  // Score each toilet risk
+  const scored = T.filter(t=>t.s!=='ok'||t.nh>20||t.pp<60||t.sp<60).map(t=>{
+    const risk = Math.round(
+      (t.nh/80)*40 + ((100-t.pp)/100)*30 + ((100-t.sp)/100)*20 + (t.wt/20)*10
+    );
+    return {t, risk};
+  }).sort((a,b)=>b.risk-a.risk).slice(0,8);
+
+  el.innerHTML = scored.map((item,i)=>{
+    const {t,risk} = item;
+    const rCol = risk>60?'#991b1b':risk>40?'#92400e':'#0f6e56';
+    const rBg = risk>60?'var(--rl)':risk>40?'var(--al)':'var(--gl)';
+    const dp = TASKS.find(d=>d.tid===t.id&&d.st==='active');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid var(--bd);">
+      <div style="width:22px;height:22px;border-radius:50%;background:${rBg};color:${rCol};font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700">${EMOJ[t.cat]} ${tname(t)}</div>
+        <div style="font-size:11px;color:var(--mu)">${CN(t.cat)} · NH₃${t.nh}ppm · 紙${t.pp}% · 皂${t.sp}%</div>
+        ${dp&&dp.dt?'<div style="font-size:11px;color:var(--gd);margin-top:2px">'+(LANG==="en"?'✅ At '+dp.dt+' dispatched '+dp.cl:'✅ 已於 '+dp.dt+' 自動派遣 '+dp.cl+' 前往處理')+'</div>':''}
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:16px;font-weight:800;color:${rCol}">${risk}</div>
+        <div style="font-size:10px;color:var(--mu)">${LANG==='en'?'Risk':'風險值'}</div>
+      </div>
+      <button class="btn sm pri" onclick="aiQuickDispatch(${t.id})" style="flex-shrink:0">${T_('AI派工','AI Dispatch')}</button>
+    </div>`;
+  }).join('');
+}
+
+function buildAISuggestions(){
+  const el = document.getElementById('ai-suggestions');
+  if(!el) return;
+  const now = new Date().getHours();
+  const errList = T.filter(t=>t.s==='err');
+  const lowPaper = T.filter(t=>t.pp<40);
+  const suggestions = [
+    {
+      tag:LANG==='en'?'URGENT':'緊急',tagColor:'#991b1b',tagBg:'var(--rl)',
+      title:LANG==='en'?'Dispatch to Alert Toilets Now':'立即派工處理異常廁所',
+      desc: errList.length>0
+        ? `${errList.slice(0,3).map(t=>tname(t)).join(LANG==='en'?', ':'、')} 等 ${errList.length} 個廁所 NH₃ 超標，需立即清潔`
+        : '目前無緊急廁所',
+      action_label:LANG==='en'?'Dispatch Now':'立即執行派工',
+      detail: T_(`將為 ${errList.length} 個異常廁所自動尋找最近可用清潔員並派遣`, `Auto-find nearest cleaner for ${errList.length} alert toilets`),
+      action: ()=>runAIDispatch('urgent')
+    },
+    {
+      tag:LANG==='en'?'PREDICT':'預測',tagColor:'#1d4ed8',tagBg:'var(--bl)',
+      title:`${now+1}:00 高峰前預防派工`,
+      desc:`根據歷史數據，接下來1小時使用量預計增加 35%，建議提前安排清潔`,
+      action_label:LANG==='en'?'Pre-emptive Dispatch':'執行預防派工',
+      detail:T_('將在高峰前30分鐘提前派遣清潔員至高流量廁所','Send cleaners to high-traffic toilets 30min before peak'),
+      action: ()=>runAIDispatch('predict')
+    },
+    {
+      tag:LANG==='en'?'SUPPLY':'補給',tagColor:'#92400e',tagBg:'var(--al)',
+      title:LANG==='en'?'Paper / Soap Supply Route':'衛生紙 / 洗手乳補給路線',
+      desc:`${lowPaper.length} 個廁所耗材低於40%，AI 已計算最短補給路線（節省約 28% 行程）`,
+      action_label:LANG==='en'?'Execute Supply Route':'按路線執行補給',
+      detail:T_('依照 AI 規劃的最短路線順序，派遣補給人員依序前往各廁所','Dispatch supply staff along AI-optimized shortest route'),
+      action: ()=>runAIDispatch('supply')
+    },
+    {
+      tag:'優化',tagColor:String('var(--gd)'),tagBg:'var(--gl)',
+      title:LANG==='en'?'Staff Scheduling Optimization':'人員排班效率優化',
+      desc:`根據今日派工數據，調整 3 名清潔員班次可減少 22% 移動距離`,
+      action_label:LANG==='en'?'Apply Schedule Advice':'套用排班建議',
+      detail:T_('AI 分析各廁所地理分布與使用尖峰，重新分配清潔員責任區','AI re-assigns cleaner zones based on geo distribution & peak hours'),
+      action: ()=>runAIDispatch('optimize')
+    },
+  ];
+  el.innerHTML = suggestions.map((s,i)=>`
+    <div style="border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:var(--s)">
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--bd)">
+        <span style="padding:2px 9px;border-radius:100px;font-size:11px;font-weight:800;background:${s.tagBg};color:${s.tagColor};flex-shrink:0">${s.tag}</span>
+        <div style="font-size:13px;font-weight:700;flex:1">${s.title}</div>
+        <button class="btn pri sm" onclick="AI_SUGG[${i}].action()" style="flex-shrink:0;white-space:nowrap">${s.action_label}</button>
+      </div>
+      <div style="padding:9px 14px;background:var(--bg)">
+        <div style="font-size:12px;color:var(--tx);margin-bottom:3px">${s.desc}</div>
+        <div style="font-size:11px;color:var(--mu)">${LANG==='en'?'How it works: ':"執行說明："}${s.detail}</div>
+      </div>
+    </div>`).join('');
+  window.AI_SUGG = suggestions;
+}
+
+function buildAIQueue(){
+  const el = document.getElementById('ai-dispatch-queue');
+  if(!el) return;
+  const abnormal = T.filter(t=>t.s!=='ok').slice(0,6);
+  el.innerHTML = abnormal.map(t=>{
+    const dp = TASKS.find(d=>d.tid===t.id&&d.st==='active');
+    const nearStaff = S.filter(s=>s.status==='on'&&s.vid===t.vid)[0];
+    const eta = Math.round(5+Math.random()*15);
+    return `<div style="background:var(--s);border-radius:9px;border:1px solid var(--bd);border-left:3px solid ${t.s==='err'?'var(--r)':'var(--a)'};padding:10px 12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+        <div style="font-size:13px;font-weight:700">${EMOJ[t.cat]} ${tname(t)}</div>
+        <span style="padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;background:${t.s==='err'?'var(--rl)':'var(--al)'};color:${t.s==='err'?'#991b1b':'#92400e'}">${T_(t.s==='err'?'緊急':'預警', t.s==='err'?'Urgent':'Warning')}</span>
+      </div>
+      ${dp&&dp.dt
+        ? '<div style="font-size:12px;color:var(--gd);font-weight:600">'+(LANG==="en"?'✅ At '+dp.dt+', '+dp.cl+' dispatched':'✅ 已於 '+dp.dt+' 自動派遣 '+dp.cl+' 清潔員前往處理')+'</div>'
+        : nearStaff
+          ? '<div style="font-size:12px;color:var(--mu)">'+(LANG==="en"?"Recommended: ":"建議派遣：")+'<strong>'+nearStaff.name+'</strong>（'+(LANG==="en"?'ETA: '+eta+' min)':"預計"+eta+"分鐘到達）")+'</div><button class="btn sm pri" onclick="aiQuickDispatch('+t.id+')" style="margin-top:6px;width:100%">'+(LANG==="en"?'AI Auto-Dispatch':'AI 自動派遣')+'</button>'
+          : `<div style="font-size:12px;color:var(--mu)">${LANG==='en'?'No available staff':'無可用人員'}</div>`
+      }
+    </div>`;
+  }).join('');
+
+  // Update stats
+  const doneEl = document.getElementById('ai-stat-done');
+  const pendEl = document.getElementById('ai-stat-pending');
+  if(doneEl) doneEl.textContent = TASKS.filter(d=>d.st==='done').length + Math.round(Math.random()*3+20);
+  if(pendEl) pendEl.textContent = TASKS.filter(d=>d.st==='pending').length;
+}
+
+// ── 高流量廁所監控 ──
+function getCrowdLevel(t){
+  const h=new Date().getHours();
+  const base=[5,3,2,2,3,8,18,32,45,52,58,62,55,48,50,54,60,68,72,65,50,38,22,12];
+  const seed=t.id*7+t.us;
+  const scale=t.us/280;
+  const cur=Math.round(base[h]*scale*(0.7+((seed*h)%30)/100));
+  const nxt=Math.round(base[(h+1)%24]*scale*(0.85+((seed*(h+1))%25)/100));
+  const trend=nxt>cur*1.2?'up':nxt<cur*0.8?'down':'flat';
+  // capacity %: assume capacity~80 people/hr for high-traffic
+  const cap=Math.min(Math.round(cur/(t.us/280*0.8)*100),120);
+  return{cur,nxt,trend,cap};
+}
+
+function buildAICrowd(){
+  // Main crowd panel
+  const el=document.getElementById('ai-crowd-list');
+  const miniEl=document.getElementById('ai-crowd-mini');
+  if(!el&&!miniEl) return;
+
+  const h=new Date().getHours();
+  // Compute crowd for all toilets, sort by current flow desc
+  const ranked=T.map(t=>{
+    const c=getCrowdLevel(t);
+    return{t,cur:c.cur,nxt:c.nxt,trend:c.trend,cap:c.cap};
+  }).sort((a,b)=>b.cur-a.cur);
+
+  const top10=ranked.slice(0,10);
+  const top5=ranked.slice(0,5);
+
+  // ── Mini panel (right sidebar Top 5) ──
+  if(miniEl){
+    miniEl.innerHTML=top5.map(({t,cur,nxt,trend,cap},i)=>{
+      const capCol=cap>=90?'#991b1b':cap>=70?'#92400e':'var(--gd)';
+      const capBg=cap>=90?'var(--rl)':cap>=70?'var(--al)':'var(--gl)';
+      const trendIcon=trend==='up'?'<span style="color:#e24b4a;font-size:11px">▲</span>':trend==='down'?'<span style="color:#1d9e75;font-size:11px">▼</span>':'<span style="color:#92400e;font-size:11px">─</span>';
+      const dp=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid var(--bd);cursor:pointer;" onclick="oDrawer(${t.id})">
+        <div style="font-size:11px;font-weight:800;color:var(--mu);width:14px;text-align:center">${i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${EMOJ[t.cat]} ${tname(t)}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:1px">${CN(t.cat)} · ${cur}人/時 ${trendIcon}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:12px;font-weight:800;color:${capCol};padding:1px 7px;background:${capBg};border-radius:100px">${cap}%</div>
+          ${dp?'<div style="font-size:10px;color:var(--gd);margin-top:2px">✓ 已派工</div>':''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Main panel (left column Top 10) ──
+  if(!el) return;
+  el.innerHTML=top10.map(({t,cur,nxt,trend,cap},i)=>{
+    const capCol=cap>=90?'#991b1b':cap>=70?'#92400e':'var(--gd)';
+    const capBg=cap>=90?'var(--rl)':cap>=70?'var(--al)':'var(--gl)';
+    const trendIcon=trend==='up'?'↑ 上升中':trend==='down'?'↓ 下降中':'→ 持平';
+    const trendCol=trend==='up'?'#e24b4a':trend==='down'?'#1d9e75':'#92400e';
+    const dp=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+    const isHigh=cap>=70;
+    // Bar width
+    const barW=Math.min(cap,100);
+    const barCol=cap>=90?'#e24b4a':cap>=70?'#f59e0b':'#1d9e75';
+
+    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--bd);">
+      <div style="width:22px;height:22px;border-radius:50%;background:${capBg};color:${capCol};font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <div style="font-size:13px;font-weight:700">${EMOJ[t.cat]} ${tname(t)}</div>
+          ${t.s!=='ok'?`<span style="padding:1px 6px;border-radius:100px;font-size:10px;font-weight:700;background:${t.s==='err'?'var(--rl)':'var(--al)'};color:${t.s==='err'?'#991b1b':'#92400e'}">${T_(t.s==='err'?'異常':'預警', t.s==='err'?'Alert':'Warning')}</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px">
+          <span style="font-size:12px;color:var(--mu)">${CN(t.cat)} · ${t.fl}</span>
+          <span style="font-size:12px;font-weight:700;color:${trendCol}">${trendIcon}</span>
+          <span style="font-size:12px;color:var(--mu)">下時: <strong style="color:var(--tx)">${nxt}人</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="flex:1;height:6px;background:var(--bd);border-radius:3px;overflow:hidden">
+            <div style="width:${barW}%;height:6px;background:${barCol};border-radius:3px;transition:width .4s"></div>
+          </div>
+          <span style="font-size:12px;font-weight:800;color:${capCol};width:38px;text-align:right">${cur}人/時</span>
+        </div>
+        ${dp?`<div style="margin-top:5px;font-size:11px;color:var(--gd);font-weight:600">✅ ${T_(`已派遣 ${dp.cl}，預計 ${dp.eta} 分到達`,`Dispatched ${dp.cl}, ETA ${dp.eta} min`)}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;align-items:flex-end">
+        <span style="padding:2px 9px;border-radius:100px;font-size:12px;font-weight:800;background:${capBg};color:${capCol}">${cap >= 100 ? '爆滿' : cap>=90?'擁擠':cap>=70?'繁忙':'流暢'}</span>
+        ${isHigh&&!dp
+          ? `<button class="btn sm pri" onclick="crowdDispatch(${t.id})" style="font-size:11px;padding:4px 10px;white-space:nowrap">⚡ 加注派工</button>`
+          : dp
+          ? `<span style="font-size:11px;color:var(--gd);font-weight:600">● 派工中</span>`
+          : `<span style="font-size:11px;color:var(--mu)">正常</span>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function crowdDispatch(tid){
+  const t=T.find(t=>t.id===tid);
+  if(!t) return;
+  const staff=bestStaff(t)||S.filter(s=>s.status==='on')[0];
+  if(!staff){toast(T_('目前無可用清潔員','No available cleaners'));return;}
+  const now=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const eta=Math.round(4+Math.random()*10);
+  let task=TASKS.find(d=>d.tid===tid&&d.st!=='done');
+  const tp='加注清潔（高流量）';
+  if(task){task.cl=staff.name;task.st='active';task.eta=eta;task.dt=now;task.auto=true;task.tp=tp;}
+  else TASKS.push({id:TASKS.length+1,tid,cl:staff.name,tp,st:'active',eta,sla:20,dt:now,auto:true});
+  toast(`⚡ ${T_(`高流量加注：已派遣 ${staff.name} 前往 ${tname(t)}，預計 ${eta} 分到達`, `Boost dispatch: ${staff.name} → ${tname(t)}, ETA ${eta} min`)}`);
+  buildAICrowd();buildAIQueue();buildAIRisk();rAL();rDP();bRPAl();bRPDP();updCounts();
+}
+
+function dispatchAllHotspots(){
+  const h=new Date().getHours();
+  const now=new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const hotspots=T.map(t=>{const c=getCrowdLevel(t);return{t,cap:c.cap};})
+    .filter(({cap})=>cap>=70)
+    .sort((a,b)=>b.cap-a.cap)
+    .slice(0,8);
+  let count=0;
+  hotspots.forEach(({t})=>{
+    const existing=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+    if(existing) return;
+    const staff=bestStaff(t)||S.filter(s=>s.status==='on')[count%3];
+    if(!staff) return;
+    const eta=Math.round(4+Math.random()*12);
+    TASKS.push({id:TASKS.length+1,tid:t.id,cl:staff.name,tp:'加注清潔（高流量）',st:'active',eta,sla:20,dt:now,auto:true});
+    count++;
+  });
+  toast(`⚡ 已對 ${count} 個高流量廁所完成加注派工！`);
+  buildAICrowd();buildAIQueue();buildAIRisk();rAL();rDP();updCounts();
+}
+
+function aiQuickDispatch(tid){
+  const t = T.find(t=>t.id===tid);
+  const staff = bestStaff(t);
+  if(!staff){toast(T_('目前無可用清潔員','No available cleaners'));return;}
+  const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const eta = Math.round(5+Math.random()*15);
+  const tp = t.pp<30?'補充衛生紙':t.sp<30?'補充洗手乳':t.nh>40?'緊急清潔':'清潔';
+  let task = TASKS.find(d=>d.tid===tid&&d.st!=='done');
+  if(task){task.cl=staff.name;task.st='active';task.eta=eta;task.dt=now;task.auto=true;task.tp=tp;}
+  else TASKS.push({id:TASKS.length+1,tid,cl:staff.name,tp,st:'active',eta,sla:t?.s==='err'?15:30,dt:now,auto:true});
+  toast(`🤖 ${T_(`已於 ${now} 自動派遣 ${staff.name} 清潔員前往 ${t?tname(t):''}`, `Auto-dispatched ${staff.name} → ${t?tname(t):''} at ${now}`)}`);
+  rAL();rDP();buildAIRisk();buildAISuggestions();buildAIQueue();buildAICrowd();bRPAl();bRPDP();updCounts();
+}
+
+function runAIDispatch(mode){
+  const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const targets = mode==='urgent'
+    ? T.filter(t=>t.s==='err')
+    : mode==='supply'
+    ? T.filter(t=>t.pp<40)
+    : T.filter(t=>t.s!=='ok');
+
+  let dispatched = 0;
+  targets.forEach(t=>{
+    const existing = TASKS.find(d=>d.tid===t.id&&d.st!=='done');
+    if(existing&&existing.st==='active') return;
+    const staff = S.filter(s=>s.status==='on'&&s.vid===t.vid)[0]||S.filter(s=>s.status==='on')[0];
+    if(!staff) return;
+    const eta = Math.round(5+Math.random()*15);
+    if(existing){existing.cl=staff.name;existing.st='active';existing.eta=eta;existing.dt=now;existing.auto=true;}
+    else TASKS.push({id:TASKS.length+1,tid:t.id,cl:staff.name,tp:t.pp<30?'補充衛生紙':'清潔',st:'active',eta,sla:30,dt:now,auto:true});
+    dispatched++;
+  });
+  toast(`🤖 ${T_(`AI 派工完成！已於 ${now} 自動派遣 ${dispatched} 筆任務`, `AI Dispatch done! ${dispatched} tasks assigned at ${now}`)}`);
+  rAL();rDP();buildAIRisk();buildAISuggestions();buildAIQueue();buildAICrowd();bRPAl();bRPDP();updCounts();
+  // Update sidebar badge
+  const aib = document.getElementById('sb-ain');
+  if(aib){aib.textContent=dispatched;aib.style.background='var(--gl)';aib.style.color='var(--gd)';}
+}
+
+// ── DISPATCH ROUTE LINES ON MAP ──
+let dispatchRouteLines = [];
+let cleanerPositions = [
+  {name:'林志明', lat:25.038, lng:121.543},
+  {name:'陳美玲', lat:25.035, lng:121.559},
+  {name:'李淑芬', lat:25.051, lng:121.544},
+  {name:'王大偉', lat:25.043, lng:121.526},
+  {name:'謝宛均', lat:25.062, lng:121.538},
+  {name:'江建成', lat:25.028, lng:121.552},
+  {name:'趙志明', lat:25.055, lng:121.561},
+  {name:'馮淑娟', lat:25.031, lng:121.531},
+  {name:'陳秋雨', lat:25.048, lng:121.574},
+  {name:'黃建民', lat:25.042, lng:121.518},
+];
+
+function getCleanerPos(name){
+  // Return approximate position or generate from name hash
+  const found = cleanerPositions.find(c=>c.name===name);
+  if(found) return {lat:found.lat, lng:found.lng};
+  // Fallback: generate pseudo-random position near Taipei
+  const hash = name.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  return {
+    lat: 25.02 + (hash % 80)/1000,
+    lng: 121.50 + (hash % 120)/1000
+  };
+}
+
+function drawDispatchRoutes(){
+  if(!lmap) return;
+  dispatchRouteLines.forEach(obj=>{try{obj.setMap(null);}catch(e){}});
+  dispatchRouteLines=[];
+
+  const rtBtn=document.getElementById('lb-rt');
+  if(!rtBtn?.classList.contains('on')) return;
+
+  TASKS.filter(d=>d.st==='active'&&d.dt).forEach(d=>{
+    const t=T.find(x=>x.id===d.tid); if(!t) return;
+    const cp=getCleanerPos(d.cl);
+    const statusCol=t.s==='err'?'#e24b4a':t.s==='warn'?'#f59e0b':'#1d9e75';
+
+    // Uniform orange dashed route line
+    try{
+      const line=new inavi.maps.Polyline({map:lmap,
+        path:[[cp.lng,cp.lat],[t.lng,t.lat]],
+        style:{lineColor:'#f59e0b',lineWidth:2.5,lineOpacity:0.9,lineDasharray:[8,5]}
+      });
+      dispatchRouteLines.push(line);
+    }catch(e){
+      try{const line=new inavi.maps.Polyline({map:lmap,path:[[cp.lng,cp.lat],[t.lng,t.lat]],style:{lineColor:'#f59e0b',lineWidth:2.5,lineOpacity:0.9}});dispatchRouteLines.push(line);}catch(e2){}
+    }
+
+    // Orange arrow at midpoint — click shows who/where/ETA
+    try{
+      const midLng=(cp.lng+t.lng)/2, midLat=(cp.lat+t.lat)/2;
+      const infoHtml=`<div style="padding:9px 13px;font-size:12px;font-family:var(--fn,sans-serif);min-width:155px;">
+        <div style="font-weight:800;margin-bottom:4px;font-size:13px;">🚶 ${d.cl}</div>
+        <div style="color:#6b808f;margin-bottom:4px;">→ ${tname(t)}</div>
+        <div style="font-weight:700;color:${statusCol};margin-bottom:2px;">ETA ${d.eta} min</div>
+        <div style="font-size:11px;color:#6b808f;">${tpName(d.tp)}</div>
+      </div>`;
+      const arrowEl=makeIconEl(`<div style="width:20px;height:20px;background:#f59e0b;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(245,158,11,.5);font-size:10px;color:#fff;font-weight:800;cursor:pointer;">→</div>`);
+      const arrowMk=new inavi.maps.Marker({map:lmap,position:[midLng,midLat]});
+      arrowMk.setIcon(arrowEl);
+      if(window.inavi?.maps?.InfoWindow){
+        const info=new inavi.maps.InfoWindow({position:[midLng,midLat],content:infoHtml});
+        arrowMk.on?.('click',()=>{closePop();info.setMap(lmap);_activeInfo=info;});
+      }
+      dispatchRouteLines.push(arrowMk);
+    }catch(e){}
+  });
+}
+
+// ── DARK MODE ──
+let isDarkMode=false;
+function toggleTheme(){
+  isDarkMode=!isDarkMode;
+  document.body.classList.toggle('dark',isDarkMode);
+  const btn=document.getElementById('thm-btn');
+  if(btn) btn.classList.toggle('dark-on',isDarkMode);
+  const lbl=document.getElementById('thm-lbl');
+  if(lbl) lbl.textContent=isDarkMode?'🌙':'☀️';
+  // Re-style modal boxes
+  document.querySelectorAll('.mbox').forEach(b=>{b.style.background=isDarkMode?'var(--s)':'';});
+}
+
+// ── i18n ──
+function applyDataLangAttrs(){
+  // Walk all [data-zh] elements - handles static HTML labels
+  document.querySelectorAll('[data-zh]').forEach(el=>{
+    if(el.tagName==='OPTION'){
+      el.textContent = LANG==='en'?(el.dataset.en||el.dataset.zh):el.dataset.zh;
+    } else if(el.children.length===0){
+      el.textContent = LANG==='en'?(el.dataset.en||el.dataset.zh):el.dataset.zh;
+    }
+  });
+  // Update placeholder that we tagged
+  const dmnt = document.getElementById('dm-nt-ph');
+  if(dmnt) dmnt.placeholder = LANG==='en'?'Additional notes…':'補充說明…';
+}
+
+function toggleLang(){
+  LANG = LANG==='zh'?'en':'zh';
+  const btn = document.getElementById('lang-btn');
+  btn.textContent = LANG==='zh'?'EN':'中文';
+  applyLang();
+}
+
+function applyLang(){
+  const isEn = LANG==='en';
+  applyDataLangAttrs();
+
+  // Logo - keep JustToilet branding
+  // (no change needed - logo is static HTML)
+
+  // Sidebar section headers
+  const secs = document.querySelectorAll('.sb-sec');
+  ['主要|MAIN','任務|TASKS','人員管理|STAFF MGMT'].forEach((s,i)=>{
+    if(secs[i]) secs[i].textContent = isEn ? s.split('|')[1] : s.split('|')[0];
+  });
+
+  // Sidebar buttons (preserve SVG + badge)
+  const sbItems = [
+    ['si-dashboard','儀表板','Dashboard'],['si-map','地圖總覽','Map Overview'],
+    ['si-toilets','廁所清單','Toilet List'],['si-alerts','異常告警','Alerts'],
+    ['si-dispatch','派工管理','Dispatch'],['si-ai','AI 預測派工','AI Dispatch'],
+    ['si-vendors','清潔公司','Vendors'],['si-staff','人員管理','Staff'],
+    ['si-schedule','排班管理','Schedule'],
+  ];
+  sbItems.forEach(([id,zh,en])=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const svg = el.querySelector('svg'), badge = el.querySelector('.snum');
+    el.textContent = isEn ? en : zh;
+    if(svg) el.prepend(svg);
+    if(badge) el.append(badge);
+  });
+
+  // Sidebar footer
+  const footDivs = document.querySelectorAll('.sbfoot > div > div');
+  if(footDivs[0]) footDivs[0].textContent = isEn ? 'Admin' : '系統管理員';
+  if(footDivs[1]) footDivs[1].textContent = isEn ? 'MRT Corp' : '捷運公司';
+
+  // Topbar refresh button
+  const rb = document.getElementById('btn-refresh');
+  if(rb) rb.textContent = isEn ? 'Refresh' : '刷新';
+
+  // Alert pill
+  const ptxt = document.getElementById('ptxt');
+  if(ptxt){ const n = parseInt(ptxt.textContent)||0; ptxt.textContent = isEn?`${n} Alerts`:`${n} 個異常`; }
+
+  // Map chips (preserve SVG)
+  [['cc-mrt','捷運','MRT'],['cc-park','公園','Park'],['cc-cvs','便利商店','CVS'],['cc-pub','公廁','Public']].forEach(([id,zh,en])=>{
+    const el=document.getElementById(id); if(!el) return;
+    const svg=el.querySelector('svg'); el.textContent=isEn?en:zh; if(svg) el.prepend(svg);
+  });
+
+  // Map layer buttons
+  const mlBtns = document.querySelectorAll('.mlb');
+  ['清潔員|Cleaners','路線|Routes','深色底圖|Dark Map'].forEach((s,i)=>{
+    if(mlBtns[i]) mlBtns[i].textContent = isEn ? s.split('|')[1] : s.split('|')[0];
+  });
+
+  // Cat bar label
+  const catlbl = document.querySelector('.catlbl');
+  if(catlbl) catlbl.textContent = isEn ? 'Filter' : '分類';
+
+  // Map legend (preserve dot)
+  document.querySelectorAll('.legi').forEach((el,i)=>{
+    const dot = el.querySelector('.legdot');
+    const txts = isEn ? ['Normal','Warning','Alert'] : ['正常','預警','異常'];
+    if(!txts[i]) return;
+    el.textContent = txts[i]; if(dot) el.prepend(dot);
+  });
+
+  // Right panel KPI labels
+  document.querySelectorAll('.rpkl').forEach((el,i)=>{
+    const txts = isEn ? ['Alerts','Warnings','Active Tasks'] : ['異常','預警','進行任務'];
+    if(txts[i]) el.textContent = txts[i];
+  });
+
+  // Right panel tabs
+  [['rpt-al','告警','Alerts'],['rpt-dp','派工','Dispatch'],['rpt-vd','公司','Vendors'],['rpt-sf','人員','Staff']].forEach(([id,zh,en])=>{
+    const el=document.getElementById(id); if(el) el.textContent=isEn?en:zh;
+  });
+
+  // Dashboard KPI labels
+  document.querySelectorAll('.kl').forEach((el,i)=>{
+    const keys=[
+      '本週異常次數|Weekly Anomalies','本週預警次數|Weekly Warnings',
+      '本月完成率|Monthly Completion','今日出勤人員|On Duty Today',
+      '本月異常總次數|Monthly Anomalies','本月預警總次數|Monthly Warnings',
+      '狀態良好廁所|Healthy Toilets','民眾滿意度|Satisfaction'
+    ];
+    if(keys[i]){ const[zh,en]=keys[i].split('|'); el.textContent=isEn?en:zh; }
+  });
+  document.querySelectorAll('.ks').forEach((el,i)=>{
+    const keys=[
+      '比上週 ↑3 次|↑3 vs last week','比上週 ↓8 次|↓8 vs last week',
+      '目標 95%，達成|Target 95%, achieved','共 52 名員工|52 employees',
+      '比上月 ↓12 次|↓12 vs last month','比上月 ↓31 次|↓31 vs last month',
+      '共 24 個點位|24 locations','共 2,841 筆評分|2,841 ratings'
+    ];
+    if(keys[i]){ const[zh,en]=keys[i].split('|'); el.textContent=isEn?en:zh; }
+  });
+
+  // Dashboard panel titles
+  document.querySelectorAll('.pt').forEach((el,i)=>{
+    const keys=[
+      '每週異常 / 預警趨勢|Weekly Alert Trend','AI 建議 / 推薦廁所|AI Suggestions',
+      '廁所評分排行（優）|Top Rated Toilets','需要關注（差）|Needs Attention',
+      '本月異常類型分佈|Monthly Alert Types'
+    ];
+    if(keys[i]){ const[zh,en]=keys[i].split('|'); el.textContent=isEn?en:zh; }
+  });
+
+  // Chart buttons
+  const cbw=document.getElementById('cbw'),cbm=document.getElementById('cbm');
+  if(cbw) cbw.textContent=isEn?'This Week':'本週';
+  if(cbm) cbm.textContent=isEn?'This Month':'本月';
+
+  // Toilet filter chips
+  [['tf-all','全部','All'],['tf-err','異常','Alert'],['tf-warn','預警','Warning'],['tf-ok','正常','Normal'],
+   ['tf-mrt','🚇 捷運','🚇 MRT'],['tf-park','🌳 公園','🌳 Park'],['tf-cvs','🏪 便利商店','🏪 CVS'],['tf-pub','🏛️ 公廁','🏛️ Public'],
+   ['tf-gas','⛽ 加油站','⛽ Gas'],['tf-temple','🏯 廟宇','🏯 Temple']
+  ].forEach(([id,zh,en])=>{ const el=document.getElementById(id); if(el) el.textContent=isEn?en:zh; });
+
+  // Toilet table headers
+  const tth = document.querySelectorAll('#pg-toilets thead th');
+  ['廁所名稱|Name','類型|Type','狀態|Status','NH₃|NH₃','衛生紙|Paper','洗手乳|Soap','等候|Wait','停車|Parking','設施|Facilities','負責公司|Vendor','營業時間|Hours','人流預測|Crowd Forecast','操作|Actions'].forEach((s,i)=>{
+    if(tth[i]){ const[zh,en]=s.split('|'); tth[i].textContent=isEn?en:zh; }
+  });
+  const tq=document.getElementById('tq'); if(tq) tq.placeholder=isEn?'Search toilet name…':'搜尋廁所名稱…';
+
+  // Alert filter chips
+  [['af-all','全部','All'],['af-err','異常','Alert'],['af-warn','預警','Warning'],
+   ['af-mrt','🚇 捷運','🚇 MRT'],['af-park','🌳 公園','🌳 Park'],['af-cvs','🏪 便利商店','🏪 CVS'],['af-pub','🏛️ 公廁','🏛️ Public'],
+   ['af-gas','⛽ 加油站','⛽ Gas'],['af-temple','🏯 廟宇','🏯 Temple']
+  ].forEach(([id,zh,en])=>{ const el=document.getElementById(id); if(el) el.textContent=isEn?en:zh; });
+
+  // Alert AI dispatch button
+  document.querySelectorAll('.albar .btn.pri').forEach(btn=>{
+    btn.textContent = isEn ? '🤖 AI Auto-Dispatch All' : '🤖 AI 自動派工全部';
+  });
+
+  // Dispatch banner
+  const banner = document.querySelector('.autobanner');
+  if(banner){
+    const divs = banner.querySelectorAll('div > div');
+    if(divs[0]) divs[0].textContent = isEn ? 'Auto-Dispatch Engine' : '自動派工引擎';
+    if(divs[1]) divs[1].textContent = isEn ? 'Optimal dispatch by distance, SLA & staff status' : '依距離、SLA、人員狀態自動計算最佳組合';
+    const btn = banner.querySelector('.btn');
+    if(btn) btn.textContent = isEn ? '🤖 AI Auto-Dispatch All' : '🤖 AI 自動派工全部';
+  }
+
+  // Dispatch staff panel title
+  const dpRight = document.querySelector('.dpright > div:first-child');
+  if(dpRight) dpRight.textContent = isEn ? 'STAFF LIVE STATUS' : '人員即時狀態';
+
+  // Staff search & filters
+  const sfq=document.getElementById('sfq'); if(sfq) sfq.placeholder=isEn?'Search staff name…':'搜尋人員姓名…';
+  const sfvOpt=document.querySelector('#sf-vf option[value=""]'); if(sfvOpt) sfvOpt.textContent=isEn?'All Companies':'全部公司';
+  const sfOpts=document.querySelectorAll('#sf-sf option');
+  if(sfOpts[0]) sfOpts[0].textContent=isEn?'All Status':'全部狀態';
+  if(sfOpts[1]) sfOpts[1].textContent=isEn?'On Duty':'值班中';
+  if(sfOpts[2]) sfOpts[2].textContent=isEn?'Off Duty':'休息';
+
+  // Staff table headers
+  const sth = document.querySelectorAll('#pg-staff thead th');
+  ['姓名|Name','員工編號|Emp ID','職稱|Role','所屬公司|Company','班別|Shift','狀態|Status','電話|Phone','到職日|Join Date','操作|Actions'].forEach((s,i)=>{
+    if(sth[i]){ const[zh,en]=s.split('|'); sth[i].textContent=isEn?en:zh; }
+  });
+
+  // Schedule
+  const scTtl = document.querySelector('.scwrap > div > div:first-child');
+  if(scTtl) scTtl.textContent = isEn ? 'Weekly Schedule' : '本週排班表';
+  const scBtns = document.querySelectorAll('.scwrap .btn');
+  ['儲存排班|Save Schedule','匯出 PDF|Export PDF','發送通知|Notify Staff'].forEach((s,i)=>{
+    if(scBtns[i]){ const[zh,en]=s.split('|'); scBtns[i].textContent=isEn?en:zh; }
+  });
+  // Schedule shift labels and legend
+  document.querySelectorAll('.sgsh').forEach(el=>{
+    if(el.classList.contains('sham')) el.textContent=isEn?'AM':'早班';
+    else if(el.classList.contains('shpm')) el.textContent=isEn?'PM':'午班';
+    else if(el.classList.contains('shfull')) el.textContent=isEn?'Full':'全班';
+    else if(el.classList.contains('shoff')) el.textContent=isEn?'Off':'休';
+  });
+
+  // Drawer section labels (drsl) and stat labels (drstl) - handled by applyDataLangAttrs
+  // Drawer row labels (dril) - handled by applyDataLangAttrs via data-zh/en
+  // Drawer sensor labels - handled by applyDataLangAttrs
+  // Drawer buttons
+  const drBtns = document.querySelectorAll('.drdpbtn');
+  if(drBtns[0]) drBtns[0].textContent = isEn ? 'Manual Dispatch' : '手動指派任務';
+  const drAiBtn = document.querySelector('#drawer button:not(.drdpbtn):not(.drx)');
+  if(drAiBtn) drAiBtn.textContent = isEn ? 'AI Auto-Dispatch' : 'AI 自動派工';
+
+  // AI page headings
+  const aiRiskTtl=document.getElementById('ai-risk-ttl');
+  if(aiRiskTtl) aiRiskTtl.textContent=isEn?'⚠️ Risk Ranking (AI)':'⚠️ 風險排行（AI 評估）';
+  const aiSuggTtl=document.getElementById('ai-sugg-ttl');
+  if(aiSuggTtl) aiSuggTtl.textContent=isEn?'Dispatch Suggestions':'派工建議行動';
+  const aiHotTtl=document.getElementById('ai-hotspot-ttl');
+  if(aiHotTtl) aiHotTtl.textContent=isEn?'Traffic Hotspots Top 5':'人流熱點 Top 5';
+  const aiQueueTtl=document.getElementById('ai-queue-ttl');
+  if(aiQueueTtl) aiQueueTtl.textContent=isEn?'AI DISPATCH QUEUE':'AI 派工佇列';
+
+  // AI page
+  const aiTtl = document.querySelector('#pg-ai [style*="font-size:16px"]');
+  if(aiTtl) aiTtl.textContent = isEn ? 'AI Dispatch Engine' : 'AI 預測派工引擎';
+  const aiSub = document.querySelector('#pg-ai [style*="font-size:13px;color:var(--mu)"]');
+  if(aiSub) aiSub.textContent = isEn ? 'Auto-plans optimal dispatch based on sensor data & crowd prediction' : '根據感測數據、歷史模式、人流預測自動規劃最佳派工';
+  document.querySelectorAll('#pg-ai .btn.pri').forEach(btn=>{
+    if(btn.textContent.includes('執行') || btn.textContent.includes('Run'))
+      btn.textContent = isEn ? '▶ Run AI Dispatch' : '▶ 執行 AI 派工';
+  });
+
+  // Re-render charts with new language labels
+  if(tch) {
+    const isEn2 = LANG==='en';
+    tch.data.labels = isEn2?['Mon','Tue','Wed','Thu','Fri','Sat','Sun']:['週一','週二','週三','週四','週五','週六','週日'];
+    tch.data.datasets[0].label = isEn2?'Alert':'異常';
+    tch.data.datasets[1].label = isEn2?'Warning':'預警';
+    tch.update();
+  }
+  if(pch) {
+    pch.data.labels = LANG==='en'?['NH₃ Excess','Low Paper','Low Soap','Equipment','Other']:['NH₃超標','衛生紙不足','洗手乳不足','設備故障','其他'];
+    pch.update();
+  }
+  // Update toilet table header col count (now 13 cols)
+  const tth11 = document.querySelectorAll('#pg-toilets thead th');
+  ['廁所名稱|Name','類型|Type','狀態|Status','NH₃|NH₃','衛生紙|Paper','洗手乳|Soap','等候|Wait','停車|Parking','設施|Facilities','負責公司|Vendor','操作|Actions'].forEach((s,i)=>{
+    if(tth11[i]){ const[zh,en]=s.split('|'); tth11[i].textContent=LANG==='en'?en:zh; }
+  });
+  // Re-render dynamic lists
+  rT(); rAL(); rSF(); rDP();
+  // Refresh map markers (labels/popups need to re-render in new language)
+  if(lmap){ bMK(); }
+  // iNavi map language (try setLanguage API)
+  if(lmap){ try{lmap.setLanguage?.(LANG==='en'?'en':'ko');}catch(e){} }
+  // Refresh drawer if open
+  if(currDid){
+    const hoursEl=document.getElementById('dhours');
+    const openEl=document.getElementById('dopen');
+    const t=T.find(x=>x.id===currDid);
+    if(t){
+      if(hoursEl) hoursEl.textContent=tHours(t);
+      if(openEl){openEl.textContent=LANG==='en'?(isOpen(t)?'Open':'Closed'):(isOpen(t)?'營業中':'已打烊');}
+    }
+  }
+  if(document.getElementById('pg-vendors').style.display !== 'none') rVC();
+  if(document.getElementById('pg-ai').style.display !== 'none'){ buildAIRisk(); buildAISuggestions(); buildAIQueue(); }
+  const scEl = document.getElementById('pg-schedule');
+  if(scEl && scEl.style.display !== 'none') rSC();
+  updCounts();
+}
+
+// ── TOAST & CLOCK ──
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2700);}
+function updClk(){document.getElementById('clk').textContent=new Date().toLocaleTimeString(LANG==='en'?'en-US':'zh-TW');}
+
+// ── INIT ──
+
+// Get a time string offset by -minutes from now (for realistic pre-dispatch times)
+function pastTime(minsAgo){
+  const d=new Date(Date.now()-minsAgo*60000);
+  return d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+}
+
+// Find best available staff for a toilet (same vendor first, fallback to any on-duty)
+function bestStaff(t){
+  return S.filter(s=>s.status==='on'&&s.vid===t.vid)[0]
+      || S.filter(s=>s.status==='on')[0]
+      || null;
+}
+
+// Auto-dispatch all abnormal/warning toilets that have no active task yet
+function initAutoDispatch(){
+  const abnormal = T.filter(t=>t.s!=='ok');
+  let offset = 2; // minutes ago for first dispatch
+  abnormal.forEach(t=>{
+    const existing = TASKS.find(d=>d.tid===t.id&&(d.st==='active'||d.st==='pending'));
+    if(existing){
+      // Upgrade pending to active with auto
+      if(existing.st==='pending'){
+        const staff=bestStaff(t);
+        if(staff){
+          existing.cl=staff.name;
+          existing.st='active';
+          existing.eta=Math.round(5+Math.random()*15);
+          existing.dt=pastTime(offset);
+          existing.auto=true;
+          offset+=Math.round(1+Math.random()*4);
+        }
+      } else if(!existing.dt){
+        // Has active task but no timestamp - add one
+        existing.dt=pastTime(offset+5);
+        existing.auto=true;
+        offset+=Math.round(2+Math.random()*3);
+      }
+      return;
+    }
+    // No task yet - create one
+    const staff=bestStaff(t);
+    if(!staff) return;
+    const taskType = t.pp<30?'補充衛生紙':t.sp<30?'補充洗手乳':t.nh>40?'緊急清潔':'清潔';
+    TASKS.push({
+      id:TASKS.length+1,
+      tid:t.id,
+      cl:staff.name,
+      tp:taskType,
+      st:'active',
+      eta:Math.round(5+Math.random()*18),
+      sla:t.s==='err'?15:30,
+      dt:pastTime(offset),
+      auto:true
+    });
+    offset+=Math.round(2+Math.random()*5);
+  });
+}
+
+window.addEventListener('load',function(){
+  // Populate filters
+  const svf=document.getElementById('sf-vf');
+  V.forEach(v=>svf.innerHTML+=`<option value="${v.id}">${v.name}</option>`);
+  // Init all pages hidden
+  PAGES.forEach(id=>{const el=document.getElementById('pg-'+id);if(el)el.style.display='none';});
+  // Show dashboard
+  const dash=document.getElementById('pg-dashboard');
+  if(dash)dash.style.display='block';
+  document.getElementById('si-dashboard').classList.add('on');
+  document.getElementById('addbtn').style.display='none';
+  // Auto-dispatch all abnormal toilets first
+  initAutoDispatch();
+  initDash();
+  rT();rAL();rSF();
+  updCounts();
+  setInterval(updClk,1000);updClk();
+  // Pre-load iNavi SDK in background (mirrors index.html: load early so map is instant when navigated)
+  setTimeout(_loadSDK, 500);
+  // Resize: keep map sized correctly
+  window.addEventListener('resize',()=>{
+    if(document.getElementById('pg-map').style.display!=='none'){
+      try{lmap?.invalidateSize?.();}catch(e){}
+    }
+  });
+});
+</script>
+</body>
+</html>

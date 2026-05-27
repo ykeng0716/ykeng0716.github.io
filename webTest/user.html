@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>智慧廁所</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --g:#1d9e75;--gd:#0f6e56;--gl:#e1f5ee;--gll:#f0fdf9;--gm:#9fe1cb;
+  --am:#ef9f27;--aml:#faeeda;
+  --r:#e24b4a;--rl:#fcebeb;--rd:#a32d2d;
+  --bl:#378add;--bll:#e6f1fb;--bd:#185fa5;
+  --mrt:#0ea5e9;--park:#22c55e;--pub:#7c3aed;--cvs:#f97316;
+  --gas:#ef4444;--temple:#b45309;
+  --g50:#f8fafb;--g100:#e8edf2;--g200:#c8d0da;--g400:#8899aa;--g600:#556677;--g800:#2c3a4a;
+  --bg:#f0f4f2;--surf:#fff;--text:#2c3a4a;--muted:#6b8099;--bdr:#d0e4ef;
+  --fn:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;
+  --rr:12px;
+}
+html,body{height:100%;overscroll-behavior:none;}
+body{font-family:var(--fn);background:var(--bg);color:var(--text);
+  max-width:420px;margin:0 auto;min-height:100dvh;
+  display:flex;flex-direction:column;
+  box-shadow:0 0 40px rgba(0,0,0,.15);}
+.shell{display:flex;flex-direction:column;height:100dvh;overflow:hidden;position:relative;}
+.page-wrap{flex:1;overflow:hidden;position:relative;}
+.page{display:none;position:absolute;inset:0;overflow-y:auto;}
+.page.on{display:block;}
+.page::-webkit-scrollbar{display:none;}
+#page-map{display:none;flex-direction:column;overflow:hidden;}
+#page-map.on{display:flex;}
+
+/* HEADER */
+.hdr{flex-shrink:0;background:var(--surf);padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1.5px solid var(--bdr);z-index:20;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:var(--g);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-icon svg{width:14px;height:14px;fill:#fff;}
+.brand-name{font-size:14px;font-weight:700;color:var(--gd);}
+.brand-sub{font-size:10px;color:var(--muted);}
+.hdr-r{display:flex;gap:5px;align-items:center;}
+.hdr-btn{font-size:11px;padding:4px 9px;border:1.5px solid var(--bdr);border-radius:20px;
+  cursor:pointer;background:var(--surf);color:var(--g600);font-weight:600;}
+.hdr-btn.act{background:var(--gl);border-color:var(--gm);color:var(--gd);}
+.lang-sw{display:flex;border:1.5px solid var(--bdr);border-radius:20px;overflow:hidden;}
+.lsw{font-size:11px;padding:4px 8px;cursor:pointer;color:var(--muted);font-weight:600;}
+.lsw.on{background:var(--g);color:#fff;}
+
+/* BOTTOM NAV */
+.bnav{flex-shrink:0;background:var(--surf);border-top:1.5px solid var(--bdr);display:flex;z-index:20;}
+.ni{flex:1;padding:7px 4px 9px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;cursor:pointer;color:var(--muted);font-size:9px;font-weight:600;}
+.ni.on{color:var(--g);}
+.ni svg{width:19px;height:19px;fill:currentColor;}
+
+/* HOME */
+.home-hero{background:linear-gradient(145deg,var(--gd),var(--g));color:#fff;padding:16px 14px 18px;}
+.hero-greet{font-size:11px;opacity:.75;font-weight:600;margin-bottom:3px;}
+.hero-title{font-size:19px;font-weight:700;line-height:1.3;margin-bottom:11px;}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.hs{background:rgba(255,255,255,.15);border-radius:10px;padding:9px 6px;text-align:center;}
+.hs-val{font-size:18px;font-weight:700;}
+.hs-lbl{font-size:10px;opacity:.8;margin-top:1px;}
+.home-qf{display:flex;gap:7px;padding:10px 14px 4px;overflow-x:auto;scrollbar-width:none;}
+.home-qf::-webkit-scrollbar{display:none;}
+.qf{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--bdr);
+  background:var(--surf);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;}
+.qf.on{border-color:var(--g);background:var(--gl);color:var(--gd);}
+.sec{padding:10px 14px 0;}
+.sec-hd{font-size:13px;font-weight:700;color:var(--g800);margin-bottom:9px;
+  display:flex;align-items:center;justify-content:space-between;}
+.sec-more{font-size:11px;color:var(--g);font-weight:600;cursor:pointer;}
+.picks{display:flex;gap:9px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.picks::-webkit-scrollbar{display:none;}
+.pick{flex-shrink:0;width:148px;background:var(--surf);border-radius:12px;
+  border:1.5px solid var(--bdr);padding:9px 11px;cursor:pointer;}
+.pick-rank{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;}
+.pick-name{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:5px;}
+.pick-row{display:flex;justify-content:space-between;font-size:11px;margin-top:3px;}
+.pick-row span:first-child{color:var(--muted);}
+.pbadge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-top:4px;display:inline-block;}
+.so-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.so-box{background:var(--surf);border-radius:10px;border:1.5px solid var(--bdr);padding:9px;text-align:center;}
+.so-val{font-size:21px;font-weight:700;}
+.c-ok{color:var(--g);}.c-warn{color:var(--am);}.c-err{color:var(--r);}
+.so-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+.alert-box{background:var(--aml);border:1.5px solid #fac775;border-radius:10px;padding:9px 11px;}
+.alert-title{font-size:12px;font-weight:700;color:#854f0b;margin-bottom:3px;}
+.alert-body{font-size:12px;color:#854f0b;line-height:1.5;}
+.alert-cta{font-size:11px;font-weight:700;color:var(--g);cursor:pointer;margin-top:4px;display:inline-block;}
+.nb-list{display:flex;flex-direction:column;gap:5px;}
+.nb{background:var(--surf);border-radius:10px;border:1.5px solid var(--bdr);
+  padding:9px 11px;display:flex;align-items:center;gap:9px;cursor:pointer;}
+.nb-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.nb-name{font-size:12px;font-weight:700;}
+.nb-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.nb-go{font-size:11px;font-weight:700;color:var(--g);white-space:nowrap;}
+
+/* LIST */
+.modes{display:flex;gap:6px;padding:8px 12px;background:var(--surf);
+  border-bottom:1.5px solid var(--bdr);overflow-x:auto;scrollbar-width:none;
+  position:sticky;top:0;z-index:10;}
+.modes::-webkit-scrollbar{display:none;}
+.mode{flex-shrink:0;padding:5px 11px;border-radius:20px;border:1.5px solid var(--bdr);
+  background:#fff;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;}
+.mode.on{border-color:var(--g);background:var(--gl);color:var(--gd);}
+.list-wrap{padding:8px 12px;display:flex;flex-direction:column;gap:8px;}
+.rc{background:var(--surf);border-radius:var(--rr);border:1.5px solid var(--bdr);overflow:hidden;cursor:pointer;}
+.rc-stripe{height:3px;}
+.s-ok{background:var(--g);}.s-warn{background:var(--am);}.s-err{background:var(--r);}
+.rc-body{padding:10px 11px 7px;}
+.rc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;}
+.rc-name{font-size:13px;font-weight:700;line-height:1.3;}
+.rc-addr{font-size:10px;color:var(--muted);margin-top:2px;}
+.rc-exit{font-size:10px;color:var(--bl);font-weight:600;margin-top:2px;}
+.rc-badges{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+.badge{display:inline-flex;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;}
+.b-best{background:#fff3cd;color:#7a4f00;border:1px solid #f5c542;}
+.b-fast{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.b-near{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb;}
+.b-ok{background:var(--gl);color:var(--gd);}
+.b-warn{background:var(--aml);color:#854f0b;}
+.b-err{background:var(--rl);color:var(--rd);}
+.rc-mets{display:flex;gap:12px;margin-bottom:7px;}
+.met{display:flex;flex-direction:column;align-items:center;}
+.mv{font-size:15px;font-weight:700;}.ml{font-size:9px;color:var(--muted);font-weight:600;margin-top:1px;}
+.mv-ok{color:var(--g);}.mv-warn{color:var(--am);}.mv-err{color:var(--r);}
+.stall-row{display:flex;align-items:center;gap:5px;padding-top:6px;border-top:1px solid var(--g100);}
+.sms{display:flex;gap:2px;flex:1;}
+.sm{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;}
+.sm.free{background:var(--gl);color:var(--gd);}.sm.used{background:var(--rl);color:var(--rd);}
+.stall-n{font-size:10px;font-weight:700;}.stall-l{font-size:9px;color:var(--muted);}
+.smsg{margin-top:5px;padding:5px 7px;border-radius:6px;font-size:10px;font-weight:600;}
+.smsg-ok{background:var(--gl);color:var(--gd);}
+.smsg-warn{background:var(--aml);color:#854f0b;}
+.smsg-err{background:var(--rl);color:var(--rd);}
+.rc-acts{display:flex;border-top:1.5px solid var(--bdr);margin-top:7px;}
+.ra{flex:1;padding:8px 4px;text-align:center;font-size:11px;cursor:pointer;color:var(--gd);font-weight:600;}
+.ra+.ra{border-left:1.5px solid var(--bdr);}
+.ra.pri{background:var(--g);color:#fff;}
+.ra.ra-fb{background:var(--bl);color:#fff;font-weight:700;letter-spacing:.02em;}
+
+/* MAP CAT BAR */
+.map-cat-bar{display:flex;gap:6px;padding:7px 12px 6px;background:var(--surf);
+  border-bottom:1.5px solid var(--bdr);overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.map-cat-bar::-webkit-scrollbar{display:none;}
+.mcat{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;
+  border:1.5px solid var(--bdr);background:var(--surf);font-size:11px;font-weight:600;
+  color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.mcat-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:8px;color:#fff;font-weight:700;flex-shrink:0;}
+.mcat.act-mrt{background:#e0f2fe;border-color:#38bdf8;color:#0369a1;}
+.mcat.act-park{background:#dcfce7;border-color:#4ade80;color:#15803d;}
+.mcat.act-cvs{background:#fff7ed;border-color:#fb923c;color:#c2410c;}
+.mcat.act-pub{background:#f3f0ff;border-color:#a78bfa;color:#7c3aed;}
+.mcat.act-gas{background:#fee2e2;border-color:#fca5a5;color:#b91c1c;}
+.mcat.act-temple{background:#fef3c7;border-color:#fcd34d;color:#92400e;}
+
+/* Route bar */
+.route-bar{flex-shrink:0;background:#1a2b3c;padding:8px 14px;
+  display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--r);}
+.route-bar.hidden{display:none;}
+.route-info{flex:1;font-size:11px;color:#c8e6f8;}
+.route-info strong{color:#ff9999;font-weight:700;}
+.route-close{font-size:16px;color:#7a9eb8;cursor:pointer;line-height:1;}
+
+/* Map */
+#imap{flex-shrink:0;width:100%;background:#e8ede8;}
+.map-leg{display:flex;gap:8px;flex-wrap:wrap;padding:4px 12px;background:var(--surf);
+  border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
+  font-size:10px;color:var(--muted);align-items:center;flex-shrink:0;}
+.ml-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:3px;}
+.map-list-hdr{display:flex;align-items:center;justify-content:space-between;
+  padding:5px 12px 3px;flex-shrink:0;}
+.map-list-title{font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em;}
+.map-list-count{font-size:11px;color:var(--g);font-weight:600;}
+.map-loc-list{overflow-y:auto;flex:1;padding:0 12px 8px;}
+.map-loc-list::-webkit-scrollbar{display:none;}
+.mloc{background:var(--surf);border:1.5px solid var(--bdr);border-radius:12px;
+  padding:8px 10px;display:flex;gap:10px;cursor:pointer;margin-bottom:5px;}
+.mloc.sel{border-color:var(--g);box-shadow:0 0 0 2px var(--gm);}
+.mloc-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px;}
+.mloc-badge.sq{border-radius:6px;}
+.mloc-body{flex:1;min-width:0;}
+.mloc-name{font-size:12px;font-weight:700;line-height:1.3;}
+.mloc-addr{font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mloc-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.mloc-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+.mloc-rt{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.mloc-status{width:8px;height:8px;border-radius:50%;margin-top:2px;}
+.mloc-fb-btn{margin-top:6px;background:var(--bl);color:#fff;border:none;
+  border-radius:12px;font-size:11px;font-weight:700;padding:7px 10px;
+  cursor:pointer;font-family:var(--fn);white-space:nowrap;line-height:1.3;
+  box-shadow:0 2px 6px rgba(55,138,221,.35);}
+
+/* ═══ UNIFIED DETAIL SHEET (replaces both mapPop + detSheet) ═══ */
+.det-sheet{display:none;position:absolute;bottom:0;left:0;right:0;
+  background:var(--surf);border-radius:16px 16px 0 0;border-top:3px solid var(--g);
+  box-shadow:0 -6px 28px rgba(0,0,0,.18);z-index:400;
+  max-height:88%;overflow-y:auto;}
+.det-sheet::-webkit-scrollbar{display:none;}
+.det-sheet.open{display:block;animation:slideUp .22s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.ds-handle{width:34px;height:4px;background:var(--g200);border-radius:2px;margin:10px auto 0;}
+.ds-hdr{padding:11px 14px 9px;display:flex;justify-content:space-between;align-items:flex-start;}
+.ds-title{font-size:16px;font-weight:700;line-height:1.3;}
+.ds-x{font-size:22px;color:var(--muted);cursor:pointer;line-height:1;flex-shrink:0;padding-left:8px;}
+.ds-addr{font-size:10px;color:var(--muted);margin-top:2px;}
+.ds-exit{font-size:10px;color:var(--bl);font-weight:600;margin-top:3px;display:none;}
+.ds-type-row{padding:0 14px 8px;display:flex;align-items:center;gap:7px;}
+.ds-type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;
+  border-radius:20px;font-size:10px;font-weight:700;}
+/* compact metrics row */
+.ds-metrics{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:0 14px 10px;}
+.ds-metric{background:var(--g100);border-radius:10px;padding:8px 4px;text-align:center;}
+.ds-mv{font-size:14px;font-weight:700;}
+.ds-ml{font-size:9px;color:var(--muted);margin-top:1px;}
+.ds-status-row{padding:0 14px 10px;}
+.ds-status{display:inline-block;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;}
+/* sections */
+.ds-sec{padding:10px 14px;border-top:1.5px solid var(--bdr);}
+.ds-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:7px;}
+.ds-stat3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.sbox{background:var(--gl);border-radius:10px;padding:9px 6px;text-align:center;}
+.sv{font-size:18px;font-weight:700;color:var(--gd);}
+.sl{font-size:9px;color:var(--g);margin-top:1px;}
+.stall-det{display:flex;flex-wrap:wrap;gap:3px;}
+.sd{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.sd.free{background:var(--gl);color:var(--gd);border-color:var(--gm);}
+.sd.used{background:var(--rl);color:var(--rd);border-color:#f7c1c1;}
+.sd.clean{background:var(--bll);color:var(--bd);border-color:#b5d4f4;}
+.facs{display:flex;flex-wrap:wrap;gap:4px;}
+.fac{font-size:10px;padding:3px 8px;border-radius:6px;border:1.5px solid var(--bdr);color:var(--g600);}
+.fac.yes{background:var(--bll);border-color:#b5d4f4;color:var(--bd);}
+.rev-item{padding:9px 0;border-bottom:1px solid var(--g100);}
+.rev-item:last-child{border-bottom:none;}
+.rev-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.rev-av{width:26px;height:26px;border-radius:50%;background:var(--g100);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g600);}
+.rev-name{font-size:11px;font-weight:700;}
+.rev-date{font-size:10px;color:var(--muted);}
+.rev-stars{font-size:10px;color:var(--am);}
+.rev-text{font-size:11px;color:var(--g600);line-height:1.6;}
+.alt-item{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 9px;background:var(--g50);border-radius:10px;border:1.5px solid var(--bdr);margin-bottom:5px;}
+.alt-btn{font-size:10px;padding:4px 9px;background:var(--g);color:#fff;border:none;border-radius:20px;cursor:pointer;font-weight:600;}
+/* bottom action buttons */
+.ds-acts{display:flex;gap:9px;padding:12px 14px 16px;border-top:1.5px solid var(--bdr);}
+.ds-btn{flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--fn);}
+.ds-btn-sec{background:var(--gl);color:var(--gd);border:1.5px solid var(--gm) !important;}
+.ds-btn-pri{background:var(--g);color:#fff;}
+
+/* Type badge colors */
+.type-mrt{background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;}
+.type-park{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
+.type-pub{background:#f3e8ff;color:#7c3aed;border:1px solid #c4b5fd;}
+.type-cvs{background:#fff7ed;color:#c2410c;border:1px solid #fdba74;}
+.type-gas{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5;}
+.type-temple{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+
+/* FAVORITES */
+.fav-hd{background:linear-gradient(145deg,var(--bd),var(--bl));color:#fff;padding:14px 14px 16px;}
+.fav-hd h2{font-size:17px;font-weight:700;margin-bottom:3px;}
+.fav-hd p{font-size:12px;opacity:.8;}
+.fav-list{padding:10px 12px;display:flex;flex-direction:column;gap:7px;}
+.fav-card{background:var(--surf);border-radius:12px;border:1.5px solid var(--bdr);padding:11px;}
+.fav-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+.fav-name{font-size:13px;font-weight:700;}
+.fav-visit{font-size:10px;color:var(--muted);margin-top:1px;}
+.fav-heart{color:var(--r);font-size:15px;cursor:pointer;}
+.fav-meta{display:flex;gap:9px;font-size:11px;color:var(--muted);}
+.fav-meta strong{color:var(--text);}
+.fav-go{margin-top:7px;width:100%;padding:7px;background:var(--gl);border:1.5px solid var(--gm);
+  border-radius:10px;color:var(--gd);font-size:12px;font-weight:700;cursor:pointer;text-align:center;}
+
+/* PROFILE */
+.prof-hd{background:linear-gradient(145deg,var(--g800),var(--g600));color:#fff;
+  padding:18px 14px 20px;display:flex;align-items:center;gap:12px;}
+.avatar{width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;
+  flex-shrink:0;border:2px solid rgba(255,255,255,.3);}
+.prof-name{font-size:16px;font-weight:700;}
+.prof-email{font-size:11px;opacity:.7;margin-top:2px;}
+.prof-lv{font-size:10px;margin-top:5px;background:rgba(255,255,255,.15);
+  padding:2px 9px;border-radius:20px;display:inline-block;}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:12px;}
+.ps{background:var(--surf);border-radius:10px;border:1.5px solid var(--bdr);padding:9px;text-align:center;}
+.ps-val{font-size:19px;font-weight:700;color:var(--g);}
+.ps-lbl{font-size:10px;color:var(--muted);margin-top:1px;}
+.psec{padding:0 12px 12px;}
+.psec-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px;}
+.p-rows{background:var(--surf);border-radius:10px;border:1.5px solid var(--bdr);overflow:hidden;margin-bottom:5px;}
+.pr{display:flex;align-items:center;padding:11px 12px;cursor:pointer;gap:9px;}
+.pr+.pr{border-top:1px solid var(--g100);}
+.pr-ic{font-size:14px;width:22px;text-align:center;}
+.pr-body{flex:1;}
+.pr-label{font-size:12px;font-weight:600;}
+.pr-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.pr-arr{color:var(--g200);font-size:14px;}
+.logout{display:block;width:100%;padding:11px;background:var(--rl);color:var(--rd);
+  border:1.5px solid #f7c1c1;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;}
+
+/* FEEDBACK SHEET */
+.fb-sheet{display:none;position:absolute;bottom:0;left:0;right:0;
+  background:var(--surf);border-radius:14px 14px 0 0;border-top:3px solid var(--bl);
+  box-shadow:0 -4px 24px rgba(0,0,0,.14);z-index:500;padding-bottom:16px;}
+.fb-sheet.open{display:block;animation:slideUp .22s ease;}
+.fb-top{padding:11px 14px 5px;display:flex;align-items:center;justify-content:space-between;}
+.fb-title{font-size:14px;font-weight:700;}
+.stars{display:flex;gap:9px;justify-content:center;padding:7px 0 11px;}
+.star{font-size:30px;color:var(--g200);cursor:pointer;}
+.star.on{color:var(--am);}
+.qtags{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 9px;}
+.qt{padding:5px 12px;border:1.5px solid var(--bdr);border-radius:20px;font-size:11px;cursor:pointer;}
+.qt.on{border-color:var(--g);background:var(--gl);color:var(--gd);font-weight:600;}
+.fb-ta{width:calc(100% - 24px);margin:0 12px 10px;padding:9px 11px;
+  border:1.5px solid var(--bdr);border-radius:10px;font-size:12px;
+  font-family:var(--fn);resize:none;color:var(--text);outline:none;background:var(--g50);}
+.fb-ta:focus{border-color:var(--g);}
+.fb-sub{display:block;width:calc(100% - 24px);margin:0 12px;padding:11px;
+  background:var(--g);color:#fff;border:none;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;}
+
+.overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:390;}
+.overlay.on{display:block;}
+.toast{position:absolute;top:62px;left:50%;transform:translateX(-50%);
+  background:var(--g800);color:#fff;padding:7px 16px;border-radius:20px;
+  font-size:12px;z-index:600;display:none;white-space:nowrap;max-width:90%;text-align:center;}
+.toast.show{display:block;animation:ft 2.7s forwards;}
+@keyframes ft{0%{opacity:0}10%{opacity:1}75%{opacity:1}100%{opacity:0}}
+.navsp{height:8px;}
+
+/* CROWD FLOW */
+.crowd-summary{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.crowd-now{display:flex;flex-direction:column;}
+.crowd-count{font-size:22px;font-weight:700;line-height:1;}
+.crowd-label{font-size:10px;color:var(--muted);margin-top:2px;}
+.crowd-trend{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+  padding:3px 8px;border-radius:20px;}
+.crowd-trend.up{background:#fee2e2;color:#b91c1c;}
+.crowd-trend.down{background:#dcfce7;color:#15803d;}
+.crowd-trend.flat{background:var(--g100);color:var(--g600);}
+.crowd-level{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.crowd-dots{display:flex;gap:3px;}
+.crowd-dot{width:10px;height:10px;border-radius:50%;}
+.crowd-level-lbl{font-size:10px;font-weight:700;}
+/* bar chart */
+.crowd-chart{width:100%;overflow:hidden;}
+.crowd-bars{display:flex;align-items:flex-end;gap:2px;height:52px;}
+.crowd-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.crowd-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .3s;}
+.crowd-bar.now{outline:2px solid var(--r);outline-offset:1px;}
+.crowd-time-labels{display:flex;justify-content:space-between;margin-top:3px;font-size:8px;color:var(--muted);}
+.crowd-peak{font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--g100);}
+.crowd-peak strong{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="hdr">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+    </div>
+    <div>
+      <div class="brand-name" id="hdrName">智慧廁所</div>
+      <div class="brand-sub" id="hdrSub">即時找廁 · iNavi 導引</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <button class="hdr-btn act" onclick="locateMe()" id="hdrLocate">定位</button>
+    <div class="lang-sw">
+      <div class="lsw on" id="lswZh" onclick="setLang('zh')">中</div>
+      <div class="lsw" id="lswEn" onclick="setLang('en')">EN</div>
+    </div>
+  </div>
+</header>
+
+<div class="page-wrap" style="position:relative;flex:1;overflow:hidden;">
+  <div class="toast" id="toast"></div>
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+  <!-- FEEDBACK SHEET -->
+  <div class="fb-sheet" id="fbSheet">
+    <div class="ds-handle"></div>
+    <div class="fb-top">
+      <div class="fb-title" id="fbTitle">使用回饋</div>
+      <div class="ds-x" onclick="closeFB()">×</div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--muted);padding-bottom:3px" id="fbName"></div>
+    <div class="stars">
+      <span class="star" onclick="rate(1)">★</span><span class="star" onclick="rate(2)">★</span>
+      <span class="star" onclick="rate(3)">★</span><span class="star" onclick="rate(4)">★</span>
+      <span class="star" onclick="rate(5)">★</span>
+    </div>
+    <div style="padding:0 12px 7px;font-size:10px;color:var(--muted);font-weight:600" id="fbQuick">快速回報</div>
+    <div class="qtags" id="qtags"></div>
+    <textarea class="fb-ta" id="fbTA" rows="2"></textarea>
+    <button class="fb-sub" id="fbSub" onclick="submitFB()">送出</button>
+  </div>
+
+  <!-- UNIFIED DETAIL SHEET -->
+  <div class="det-sheet" id="detSheet">
+    <div class="ds-handle"></div>
+    <div class="ds-hdr">
+      <div style="flex:1">
+        <div class="ds-title" id="ds-name"></div>
+        <div class="ds-addr" id="ds-addr"></div>
+        <div class="ds-exit" id="ds-exit"></div>
+      </div>
+      <div class="ds-x" onclick="closeDet()">×</div>
+    </div>
+    <div class="ds-type-row">
+      <div id="ds-type-badge"></div>
+    </div>
+    <!-- compact 4-metric row -->
+    <div class="ds-metrics">
+      <div class="ds-metric"><div class="ds-mv" id="ds-wait">—</div><div class="ds-ml" id="ds-lbl-wait">等候</div></div>
+      <div class="ds-metric"><div class="ds-mv" id="ds-dist">—</div><div class="ds-ml" id="ds-lbl-dist">距離</div></div>
+      <div class="ds-metric"><div class="ds-mv" id="ds-paper">—</div><div class="ds-ml" id="ds-lbl-paper">衛生紙</div></div>
+      <div class="ds-metric"><div class="ds-mv" id="ds-score">—</div><div class="ds-ml" id="ds-lbl-score">評分</div></div>
+    </div>
+    <div class="ds-status-row"><div class="ds-status" id="ds-status"></div></div>
+    <!-- live stall status -->
+    <div class="ds-sec">
+      <div class="ds-lbl" id="ds-lbl-live">即時狀態</div>
+      <div class="ds-stat3">
+        <div class="sbox"><div class="sv" id="ds-stat-wait">—</div><div class="sl" id="ds-lbl-swt">等候</div></div>
+        <div class="sbox"><div class="sv" id="ds-free">—</div><div class="sl" id="ds-lbl-fr">空閒廁間</div></div>
+        <div class="sbox"><div class="sv" id="ds-parking">—</div><div class="sl" id="ds-lbl-pk">停車位</div></div>
+      </div>
+      <div id="ds-alert" style="margin-top:7px"></div>
+    </div>
+    <!-- stall occupancy -->
+    <div class="ds-sec">
+      <div class="ds-lbl" id="ds-lbl-occ">廁間佔用</div>
+      <div class="stall-det" id="ds-stalls"></div>
+      <div style="display:flex;gap:9px;margin-top:7px;font-size:10px;color:var(--muted)" id="ds-leg"></div>
+    </div>
+    <!-- crowd flow -->
+    <div class="ds-sec">
+      <div class="ds-lbl" id="ds-lbl-crowd">人流資訊</div>
+      <div class="crowd-summary">
+        <div class="crowd-now">
+          <div class="crowd-count" id="crowd-now-count">—</div>
+          <div class="crowd-label" id="crowd-now-lbl">目前人數</div>
+        </div>
+        <div class="crowd-trend" id="crowd-trend"></div>
+        <div class="crowd-level">
+          <div class="crowd-dots" id="crowd-dots"></div>
+          <div class="crowd-level-lbl" id="crowd-level-lbl"></div>
+        </div>
+      </div>
+      <div class="crowd-chart">
+        <div class="crowd-bars" id="crowd-bars"></div>
+        <div class="crowd-time-labels" id="crowd-time-labels"></div>
+      </div>
+      <div class="crowd-peak" id="crowd-peak"></div>
+    </div>
+    <!-- facilities -->
+    <div class="ds-sec">
+      <div class="ds-lbl" id="ds-lbl-fac">設施</div>
+      <div class="facs" id="ds-facs"></div>
+    </div>
+    <!-- nearby alternatives -->
+    <div class="ds-sec">
+      <div class="ds-lbl" id="ds-lbl-alt">附近替代</div>
+      <div id="ds-alts"></div>
+    </div>
+    <!-- reviews -->
+    <div class="ds-sec">
+      <div class="ds-lbl" id="ds-lbl-rev">使用者評論</div>
+      <div id="ds-revs"></div>
+    </div>
+    <!-- action buttons -->
+    <div class="ds-acts">
+      <button class="ds-btn ds-btn-sec" id="ds-fb-btn" onclick="">回饋</button>
+      <button class="ds-btn ds-btn-pri" id="ds-go-btn" onclick="">立即帶我去</button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="page on" id="page-home">
+    <div class="home-hero">
+      <div class="hero-greet" id="hGreet">早安，王小明</div>
+      <div class="hero-title" id="hTitle">—</div>
+      <div class="hero-stats">
+        <div class="hs"><div class="hs-val" id="hAvg">—</div><div class="hs-lbl" id="hAvgL">平均等候</div></div>
+        <div class="hs"><div class="hs-val" id="hNear">—</div><div class="hs-lbl" id="hNearL">離你最近</div></div>
+        <div class="hs"><div class="hs-val">4.7★</div><div class="hs-lbl" id="hTopL">最高評分</div></div>
+      </div>
+    </div>
+    <div class="home-qf">
+      <div class="qf on" onclick="setHQF(this,'best')" id="hqfB">最佳</div>
+      <div class="qf" onclick="setHQF(this,'near')" id="hqfN">離你最近</div>
+      <div class="qf" onclick="setHQF(this,'clean')" id="hqfC">最乾淨</div>
+      <div class="qf" onclick="setHQF(this,'fast')" id="hqfF">等候最少</div>
+    </div>
+    <div class="sec">
+      <div class="sec-hd"><span id="hPickTitle">本區最佳廁所</span><span class="sec-more" onclick="setPage('list')" id="hPickMore">全部 →</span></div>
+      <div class="picks" id="picks"></div>
+    </div>
+    <div class="sec" style="margin-top:12px">
+      <div class="sec-hd" id="hAlertTitle">系統警示</div>
+      <div class="alert-box">
+        <div class="alert-title" id="hAlertHd">忠孝復興男廁人數偏多</div>
+        <div class="alert-body" id="hAlertBd">系統建議改走出口 5 側廁所，預估等候時間較短</div>
+        <div class="alert-cta" onclick="setPage('map');openDet(0)" id="hAlertCta">→ 在地圖上查看</div>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:12px">
+      <div class="sec-hd" id="hOvTitle">廁所狀態總覽</div>
+      <div class="so-grid">
+        <div class="so-box"><div class="so-val c-ok" id="soOk">—</div><div class="so-lbl" id="soOkL">可使用</div></div>
+        <div class="so-box"><div class="so-val c-warn" id="soWarn">—</div><div class="so-lbl" id="soWarnL">注意</div></div>
+        <div class="so-box"><div class="so-val c-err" id="soErr">—</div><div class="so-lbl" id="soErrL">不建議</div></div>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:12px;padding-bottom:12px">
+      <div class="sec-hd"><span id="hNbTitle">離你最近</span><span class="sec-more" onclick="setPage('list')" id="hNbMore">全部 →</span></div>
+      <div class="nb-list" id="nbList"></div>
+    </div>
+    <div class="navsp"></div>
+  </div>
+
+  <!-- LIST -->
+  <div class="page" id="page-list">
+    <div class="modes" id="listModes">
+      <div class="mode on" onclick="setMode(this,'all')" id="mAll">全部</div>
+      <div class="mode" onclick="setMode(this,'mrt')" id="mMrt">捷運</div>
+      <div class="mode" onclick="setMode(this,'park')" id="mPark">公園</div>
+      <div class="mode" onclick="setMode(this,'pub')" id="mPub">公廁</div>
+      <div class="mode" onclick="setMode(this,'cvs')" id="mCvs">便利商店</div>
+      <div class="mode" onclick="setMode(this,'gas')" id="mGas">加油站</div>
+      <div class="mode" onclick="setMode(this,'temple')" id="mTemple">廟宇</div>
+      <div class="mode" onclick="setMode(this,'nursing')" id="mNursing">哺乳室</div>
+      <div class="mode" onclick="setMode(this,'access')" id="mAccess">無障礙</div>
+      <div class="mode" onclick="setMode(this,'parking')" id="mParking">停車場</div>
+    </div>
+    <div class="list-wrap" id="listEl"></div>
+    <div class="navsp"></div>
+  </div>
+
+  <!-- MAP PAGE -->
+  <div class="page" id="page-map">
+    <div class="map-cat-bar" id="mapCatBar">
+      <div class="mcat act-mrt" data-cat="mrt" onclick="toggleCat(this,'mrt')">
+        <div class="mcat-icon" style="background:#0ea5e9">捷</div><span id="catLblMrt">捷運</span>
+      </div>
+      <div class="mcat act-park" data-cat="park" onclick="toggleCat(this,'park')">
+        <div class="mcat-icon" style="background:#22c55e">公</div><span id="catLblPark">公園</span>
+      </div>
+      <div class="mcat act-pub" data-cat="pub" onclick="toggleCat(this,'pub')">
+        <div class="mcat-icon" style="background:#7c3aed;border-radius:3px">廁</div><span id="catLblPub">公廁</span>
+      </div>
+      <div class="mcat act-cvs" data-cat="cvs" onclick="toggleCat(this,'cvs')">
+        <div class="mcat-icon" style="background:#f97316;border-radius:3px">便</div><span id="catLblCvs">便利商店</span>
+      </div>
+      <div class="mcat act-gas" data-cat="gas" onclick="toggleCat(this,'gas')">
+        <div class="mcat-icon" style="background:#ef4444;border-radius:3px">油</div><span id="catLblGas">加油站</span>
+      </div>
+      <div class="mcat act-temple" data-cat="temple" onclick="toggleCat(this,'temple')">
+        <div class="mcat-icon" style="background:#b45309;border-radius:50%">廟</div><span id="catLblTemple">廟宇</span>
+      </div>
+    </div>
+
+    <div class="route-bar hidden" id="routeBar">
+      <span style="font-size:14px">🗺</span>
+      <span class="route-info" id="routeInfo"></span>
+      <span class="route-close" onclick="clearRoute()">×</span>
+    </div>
+
+    <div id="imap"></div>
+
+    <div class="map-leg" id="mapLeg">
+      <span><span class="ml-dot" style="background:#3b82f6"></span><span id="legMe">我的位置</span></span>
+      <span><span class="ml-dot" style="background:#1d9e75"></span><span id="legOk">正常</span></span>
+      <span><span class="ml-dot" style="background:#ef9f27"></span><span id="legWarn">預警</span></span>
+      <span><span class="ml-dot" style="background:#e24b4a"></span><span id="legErr">異常</span></span>
+      <span style="margin-left:auto;font-size:9px;color:var(--muted)" id="mCount"></span>
+    </div>
+    <div class="map-list-hdr">
+      <span class="map-list-title" id="mapListTitle">點位清單</span>
+      <span class="map-list-count" id="mapListCount"></span>
+    </div>
+    <div class="map-loc-list" id="mapLocList"></div>
+  </div>
+
+  <!-- FAVORITES -->
+  <div class="page" id="page-fav">
+    <div class="fav-hd"><h2 id="favTitle">我常去的廁所</h2><p id="favSub">快速導航至您常用的廁所</p></div>
+    <div class="fav-list" id="favList"></div>
+    <div class="navsp"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
+    <div class="prof-hd">
+      <div class="avatar">王</div>
+      <div>
+        <div class="prof-name">王小明</div>
+        <div class="prof-email">ming.wang@example.com</div>
+        <div class="prof-lv" id="profLv">資深使用者</div>
+      </div>
+    </div>
+    <div class="prof-stats">
+      <div class="ps"><div class="ps-val">47</div><div class="ps-lbl" id="psV">使用次數</div></div>
+      <div class="ps"><div class="ps-val">12</div><div class="ps-lbl" id="psF">回饋次數</div></div>
+      <div class="ps"><div class="ps-val">3</div><div class="ps-lbl" id="psS">收藏數</div></div>
+    </div>
+    <div class="psec">
+      <div class="psec-title" id="psSetT">設定</div>
+      <div class="p-rows">
+        <div class="pr" onclick="showToast(L.toastProfileSaved)"><div class="pr-ic">👤</div><div class="pr-body"><div class="pr-label" id="psE">編輯個人資訊</div><div class="pr-sub" id="psES">名稱、頭像</div></div><div class="pr-arr">›</div></div>
+        <div class="pr" onclick="showToast(L.toastNotifSaved)"><div class="pr-ic">🔔</div><div class="pr-body"><div class="pr-label" id="psN">通知設定</div><div class="pr-sub" id="psNS">附近廁所警示</div></div><div class="pr-arr">›</div></div>
+      </div>
+    </div>
+    <div class="psec">
+      <div class="psec-title" id="psAbT">關於</div>
+      <div class="p-rows">
+        <div class="pr" onclick="showToast('v11.0.0 · iNavi Maps')"><div class="pr-ic">ℹ️</div><div class="pr-body"><div class="pr-label" id="psVer">版本資訊</div><div class="pr-sub">v11.0.0 · iNavi Maps</div></div><div class="pr-arr">›</div></div>
+        <div class="pr" onclick="showToast(L.toastThanks)"><div class="pr-ic">💬</div><div class="pr-body"><div class="pr-label" id="psCt">聯絡我們</div></div><div class="pr-arr">›</div></div>
+      </div>
+    </div>
+    <div class="psec"><button class="logout" id="psLo" onclick="showToast(L.toastLogout)">登出</button></div>
+    <div class="navsp"></div>
+  </div>
+</div>
+
+<nav class="bnav">
+  <div class="ni on" id="nav-home" onclick="setPage('home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span id="navH">首頁</span></div>
+  <div class="ni" id="nav-list" onclick="setPage('list')"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg><span id="navL">列表</span></div>
+  <div class="ni" id="nav-map" onclick="setPage('map')"><svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5z"/></svg><span id="navM">地圖</span></div>
+  <div class="ni" id="nav-fav" onclick="setPage('fav')"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg><span id="navF">常去</span></div>
+  <div class="ni" id="nav-profile" onclick="setPage('profile')"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span id="navP">我的</span></div>
+</nav>
+</div>
+
+<script>
+/* ═══ CONFIG ═══ */
+const INAVI_APP_KEY = '38dd3a4506b3f8bf9265977c3b1fbd2d310f16a1';
+const ME = [25.0418, 121.5441]; // [lat,lng]
+
+/* ═══ i18n ═══ */
+const TXT = {
+  zh:{
+    hdrName:'智慧廁所', hdrSub:'即時找廁 · iNavi 導引', hdrLocate:'定位',
+    hGreet:'早安，王小明',
+    heroTpl:'附近有 {n} 間可用廁所',
+    hAvgL:'平均等候', hNearL:'離你最近', hTopL:'最高評分',
+    hqfB:'最佳', hqfN:'離你最近', hqfC:'最乾淨', hqfF:'等候最少',
+    hPickTitle:{best:'本區最佳廁所',near:'離你最近',clean:'最乾淨',fast:'等候最少'},
+    hPickMore:'全部 →',
+    hAlertTitle:'系統警示', hAlertHd:'忠孝復興男廁人數偏多',
+    hAlertBd:'系統建議改走出口 5 側廁所，預估等候時間較短',
+    hAlertCta:'→ 在地圖上查看',
+    hOvTitle:'廁所狀態總覽', soOkL:'可使用', soWarnL:'注意', soErrL:'不建議',
+    hNbTitle:'離你最近', hNbMore:'全部 →',
+    navH:'首頁', navL:'列表', navM:'地圖', navF:'常去', navP:'我的',
+    mAll:'全部', mMrt:'捷運', mPark:'公園', mPub:'公廁', mCvs:'便利商店',
+    mGas:'加油站', mTemple:'廟宇', mNursing:'哺乳室', mAccess:'無障礙', mParking:'停車場',
+    catLblMrt:'捷運', catLblPark:'公園', catLblPub:'公廁', catLblCvs:'便利商店',
+    catLblGas:'加油站', catLblTemple:'廟宇',
+    legMe:'我的位置', legOk:'正常', legWarn:'預警', legErr:'異常',
+    mapListTitle:'點位清單', mCountTpl:'{n} 個點位',
+    favTitle:'我常去的廁所', favSub:'快速導航至您常用的廁所',
+    favLastVisit:'上次使用：{n}天前', favNav:'立即導航',
+    profLv:'資深使用者', psV:'使用次數', psF:'回饋次數', psS:'收藏數',
+    psSetT:'設定', psE:'編輯個人資訊', psES:'名稱、頭像',
+    psN:'通知設定', psNS:'附近廁所警示',
+    psAbT:'關於', psVer:'版本資訊', psCt:'聯絡我們', psLo:'登出',
+    // detail sheet labels
+    dsLblWait:'等候', dsLblDist:'距離', dsLblPaper:'衛生紙', dsLblScore:'評分',
+    dsLblLive:'即時狀態', dsLblSwt:'等候', dsLblFr:'空閒廁間', dsLblPk:'停車位',
+    dsLblOcc:'廁間佔用', dsLblFac:'設施', dsLblAlt:'附近替代', dsLblRev:'使用者評論',
+    dsGoBtn:'立即帶我去', dsFbBtn:'回饋',
+    statusOk:'可用', statusWarn:'注意', statusErr:'不建議',
+    statusMsgOk:'狀態良好，可正常使用',
+    statusMsgWarnPaper:'注意：衛生紙不足',
+    statusMsgWarn:'注意：使用人數偏多',
+    statusMsgErr:'不建議使用：異味嚴重',
+    stallFree:'空閒', stallUsed:'使用中', stallClean:'清潔中',
+    stallLeg:[['var(--gl)','var(--gm)','空閒'],['var(--rl)','#f7c1c1','使用中'],['var(--bl)','#b5d4f4','清潔中']],
+    facNames:['無障礙','哺乳室','親子廁','換尿布台','24小時'],
+    parkingYes:'有停車場', parkingNo:'無停車場',
+    badgeBest:'最佳選擇', badgeFast:'最快', badgeNear:'最近',
+    // list
+    waitLabel:'等候', distLabel:'距離', paperLabel:'衛生紙', freeLabel:'空閒',
+    detBtn:'詳情', navBtn:'立即帶我去', fbBtn:'回饋', fbBtnQuick:'立即回饋',
+    noResult:'無符合條件',
+    // type labels
+    typeLabel:{mrt:'🚇 捷運',park:'🌳 公園',pub:'🏛 公廁',cvs:'🏪 便利商店',gas:'⛽ 加油站',temple:'🛕 廟宇'},
+    // route bar
+    routeCalc:'計算中…', routeDrawn:'路線已繪製',
+    // toast
+    toastLocate:'✅ 模擬定位：忠孝復興站',
+    toastMapLoaded:'✅ iNavi 地圖已載入',
+    toastSDKFail:'iNavi SDK 載入失敗',
+    toastRouteFail:'路線規劃失敗：',
+    toastRouteDrawn:'✅ 路線已繪製',
+    toastProfileSaved:'個人資訊已更新',
+    toastNotifSaved:'通知設定已更新',
+    toastThanks:'感謝您的意見！',
+    toastLogout:'已登出',
+    toastFbThanks:'✅ 感謝回饋！',
+    toastFbRate:'請先選擇星等',
+    toastFavRemoved:'已移除',
+    // feedback
+    fbTitle:'使用回饋', fbQuick:'快速回報',
+    fbPlaceholder:'留下您的使用心得…', fbSub:'送出',
+    fbTags:['缺衛生紙','異味','積水','設備故障','非常乾淨','補充完畢'],
+    // nav nearby
+    navigateArrow:'導航 →',
+    // stall types
+    stallF:'女', stallM:'男', stallH:'障', stallN:'哺',
+    minUnit:'分',
+    // crowd
+    dsLblCrowd:'人流資訊',
+    crowdNowLbl:'目前人數',
+    crowdPerson:'人',
+    crowdLow:'人少', crowdMed:'普通', crowdBusy:'繁忙', crowdVeryBusy:'非常繁忙',
+    crowdTrendUp:'↑ 上升中', crowdTrendDown:'↓ 下降中', crowdTrendFlat:'→ 平穩',
+    crowdPeakTpl:'今日尖峰：{hr}:00 · {n}人',
+    crowdBestTpl:'最佳時段：{hr}:00（人數最少）',
+    crowdHrNow:'現在',
+  },
+  en:{
+    hdrName:'Smart Restroom', hdrSub:'Find · iNavi Navigate', hdrLocate:'Locate',
+    hGreet:'Good morning, Ming',
+    heroTpl:'{n} restrooms available nearby',
+    hAvgL:'Avg wait', hNearL:'Nearest', hTopL:'Top rated',
+    hqfB:'Best', hqfN:'Nearest', hqfC:'Cleanest', hqfF:'Shortest wait',
+    hPickTitle:{best:'Top Restrooms',near:'Nearest to You',clean:'Cleanest',fast:'Shortest Wait'},
+    hPickMore:'All →',
+    hAlertTitle:'System Alert', hAlertHd:'Zhongxiao Fuxing male WC busy',
+    hAlertBd:'Suggest Exit 5 restroom for shorter wait',
+    hAlertCta:'→ View on map',
+    hOvTitle:'Status Overview', soOkL:'Available', soWarnL:'Caution', soErrL:'Avoid',
+    hNbTitle:'Nearest to You', hNbMore:'All →',
+    navH:'Home', navL:'List', navM:'Map', navF:'Saved', navP:'Profile',
+    mAll:'All', mMrt:'MRT', mPark:'Park', mPub:'Public WC', mCvs:'Convenience',
+    mGas:'Gas Station', mTemple:'Temple', mNursing:'Nursing', mAccess:'Accessible', mParking:'Parking',
+    catLblMrt:'MRT', catLblPark:'Park', catLblPub:'Public WC', catLblCvs:'CVS',
+    catLblGas:'Gas', catLblTemple:'Temple',
+    legMe:'My location', legOk:'OK', legWarn:'Caution', legErr:'Avoid',
+    mapListTitle:'Locations', mCountTpl:'{n} locations',
+    favTitle:'My Favorites', favSub:'Quick nav to your go-to restrooms',
+    favLastVisit:'Last visit: {n} days ago', favNav:'Navigate',
+    profLv:'Senior User', psV:'Visits', psF:'Reviews', psS:'Saved',
+    psSetT:'Settings', psE:'Edit Profile', psES:'Name, avatar',
+    psN:'Notifications', psNS:'Nearby alerts',
+    psAbT:'About', psVer:'Version', psCt:'Contact Us', psLo:'Log Out',
+    dsLblWait:'Wait', dsLblDist:'Dist', dsLblPaper:'Paper', dsLblScore:'Rating',
+    dsLblLive:'Live Status', dsLblSwt:'Wait', dsLblFr:'Free Stalls', dsLblPk:'Parking',
+    dsLblOcc:'Stall Occupancy', dsLblFac:'Facilities', dsLblAlt:'Nearby Alt.', dsLblRev:'Reviews',
+    dsGoBtn:'Take me there', dsFbBtn:'Review',
+    statusOk:'Available', statusWarn:'Caution', statusErr:'Avoid',
+    statusMsgOk:'Good condition',
+    statusMsgWarnPaper:'Caution: Low paper',
+    statusMsgWarn:'Caution: High traffic',
+    statusMsgErr:'Avoid: Bad odor',
+    stallFree:'Free', stallUsed:'In use', stallClean:'Cleaning',
+    stallLeg:[['var(--gl)','var(--gm)','Free'],['var(--rl)','#f7c1c1','In use'],['var(--bl)','#b5d4f4','Cleaning']],
+    facNames:['Accessible','Nursing Room','Family WC','Changing Table','24H'],
+    parkingYes:'Parking available', parkingNo:'No parking',
+    badgeBest:'Best Pick', badgeFast:'Fastest', badgeNear:'Nearest',
+    waitLabel:'Wait', distLabel:'Dist', paperLabel:'Paper', freeLabel:'Free',
+    detBtn:'Details', navBtn:'Take me there', fbBtn:'Review', fbBtnQuick:'Quick Review',
+    noResult:'No results',
+    typeLabel:{mrt:'🚇 MRT',park:'🌳 Park',pub:'🏛 Public WC',cvs:'🏪 CVS',gas:'⛽ Gas',temple:'🛕 Temple'},
+    routeCalc:'Routing…', routeDrawn:'Route drawn',
+    toastLocate:'✅ Demo: Zhongxiao Fuxing',
+    toastMapLoaded:'✅ iNavi map loaded',
+    toastSDKFail:'iNavi SDK load failed',
+    toastRouteFail:'Route failed: ',
+    toastRouteDrawn:'✅ Route drawn',
+    toastProfileSaved:'Profile updated',
+    toastNotifSaved:'Notifications updated',
+    toastThanks:'Thank you!',
+    toastLogout:'Logged out',
+    toastFbThanks:'✅ Thank you!',
+    toastFbRate:'Please rate first',
+    toastFavRemoved:'Removed',
+    fbTitle:'Feedback', fbQuick:'Quick report',
+    fbPlaceholder:'Share your experience…', fbSub:'Submit',
+    fbTags:['No paper','Bad odor','Puddles','Fault','Very clean','Restocked'],
+    navigateArrow:'Nav →',
+    stallF:'F', stallM:'M', stallH:'A', stallN:'N',
+    minUnit:'min',
+    // crowd
+    dsLblCrowd:'Crowd Flow',
+    crowdNowLbl:'People now',
+    crowdPerson:'',
+    crowdLow:'Quiet', crowdMed:'Moderate', crowdBusy:'Busy', crowdVeryBusy:'Very Busy',
+    crowdTrendUp:'↑ Rising', crowdTrendDown:'↓ Easing', crowdTrendFlat:'→ Steady',
+    crowdPeakTpl:'Peak today: {hr}:00 · {n} people',
+    crowdBestTpl:'Best time: {hr}:00 (least crowded)',
+    crowdHrNow:'Now',
+  }
+};
+let lang = 'zh';
+let L = TXT.zh;
+
+/* ═══ iNavi SDK ═══ */
+let inaviReady=false, inaviLoading=false, inaviQueue=[];
+function initInaviMaps(){
+  inaviReady=!!window.inavi?.maps?.Map; inaviLoading=false;
+  if(!inaviReady){showToast('iNavi SDK not ready');return;}
+  const q=[...inaviQueue]; inaviQueue=[]; q.forEach(fn=>fn());
+}
+window.initInaviMaps=initInaviMaps; window.initMap=initInaviMaps;
+function ensureInaviReady(fn){
+  if(window.inavi?.maps?.Map){inaviReady=true;fn();return;}
+  inaviQueue.push(fn);
+  if(inaviLoading)return;
+  inaviLoading=true;
+  const s=document.createElement('script');
+  s.id='inavi-sdk';s.async=true;
+  s.src=`https://gmaps.inavi.com/v1/sdk/web/${encodeURIComponent(INAVI_APP_KEY)}?callback=initMap`;
+  s.onerror=()=>{inaviLoading=false;showToast(L.toastSDKFail);};
+  document.head.appendChild(s);
+}
+
+/* ═══ Map utils ═══ */
+function toInaviCoord(latLng){return[latLng[1],latLng[0]];}
+function toiletCoord(t){return[t.lng,t.lat];}
+function makeIconEl(html){const d=document.createElement('div');d.innerHTML=html;return d.firstElementChild;}
+
+const STATUS_COLOR={ok:'#1d9e75',warn:'#ef9f27',err:'#e24b4a'};
+const CAT_COLOR={mrt:'#0ea5e9',park:'#22c55e',pub:'#7c3aed',cvs:'#f97316',gas:'#ef4444',temple:'#b45309'};
+const CAT_CHAR_ZH={mrt:'捷',park:'公',pub:'廁',cvs:'便',gas:'油',temple:'廟'};
+const CAT_CHAR_EN={mrt:'M',park:'P',pub:'W',cvs:'C',gas:'G',temple:'T'};
+const CAT_ACT_CLS={mrt:'act-mrt',park:'act-park',pub:'act-pub',cvs:'act-cvs',gas:'act-gas',temple:'act-temple'};
+
+function makeToiletIcon(t){
+  const sc=STATUS_COLOR[t.status];
+  const cc=CAT_COLOR[t.type]||'#888';
+  const ch=lang==='en'?CAT_CHAR_EN[t.type]||'?':CAT_CHAR_ZH[t.type]||'廁';
+  if(t.status==='err'){
+    return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <div style="width:30px;height:30px;border-radius:50%;background:#e24b4a;border:3px solid #fff;
+        box-shadow:0 2px 8px rgba(226,75,74,.5),0 0 0 4px rgba(226,75,74,.2);
+        display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;">✕</div>
+      <div style="width:5px;height:5px;background:#e24b4a;border-radius:50%;opacity:.7;"></div>
+    </div>`);
+  }
+  return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+    <div style="width:30px;height:30px;border-radius:50%;background:${sc};border:3px solid #fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.25),0 0 0 3px ${cc}55;
+      display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">${ch}</div>
+    <div style="width:5px;height:5px;background:${sc};border-radius:50%;opacity:.7;"></div>
+  </div>`);
+}
+function makeMeIcon(){
+  return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+    <div style="width:28px;height:28px;border-radius:50%;background:#3b82f6;border:3px solid #fff;
+      box-shadow:0 2px 8px rgba(59,130,246,.5),0 0 0 5px rgba(59,130,246,.15);
+      display:flex;align-items:center;justify-content:center;">
+      <div style="width:8px;height:8px;border-radius:50%;background:#fff;"></div>
+    </div>
+  </div>`);
+}
+function addMarker(map,position,icon,infoHtml,open=false){
+  const marker=new inavi.maps.Marker({map,position});
+  if(icon)marker.setIcon(icon);
+  let info=null;
+  if(infoHtml&&window.inavi?.maps?.InfoWindow){
+    info=new inavi.maps.InfoWindow({position,content:infoHtml});
+    marker.on?.('click',()=>info.setMap(map));
+    if(open)info.setMap(map);
+  }
+  return{marker,info};
+}
+function addPolyline(map,path,color,weight=3,opacity=0.85,dash=''){
+  const da=dash?String(dash).split(/\s+/).map(Number).filter(Number.isFinite):[];
+  const style={lineColor:color,lineWidth:weight,lineOpacity:opacity};
+  if(da.length>=2)style.lineDasharray=da.slice(0,2);
+  return new inavi.maps.Polyline({map,path,style});
+}
+function fitMap(map,points,zf=14){
+  if(points.length>1&&map.fitCoordinates){map.fitCoordinates(points,{padding:32,duration:0});return;}
+  if(points[0])map.setCenter?.(points[0]);
+  map.setZoom?.(zf);
+}
+
+/* ═══ Map state ═══ */
+let mainMap=null,meMarker=null,toiletMarkers=[],routeLine=null,destMarker=null;
+
+function makeDestIcon(name){
+  const short=name.length>8?name.slice(0,8)+'…':name;
+  return makeIconEl(`<div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+    <div style="background:#e24b4a;color:#fff;font-size:10px;font-weight:700;
+      padding:4px 8px;border-radius:8px;white-space:nowrap;
+      box-shadow:0 3px 10px rgba(226,75,74,.65);
+      border:2.5px solid #fff;text-align:center;line-height:1.3;letter-spacing:.02em;">${short}</div>
+    <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
+      border-top:10px solid #e24b4a;margin-top:-1px;filter:drop-shadow(0 2px 2px rgba(226,75,74,.4));"></div>
+    <div style="width:7px;height:7px;background:#e24b4a;border-radius:50%;margin-top:1px;
+      box-shadow:0 0 0 4px rgba(226,75,74,.22),0 0 0 8px rgba(226,75,74,.08);"></div>
+  </div>`);
+}
+let activeCats=new Set(['mrt','park','cvs','pub','gas','temple']);
+let selectedId=null;
+
+function setMapHeight(){
+  const pg=document.getElementById('page-map');
+  if(!pg||!pg.offsetHeight)return;
+  const catH=document.getElementById('mapCatBar')?.offsetHeight||40;
+  const rbEl=document.getElementById('routeBar');
+  const rbH=rbEl&&!rbEl.classList.contains('hidden')?rbEl.offsetHeight:0;
+  const legH=pg.querySelector('.map-leg')?.offsetHeight||28;
+  const lhH=pg.querySelector('.map-list-hdr')?.offsetHeight||30;
+  const h=Math.max(220,Math.round((pg.offsetHeight-catH-rbH-legH-lhH)*0.65));
+  document.getElementById('imap').style.height=h+'px';
+}
+
+function initMainMap(){
+  if(mainMap)return;
+  setMapHeight();
+  ensureInaviReady(()=>{
+    if(mainMap)return;
+    const el=document.getElementById('imap');
+    if(!el||!el.offsetWidth||!el.offsetHeight){setTimeout(initMainMap,120);return;}
+    mainMap=new inavi.maps.Map({container:'imap',center:toInaviCoord(ME),zoom:14,language:lang==='en'?'en':'ko'});
+    const{marker}=addMarker(mainMap,toInaviCoord(ME),makeMeIcon(),lang==='zh'?'📍 我的位置':'📍 My Location');
+    meMarker=marker;
+    // markers placed below
+    DATA.forEach(t=>{
+      const n=lang==='en'?t.nameEn:t.name;
+      const sc=STATUS_COLOR[t.status];
+      const sLbl=t.status==='ok'?L.statusOk:t.status==='warn'?L.statusWarn:L.statusErr;
+      const infoHtml=`<div style="font-size:11px;padding:3px 5px;min-width:110px;">
+        <b>${n}</b>
+        <div style="color:${sc};margin-top:2px;font-weight:600">${sLbl}</div>
+        <div style="color:#6b8099;margin-top:1px">${L.waitLabel} ${t.wait}${L.minUnit} · ${dt(t.dist)}</div>
+      </div>`;
+      const{marker,info}=addMarker(mainMap,toiletCoord(t),makeToiletIcon(t),infoHtml);
+      marker.on?.('click',()=>{info?.setMap(mainMap);openDet(t.id);});
+      toiletMarkers.push({t,marker,info});
+    });
+    fitMap(mainMap,[toInaviCoord(ME),...DATA.slice(0,8).map(toiletCoord)],14);
+    updateMapVis();
+    renderLocList();
+    updateMCount();
+    showToast(L.toastMapLoaded);
+  });
+}
+
+function updateMapVis(){
+  toiletMarkers.forEach(({t,marker})=>{
+    marker.setVisible?.(activeCats.has(t.type));
+  });
+}
+
+/* ═══ Route API ═══ */
+function extractRouteCoords(data){
+  if(Array.isArray(data.coordinates))return data.coordinates;
+  if(data.routes?.coordinates)return data.routes.coordinates;
+  if(Array.isArray(data.routes)&&data.routes[0]?.coordinates)return data.routes[0].coordinates;
+  if(data.geometry?.coordinates)return data.geometry.coordinates;
+  return null;
+}
+function extractRouteStats(data){
+  const r=Array.isArray(data.routes)?data.routes[0]:data.routes;
+  return r||{};
+}
+
+async function fetchAndDrawRoute(t){
+  const btn=document.getElementById('ds-go-btn');
+  if(btn){btn.disabled=true;btn.textContent=lang==='zh'?'規劃中…':'Routing…';}
+  try{
+    await new Promise(res=>ensureInaviReady(res));
+    if(!mainMap)initMainMap();
+    if(!mainMap)throw new Error(lang==='zh'?'地圖未初始化':'Map not ready');
+    const url=`https://gmaps.inavi.com/maps/v3.0/appkeys/${encodeURIComponent(INAVI_APP_KEY)}/route-normal-tw`;
+    const body={startX:String(ME[1]),startY:String(ME[0]),endX:String(t.lng),endY:String(t.lat),traffic:1};
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const text=await res.text();
+    let data;try{data=JSON.parse(text);}catch(e){data={__raw:text};}
+    if(!res.ok)throw new Error(`HTTP ${res.status}`);
+    const raw=extractRouteCoords(data);
+    if(!raw?.length)throw new Error(lang==='zh'?'無路線座標':'No route coords');
+    const points=raw.filter(c=>Array.isArray(c)&&Number.isFinite(+c[0])&&Number.isFinite(+c[1])).map(c=>[+c[0],+c[1]]);
+    if(!points.length)throw new Error(lang==='zh'?'座標解析失敗':'Parse failed');
+    if(routeLine){try{routeLine.setMap(null);}catch(e){}routeLine=null;}
+    if(destMarker){try{destMarker.setMap(null);}catch(e){}destMarker=null;}
+    routeLine=addPolyline(mainMap,points,'#e24b4a',5,0.95);
+    // destination marker
+    const destName=lang==='en'?t.nameEn:t.name;
+    const{marker:dm}=addMarker(mainMap,toiletCoord(t),makeDestIcon(destName),null);
+    destMarker=dm;
+    fitMap(mainMap,points,14);
+    const stats=extractRouteStats(data);
+    const dk=stats.distance!=null?(stats.distance/1000).toFixed(1)+'km':'—';
+    const tm=stats.spend_time!=null?Math.max(1,Math.round(stats.spend_time/60))+L.minUnit:'—';
+    const nm=lang==='en'?t.nameEn:t.name;
+    document.getElementById('routeInfo').innerHTML=`${nm} &nbsp;·&nbsp; <strong>${dk}</strong> &nbsp;·&nbsp; <strong>${tm}</strong>`;
+    document.getElementById('routeBar').classList.remove('hidden');
+    setMapHeight();
+    showToast(`${L.toastRouteDrawn} · ${dk} · ${tm}`);
+  }catch(err){
+    const cors=/CORS|fetch|Failed|Network/i.test(err.message);
+    showToast(L.toastRouteFail+err.message+(cors?' (CORS)':''));
+    if(mainMap){mainMap.setCenter?.(toiletCoord(t));mainMap.setZoom?.(16);}
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=L.dsGoBtn;}
+  }
+}
+function clearRoute(){
+  if(routeLine){try{routeLine.setMap(null);}catch(e){}routeLine=null;}
+  if(destMarker){try{destMarker.setMap(null);}catch(e){}destMarker=null;}
+  document.getElementById('routeBar').classList.add('hidden');
+  setMapHeight();
+}
+
+/* ═══ navigate ═══ */
+function navigate(id){
+  const t=DATA.find(x=>x.id===id);if(!t)return;
+  closeDet();
+  setPage('map');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    fetchAndDrawRoute(t);
+    // show it in loc list
+    selectedId=id;
+    document.querySelectorAll('.mloc').forEach(c=>c.classList.remove('sel'));
+    document.getElementById(`mloc-${id}`)?.classList.add('sel');
+    if(mainMap){mainMap.setCenter?.(toiletCoord(t));mainMap.setZoom?.(15);}
+  }));
+}
+
+/* ═══ Cat filter ═══ */
+function toggleCat(el,cat){
+  if(activeCats.has(cat)){if(activeCats.size===1)return;activeCats.delete(cat);el.className='mcat';}
+  else{activeCats.add(cat);el.className=`mcat ${CAT_ACT_CLS[cat]}`;}
+  updateMapVis();renderLocList();updateMCount();
+}
+function updateMCount(){
+  const n=DATA.filter(t=>activeCats.has(t.type)).length;
+  const el=document.getElementById('mCount');
+  if(el)el.textContent=L.mCountTpl.replace('{n}',n);
+}
+
+/* ═══ Loc list ═══ */
+function renderLocList(){
+  const el=document.getElementById('mapLocList');if(!el)return;
+  el.innerHTML='';
+  const list=DATA.filter(t=>activeCats.has(t.type))
+    .sort((a,b)=>{const w={ok:0,warn:1,err:2};return w[a.status]-w[b.status]||a.dist-b.dist;});
+  const cnt=document.getElementById('mapListCount');
+  if(cnt)cnt.textContent=list.length+(lang==='zh'?' 個點位':' locations');
+  const tt=document.getElementById('mapListTitle');
+  if(tt)tt.textContent=L.mapListTitle;
+  list.forEach(t=>{
+    const sc=STATUS_COLOR[t.status];
+    const stBg={ok:'var(--gl)',warn:'var(--aml)',err:'var(--rl)'}[t.status];
+    const stTx={ok:'var(--gd)',warn:'#854f0b',err:'var(--rd)'}[t.status];
+    const stLbl=t.status==='ok'?L.statusOk:t.status==='warn'?L.statusWarn:L.statusErr;
+    const wc=t.wait>10?'color:#e24b4a':t.wait>5?'color:#ef9f27':'color:#1d9e75';
+    const pc=t.paper<25?'color:#e24b4a':t.paper<50?'color:#ef9f27':'color:#1d9e75';
+    const ch=lang==='en'?CAT_CHAR_EN[t.type]||'?':CAT_CHAR_ZH[t.type]||'廁';
+    const cc=CAT_COLOR[t.type]||'#888';
+    const exitHtml=t.type==='mrt'&&(lang==='en'?t.exitEn:t.exit)
+      ?`<div style="font-size:9px;color:var(--bl);font-weight:600;margin-top:2px;">🚇 ${lang==='en'?t.exitEn:t.exit}</div>`:'';
+    const pkHtml=t.parking?`<span class="mloc-tag" style="background:#dcfce7;color:#15803d">🅿</span>`:'';
+    const d=document.createElement('div');
+    d.className='mloc'+(t.id===selectedId?' sel':'');
+    d.id=`mloc-${t.id}`;
+    d.innerHTML=`
+      <div class="mloc-badge" style="background:${sc};outline:2px solid ${cc};outline-offset:1px;">${ch}</div>
+      <div class="mloc-body">
+        <div class="mloc-name">${lang==='en'?t.nameEn:t.name}</div>
+        <div class="mloc-addr">${lang==='en'?t.addrEn:t.addr}</div>
+        ${exitHtml}
+        <div class="mloc-tags">
+          <span class="mloc-tag" style="background:${stBg};color:${stTx}">${stLbl}</span>
+          <span class="mloc-tag" style="background:var(--g100);color:var(--g600)">${dt(t.dist)}</span>
+          <span class="mloc-tag" style="${wc};background:var(--g100)">${t.wait}${L.minUnit}</span>
+          <span class="mloc-tag" style="${pc};background:var(--g100)">${lang==='zh'?'紙':'Paper'} ${t.paper}%</span>
+          ${pkHtml}
+        </div>
+      </div>
+      <div class="mloc-rt">
+        <div style="font-size:11px;font-weight:700;color:var(--am)">★${t.score}</div>
+        <div style="font-size:10px;color:var(--muted)">${t.wait}${L.minUnit}</div>
+        <div class="mloc-status" style="background:${sc}"></div>
+        <button class="mloc-fb-btn" onclick="event.stopPropagation();openFB(${t.id})">${L.fbBtnQuick}</button>
+      </div>`;
+    d.onclick=()=>openDet(t.id);
+    el.appendChild(d);
+  });
+}
+
+/* ═══ Page nav ═══ */
+function setPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('on'));
+  document.getElementById('page-'+p).classList.add('on');
+  document.getElementById('nav-'+p).classList.add('on');
+  if(p==='map'){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      setMapHeight();
+      if(!mainMap)initMainMap();
+      else{mainMap.invalidateSize?.();renderLocList();updateMCount();}
+    }));
+  }
+  if(p==='list')renderList();
+  if(p==='fav')renderFav();
+  if(p==='home')renderHome();
+}
+window.addEventListener('resize',()=>{
+  if(document.getElementById('page-map').classList.contains('on')){
+    setMapHeight();mainMap?.invalidateSize?.();
+  }
+});
+
+/* ═══ DATA ═══ */
+function hav(a,b){
+  const R=6371000,p=Math.PI/180,dl=(b.lat-a.lat)*p,dg=(b.lng-a.lng)*p;
+  return Math.round(2*R*Math.asin(Math.sqrt(Math.sin(dl/2)**2+Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin(dg/2)**2)));
+}
+const dt=d=>d<1000?d+'m':(d/1000).toFixed(1)+'km';
+
+const RAW=[
+  {id:0, name:'忠孝復興站 B1',nameEn:'Zhongxiao Fuxing B1',addr:'大安區忠孝東路三段',addrEn:'Sec.3 Zhongxiao E.Rd',exit:'出口2（Citibank側）',exitEn:'Exit 2 (Citibank)',type:'mrt',lat:25.0418,lng:121.5441,status:'ok',wait:3,paper:72,uses:143,score:4.5,tags:['無障礙'],accessible:true,family:true,nursing:false,h24:false,parking:true,
+    crowd:[2,1,1,1,2,4,12,28,42,38,25,30,35,28,22,26,38,45,40,32,20,14,8,4]},
+  {id:1, name:'大安站 B1',nameEn:'Daan Station B1',addr:'大安區信義路三段',addrEn:'Sec.3 Xinyi Rd',exit:'出口3',exitEn:'Exit 3',type:'mrt',lat:25.0280,lng:121.5362,status:'ok',wait:4,paper:65,uses:132,score:4.3,tags:['無障礙'],accessible:true,family:false,nursing:false,h24:false,parking:false,
+    crowd:[1,1,1,1,2,3,10,22,35,30,20,24,28,22,18,20,30,36,32,25,15,10,6,3]},
+  {id:2, name:'東門站 B1',nameEn:'Dongmen Station B1',addr:'中正區信義路二段',addrEn:'Sec.2 Xinyi Rd',exit:'出口5（永康街）',exitEn:'Exit 5 (Yongkang)',type:'mrt',lat:25.0336,lng:121.5276,status:'ok',wait:5,paper:78,uses:156,score:4.1,tags:[],accessible:false,family:false,nursing:false,h24:false,parking:false,
+    crowd:[1,1,1,1,2,3,8,18,28,26,20,30,38,32,25,22,30,35,30,22,14,9,5,2]},
+  {id:3, name:'南京復興站 B1',nameEn:'Nanjing Fuxing B1',addr:'中山區南京東路三段',addrEn:'Sec.3 Nanjing E.Rd',exit:'出口2',exitEn:'Exit 2',type:'mrt',lat:25.0518,lng:121.5441,status:'err',wait:15,paper:5,uses:287,score:2.8,tags:[],accessible:false,family:false,nursing:false,h24:false,parking:false,
+    crowd:[2,1,1,1,3,6,18,45,65,58,42,55,70,62,48,52,68,80,72,55,35,22,12,5]},
+  {id:4, name:'台北車站 M5',nameEn:'Taipei Main Station M5',addr:'中正區北平西路',addrEn:'Beiping W.Rd',exit:'M5出口旁',exitEn:'Near Exit M5',type:'mrt',lat:25.0478,lng:121.5170,status:'ok',wait:6,paper:80,uses:320,score:4.2,tags:['無障礙','哺乳室'],accessible:true,family:true,nursing:true,h24:false,parking:true,
+    crowd:[5,3,2,2,4,10,25,55,75,65,50,60,72,65,52,58,72,85,78,60,42,28,18,8]},
+  {id:5, name:'西門站 B1',nameEn:'Ximen Station B1',addr:'萬華區漢中街',addrEn:'Hanzhong St',exit:'出口1',exitEn:'Exit 1',type:'mrt',lat:25.0424,lng:121.5079,status:'warn',wait:9,paper:30,uses:250,score:3.7,tags:['無障礙'],accessible:true,family:false,nursing:false,h24:false,parking:false,
+    crowd:[3,2,2,2,3,5,12,28,40,38,32,40,48,44,38,42,52,58,55,48,38,28,18,8]},
+  {id:6, name:'市政府站 B1',nameEn:'City Hall Station B1',addr:'信義區市府路',addrEn:'Shifu Rd',exit:'出口2',exitEn:'Exit 2',type:'mrt',lat:25.0409,lng:121.5650,status:'ok',wait:3,paper:88,uses:110,score:4.6,tags:['無障礙','哺乳室'],accessible:true,family:true,nursing:true,h24:false,parking:true,
+    crowd:[1,1,1,1,2,4,10,22,32,28,20,24,28,22,18,20,28,32,28,22,14,8,4,2]},
+  {id:9, name:'大安森林公園北側',nameEn:'Daan Forest Park North',addr:'大安區信義路三段',addrEn:'Sec.3 Xinyi Rd',exit:'',exitEn:'',type:'park',lat:25.0332,lng:121.5362,status:'warn',wait:8,paper:18,uses:210,score:3.8,tags:['哺乳室'],accessible:true,family:true,nursing:true,h24:false,parking:true,
+    crowd:[2,1,1,1,3,8,18,30,40,42,38,36,40,38,36,40,45,50,46,38,28,18,10,4]},
+  {id:10,name:'228和平公園',nameEn:'228 Peace Park',addr:'中正區公園路',addrEn:'Park Rd',exit:'',exitEn:'',type:'park',lat:25.0436,lng:121.5188,status:'ok',wait:4,paper:65,uses:120,score:4.0,tags:['無障礙'],accessible:true,family:false,nursing:false,h24:false,parking:false,
+    crowd:[1,1,1,1,2,5,14,22,30,32,28,30,35,32,28,30,36,38,34,28,20,12,6,2]},
+  {id:14,name:'市政府廁所 B1',nameEn:'City Hall WC B1',addr:'信義區市府路1號',addrEn:'1 Shifu Rd',exit:'',exitEn:'',type:'pub',lat:25.0376,lng:121.5625,status:'ok',wait:2,paper:85,uses:98,score:4.7,tags:['無障礙','哺乳室'],accessible:true,family:true,nursing:true,h24:false,parking:true,
+    crowd:[1,1,1,1,2,3,8,18,26,22,16,18,22,18,14,16,22,26,22,16,10,6,3,1]},
+  {id:15,name:'中正紀念堂廁所',nameEn:'CKS Memorial WC',addr:'中正區中山南路21號',addrEn:'21 Zhongshan S.Rd',exit:'',exitEn:'',type:'pub',lat:25.0369,lng:121.5212,status:'warn',wait:10,paper:28,uses:298,score:3.6,tags:['無障礙'],accessible:true,family:false,nursing:false,h24:false,parking:true,
+    crowd:[2,1,1,1,3,6,20,45,68,62,48,55,72,65,52,56,70,78,72,58,40,25,14,5]},
+  {id:22,name:'全家 仁愛門市',nameEn:'FamilyMart Renai',addr:'大安區仁愛路四段',addrEn:'Sec.4 Renai Rd',exit:'',exitEn:'',type:'cvs',lat:25.0340,lng:121.5420,status:'ok',wait:2,paper:90,uses:60,score:4.4,tags:['24小時'],accessible:false,family:false,nursing:false,h24:true,parking:false,
+    crowd:[4,3,3,3,4,6,10,14,16,14,12,14,16,14,12,14,16,18,16,14,12,10,8,5]},
+  {id:23,name:'萊爾富 信義門市',nameEn:'Hi-Life Xinyi',addr:'信義區信義路四段',addrEn:'Sec.4 Xinyi Rd',exit:'',exitEn:'',type:'cvs',lat:25.0330,lng:121.5600,status:'ok',wait:1,paper:95,uses:40,score:4.6,tags:['24小時'],accessible:false,family:false,nursing:false,h24:true,parking:false,
+    crowd:[3,2,2,2,3,5,8,12,14,12,10,12,14,12,10,12,14,16,14,12,10,8,6,4]},
+  {id:30,name:'台亞石油 忠孝加油站',nameEn:'Taiya Gas Station Zhongxiao',addr:'大安區忠孝東路四段',addrEn:'Sec.4 Zhongxiao E.Rd',exit:'',exitEn:'',type:'gas',lat:25.0408,lng:121.5490,status:'ok',wait:2,paper:60,uses:80,score:4.0,tags:[],accessible:false,family:false,nursing:false,h24:true,parking:true,
+    crowd:[2,1,1,1,3,8,14,18,16,14,12,14,16,14,12,14,16,18,16,14,10,8,5,3]},
+  {id:31,name:'中油 信義加油站',nameEn:'CPC Xinyi Gas Station',addr:'信義區信義路五段',addrEn:'Sec.5 Xinyi Rd',exit:'',exitEn:'',type:'gas',lat:25.0310,lng:121.5640,status:'ok',wait:1,paper:70,uses:60,score:4.1,tags:[],accessible:false,family:false,nursing:false,h24:true,parking:true,
+    crowd:[2,1,1,1,2,6,12,16,14,12,10,12,14,12,10,12,14,16,14,12,8,6,4,2]},
+  {id:40,name:'行天宮',nameEn:'Xingtian Temple',addr:'中山區民權東路二段',addrEn:'Sec.2 Minquan E.Rd',exit:'',exitEn:'',type:'temple',lat:25.0638,lng:121.5340,status:'ok',wait:5,paper:55,uses:180,score:3.9,tags:[],accessible:true,family:false,nursing:false,h24:false,parking:false,
+    crowd:[1,1,1,1,3,10,28,45,52,48,42,46,50,46,40,44,50,55,48,38,25,15,8,3]},
+  {id:41,name:'龍山寺',nameEn:'Longshan Temple',addr:'萬華區廣州街211號',addrEn:'211 Guangzhou St',exit:'',exitEn:'',type:'temple',lat:25.0375,lng:121.4997,status:'warn',wait:8,paper:25,uses:240,score:3.5,tags:['無障礙'],accessible:true,family:false,nursing:false,h24:false,parking:false,
+    crowd:[5,3,2,2,5,15,35,58,70,65,55,62,68,62,55,60,68,75,68,55,40,28,18,8]},
+];
+const DATA=RAW.map(t=>({...t,dist:hav({lat:ME[0],lng:ME[1]},t)})).sort((a,b)=>a.dist-b.dist);
+const FAVIDS=[0,14,1];
+
+/* reviews */
+const REVS={};
+const RN=['陳小華','林美玲','張偉','王雅婷','李志遠','吳家豪'];
+const RNe=['Chen H.','Lin M.','Zhang W.','Wang Y.','Li Z.','Wu J.'];
+const RT=[['非常乾淨，衛生紙充足，推薦！','整潔，等候短。','使用方便。','超乾淨！','整體很好。'],['偶爾有異味，整體尚可。','假日人多。','衛生紙有時不夠。','一般水準。','清晨使用很棒。'],['異味嚴重，不建議。','設備老舊。','衛生紙沒有。','需大幅改善。','急需整修。']];
+const RE=[['Very clean!','Short wait.','Convenient.','Super clean!','Great.'],['Occasional odor.','Crowded weekends.','Paper low.','Average.','Great morning.'],['Bad odor!','Old equipment.','No paper.','Needs improvement.','Not recommended.']];
+DATA.forEach(t=>{
+  const pool=t.status==='err'?2:t.status==='warn'?1:0;
+  REVS[t.id]=Array.from({length:5},(_,i)=>({
+    name:RN[i%6],nameEn:RNe[i%6],
+    stars:Math.max(1,Math.min(5,t.status==='err'?2-Math.floor(i/2):t.status==='warn'?3+(i%2):4+(i%2))),
+    date:`${i+1}天前`,dateEn:`${i+1} days ago`,
+    text:RT[pool][i%5],textEn:RE[pool][i%5]
+  }));
+});
+
+/* helpers */
+const sti=t=>{
+  if(t.status==='err')return{cls:'smsg-err',txt:L.statusMsgErr};
+  if(t.status==='warn'&&t.paper<30)return{cls:'smsg-warn',txt:L.statusMsgWarnPaper};
+  if(t.status==='warn')return{cls:'smsg-warn',txt:L.statusMsgWarn};
+  return{cls:'smsg-ok',txt:L.statusMsgOk};
+};
+function cbadge(t,all){
+  if(t.status==='err')return null;
+  const av=all.filter(x=>x.status!=='err');if(!av.length)return null;
+  if(t.score===Math.max(...av.map(x=>x.score))&&t.status==='ok')return{cls:'b-best',txt:L.badgeBest};
+  if(t.wait===Math.min(...av.map(x=>x.wait)))return{cls:'b-fast',txt:L.badgeFast};
+  if(t.dist===Math.min(...av.map(x=>x.dist)))return{cls:'b-near',txt:L.badgeNear};
+  return null;
+}
+function smini(t){
+  const F=L.stallF,M=L.stallM,H=L.stallH,N=L.stallN;
+  const types=[{l:F,n:3},{l:M,n:3},{l:H,n:1}];
+  let h='',fr=0,tot=0;
+  types.forEach(st=>{for(let i=0;i<st.n;i++){
+    const cls=t.uses>200&&Math.random()<0.5?'used':'free';
+    tot++;if(cls==='free')fr++;
+    h+=`<div class="sm ${cls}">${st.l}</div>`;
+  }});
+  return{h,fr,tot};
+}
+
+/* ═══ LANG SWITCH ═══ */
+function applyLang(){
+  L=TXT[lang];
+  document.getElementById('lswZh').classList.toggle('on',lang==='zh');
+  document.getElementById('lswEn').classList.toggle('on',lang==='en');
+  // static labels
+  const ids={
+    hdrName:'hdrName',hdrSub:'hdrSub',hdrLocate:'hdrLocate',
+    hGreet:'hGreet',hAvgL:'hAvgL',hNearL:'hNearL',hTopL:'hTopL',
+    hqfB:'hqfB',hqfN:'hqfN',hqfC:'hqfC',hqfF:'hqfF',
+    hPickMore:'hPickMore',hAlertTitle:'hAlertTitle',hAlertHd:'hAlertHd',
+    hAlertBd:'hAlertBd',hAlertCta:'hAlertCta',
+    hOvTitle:'hOvTitle',soOkL:'soOkL',soWarnL:'soWarnL',soErrL:'soErrL',
+    hNbTitle:'hNbTitle',hNbMore:'hNbMore',
+    navH:'navH',navL:'navL',navM:'navM',navF:'navF',navP:'navP',
+    mAll:'mAll',mMrt:'mMrt',mPark:'mPark',mPub:'mPub',mCvs:'mCvs',
+    mGas:'mGas',mTemple:'mTemple',mNursing:'mNursing',mAccess:'mAccess',mParking:'mParking',
+    catLblMrt:'catLblMrt',catLblPark:'catLblPark',catLblPub:'catLblPub',
+    catLblCvs:'catLblCvs',catLblGas:'catLblGas',catLblTemple:'catLblTemple',
+    legMe:'legMe',legOk:'legOk',legWarn:'legWarn',legErr:'legErr',
+    favTitle:'favTitle',favSub:'favSub',
+    profLv:'profLv',psV:'psV',psF:'psF',psS:'psS',
+    psSetT:'psSetT',psE:'psE',psES:'psES',psN:'psN',psNS:'psNS',
+    psAbT:'psAbT',psVer:'psVer',psCt:'psCt',psLo:'psLo',
+    fbTitle:'fbTitle',fbQuick:'fbQuick',fbSub:'fbSub',
+    dsLblCrowd:'ds-lbl-crowd',
+  };
+  Object.entries(ids).forEach(([k,id])=>{
+    const el=document.getElementById(id);
+    if(el&&L[k]!==undefined)el.textContent=L[k];
+  });
+  // textarea placeholder
+  document.getElementById('fbTA').placeholder=L.fbPlaceholder;
+}
+function setLang(l){
+  lang=l;
+  if(mainMap){try{mainMap.remove?.();}catch(e){}mainMap=null;meMarker=null;toiletMarkers=[];routeLine=null;}
+  applyLang();
+  const cur=document.querySelector('.page.on')?.id?.replace('page-','');
+  if(cur==='map'){requestAnimationFrame(()=>requestAnimationFrame(initMainMap));}
+  renderAll();
+}
+
+/* ═══ CROWD FLOW ═══ */
+function renderCrowd(t){
+  const now=new Date().getHours();
+  const crowd=t.crowd||Array.from({length:24},(_,i)=>Math.round(8+Math.sin(i/24*Math.PI*2-1)*6+Math.random()*3));
+  const cur=crowd[now];
+  const prev=crowd[(now-1+24)%24];
+  const max=Math.max(...crowd);
+  const peakHr=crowd.indexOf(max);
+  const futureHours=crowd.slice(now+1);
+  const bestFutureIdx=futureHours.indexOf(Math.min(...futureHours));
+  const bestHr=now+1+bestFutureIdx;
+
+  // level
+  const pct=cur/max;
+  let lvl,lvlColor;
+  if(pct<0.3){lvl=L.crowdLow;lvlColor='#22c55e';}
+  else if(pct<0.6){lvl=L.crowdMed;lvlColor='#ef9f27';}
+  else if(pct<0.85){lvl=L.crowdBusy;lvlColor='#f97316';}
+  else{lvl=L.crowdVeryBusy;lvlColor='#e24b4a';}
+
+  // current count
+  document.getElementById('crowd-now-count').textContent=cur+(L.crowdPerson?' '+L.crowdPerson:'');
+  document.getElementById('crowd-now-lbl').textContent=L.crowdNowLbl;
+
+  // trend
+  const trendEl=document.getElementById('crowd-trend');
+  const diff=cur-prev;
+  if(diff>2){trendEl.textContent=L.crowdTrendUp;trendEl.className='crowd-trend up';}
+  else if(diff<-2){trendEl.textContent=L.crowdTrendDown;trendEl.className='crowd-trend down';}
+  else{trendEl.textContent=L.crowdTrendFlat;trendEl.className='crowd-trend flat';}
+
+  // level dots
+  const dotsEl=document.getElementById('crowd-dots');
+  const lvlNum=pct<0.3?1:pct<0.6?2:pct<0.85?3:4;
+  dotsEl.innerHTML=Array.from({length:4},(_,i)=>`<div class="crowd-dot" style="background:${i<lvlNum?lvlColor:'var(--g200)'}"></div>`).join('');
+  const llEl=document.getElementById('crowd-level-lbl');
+  llEl.textContent=lvl; llEl.style.color=lvlColor;
+
+  // bar chart — show every hour, label every 4h
+  const barsEl=document.getElementById('crowd-bars');
+  const labelsEl=document.getElementById('crowd-time-labels');
+  barsEl.innerHTML=''; labelsEl.innerHTML='';
+  crowd.forEach((v,i)=>{
+    const h=Math.round((v/max)*100);
+    const isNow=i===now;
+    const barColor=isNow?lvlColor:i<now?'var(--g200)':'var(--bdr)';
+    const wrap=document.createElement('div');
+    wrap.className='crowd-bar-wrap';
+    wrap.innerHTML=`<div class="crowd-bar${isNow?' now':''}" style="height:${h}%;background:${barColor};"></div>`;
+    barsEl.appendChild(wrap);
+  });
+  // time axis labels: 0,6,12,18,now
+  const labelHrs=[0,6,12,18];
+  if(!labelHrs.includes(now)) labelHrs.push(now);
+  labelHrs.sort((a,b)=>a-b);
+  const totalW=100/24;
+  labelsEl.style.position='relative'; labelsEl.style.height='12px';
+  labelHrs.forEach(h=>{
+    const span=document.createElement('span');
+    span.style.cssText=`position:absolute;left:${(h/24*100).toFixed(1)}%;transform:translateX(-50%);font-size:8px;color:${h===now?lvlColor:'var(--muted)'};font-weight:${h===now?700:400};`;
+    span.textContent=h===now?L.crowdHrNow:`${h}`;
+    labelsEl.appendChild(span);
+  });
+
+  // peak & best
+  const peakTxt=L.crowdPeakTpl.replace('{hr}',String(peakHr).padStart(2,'0')).replace('{n}',max);
+  const bestTxt=bestHr<24?L.crowdBestTpl.replace('{hr}',String(bestHr).padStart(2,'0')):'';
+  document.getElementById('crowd-peak').innerHTML=`<strong>${peakTxt}</strong>${bestTxt?'<br>'+bestTxt:''}`;
+
+  // section label
+  const lbl=document.getElementById('ds-lbl-crowd');
+  if(lbl) lbl.textContent=L.dsLblCrowd;
+}
+
+/* ═══ DETAIL SHEET (unified) ═══ */
+function openDet(id){
+  const t=DATA.find(x=>x.id===id);if(!t)return;
+  selectedId=id;
+  // update loc list selection
+  document.querySelectorAll('.mloc').forEach(c=>c.classList.remove('sel'));
+  const lcard=document.getElementById(`mloc-${id}`);
+  if(lcard){lcard.classList.add('sel');lcard.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  // pan map if visible
+  if(mainMap){mainMap.setCenter?.(toiletCoord(t));mainMap.setZoom?.(15);}
+
+  const nm=lang==='en'?t.nameEn:t.name;
+  const ad=lang==='en'?t.addrEn:t.addr;
+  const ex=lang==='en'?t.exitEn:t.exit;
+
+  document.getElementById('ds-name').textContent=nm;
+  document.getElementById('ds-addr').textContent=ad;
+  const exEl=document.getElementById('ds-exit');
+  if(t.type==='mrt'&&ex){exEl.textContent='🚇 '+ex;exEl.style.display='block';}
+  else exEl.style.display='none';
+
+  // type badge
+  const tc={mrt:'type-mrt',park:'type-park',pub:'type-pub',cvs:'type-cvs',gas:'type-gas',temple:'type-temple'}[t.type]||'type-pub';
+  const tl=L.typeLabel[t.type]||t.type;
+  document.getElementById('ds-type-badge').innerHTML=`<span class="ds-type-badge ${tc}">${tl}</span>`;
+
+  // metrics
+  const wv=document.getElementById('ds-wait');
+  wv.textContent=t.wait+L.minUnit;wv.style.color=t.wait>10?'var(--r)':t.wait>5?'var(--am)':'var(--g)';
+  document.getElementById('ds-dist').textContent=dt(t.dist);
+  const pv=document.getElementById('ds-paper');
+  pv.textContent=t.paper+'%';pv.style.color=t.paper<25?'var(--r)':t.paper<50?'var(--am)':'var(--g)';
+  document.getElementById('ds-score').textContent=t.score+'★';
+
+  // labels
+  document.getElementById('ds-lbl-wait').textContent=L.dsLblWait;
+  document.getElementById('ds-lbl-dist').textContent=L.dsLblDist;
+  document.getElementById('ds-lbl-paper').textContent=L.dsLblPaper;
+  document.getElementById('ds-lbl-score').textContent=L.dsLblScore;
+
+  // status pill
+  const se=document.getElementById('ds-status');
+  se.textContent=t.status==='ok'?L.statusOk:t.status==='warn'?L.statusWarn:L.statusErr;
+  se.className='ds-status '+{ok:'smsg-ok',warn:'smsg-warn',err:'smsg-err'}[t.status];
+
+  // live section labels
+  document.getElementById('ds-lbl-live').textContent=L.dsLblLive;
+  document.getElementById('ds-lbl-swt').textContent=L.dsLblSwt;
+  document.getElementById('ds-lbl-fr').textContent=L.dsLblFr;
+  document.getElementById('ds-lbl-pk').textContent=L.dsLblPk;
+
+  // live stat boxes
+  const sw=document.getElementById('ds-stat-wait');
+  sw.textContent=t.wait+L.minUnit;sw.style.color=t.wait>10?'var(--r)':t.wait>5?'var(--am)':'var(--g)';
+
+  // stalls
+  const stallTypes=[{l:L.stallF,n:3},{l:L.stallM,n:3},{l:L.stallH,n:1},{l:L.stallN,n:1}];
+  let sh='',fr=0,tot=0;
+  stallTypes.forEach(st=>{for(let i=0;i<st.n;i++){
+    const r=Math.random();let cls='free';
+    if(t.uses>200&&r<0.5)cls='used';else if(r<0.08)cls='clean';
+    if(cls==='free')fr++;tot++;
+    const tip=cls==='free'?L.stallFree:cls==='used'?L.stallUsed:L.stallClean;
+    sh+=`<div class="sd ${cls}" onclick="showToast('${st.l}${i+1}: ${tip}')">${st.l}${i+1}</div>`;
+  }});
+  document.getElementById('ds-stalls').innerHTML=sh;
+  document.getElementById('ds-free').textContent=`${fr}/${tot}`;
+
+  // parking
+  const pkEl=document.getElementById('ds-parking');
+  pkEl.textContent=t.parking?'🅿 ✓':'—';
+  pkEl.style.color=t.parking?'var(--g)':'var(--muted)';
+
+  // stall legend
+  document.getElementById('ds-leg').innerHTML=L.stallLeg.map(([bg,bd,lb])=>`<span style="display:flex;align-items:center;gap:3px"><span style="width:9px;height:9px;background:${bg};border:1px solid ${bd};border-radius:2px;display:inline-block"></span>${lb}</span>`).join('');
+
+  // alert
+  const si=sti(t);
+  document.getElementById('ds-alert').innerHTML=t.status!=='ok'?`<div class="smsg ${si.cls}">${si.txt}</div>`:'';
+
+  // crowd flow
+  renderCrowd(t);
+
+  // section labels
+  document.getElementById('ds-lbl-occ').textContent=L.dsLblOcc;
+  document.getElementById('ds-lbl-fac').textContent=L.dsLblFac;
+  document.getElementById('ds-lbl-alt').textContent=L.dsLblAlt;
+  document.getElementById('ds-lbl-rev').textContent=L.dsLblRev;
+
+  // facilities (include parking)
+  const facKeys=['accessible','nursing','family','h24'];
+  const facDisp=L.facNames;
+  const parkDisp=t.parking?L.parkingYes:L.parkingNo;
+  let facHtml=facKeys.map((k,i)=>{
+    const has=(k==='accessible'&&t.accessible)||(k==='nursing'&&t.nursing)||(k==='family'&&t.family)||(k==='h24'&&t.h24);
+    return`<div class="fac${has?' yes':''}">${has?'✓ ':' '}${facDisp[i]}</div>`;
+  }).join('');
+  facHtml+=`<div class="fac${t.parking?' yes':''}">${t.parking?'✓ ':' '}${parkDisp}</div>`;
+  document.getElementById('ds-facs').innerHTML=facHtml;
+
+  // alternatives
+  const alts=DATA.filter(x=>x.id!==id&&x.status!=='err').slice(0,2);
+  document.getElementById('ds-alts').innerHTML=alts.map(a=>`<div class="alt-item">
+    <div>
+      <div style="font-size:12px;font-weight:700">${lang==='en'?a.nameEn:a.name}</div>
+      <div style="font-size:10px;color:var(--muted)">${a.wait}${L.minUnit} · ${dt(a.dist)}</div>
+    </div>
+    <button class="alt-btn" onclick="navigate(${a.id})">${lang==='zh'?'導航':'Nav'}</button>
+  </div>`).join('');
+
+  // reviews
+  const revs=REVS[id]||[];
+  document.getElementById('ds-revs').innerHTML=revs.map(r=>`<div class="rev-item">
+    <div class="rev-top">
+      <div class="rev-av">${(lang==='en'?r.nameEn:r.name).charAt(0)}</div>
+      <div style="flex:1">
+        <div class="rev-name">${lang==='en'?r.nameEn:r.name}</div>
+        <div class="rev-date">${lang==='en'?r.dateEn:r.date}</div>
+      </div>
+      <div class="rev-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+    </div>
+    <div class="rev-text">${lang==='en'?r.textEn:r.text}</div>
+  </div>`).join('');
+
+  // action buttons
+  document.getElementById('ds-go-btn').textContent=L.dsGoBtn;
+  document.getElementById('ds-go-btn').onclick=()=>navigate(id);
+  document.getElementById('ds-fb-btn').textContent=L.dsFbBtn;
+  document.getElementById('ds-fb-btn').onclick=()=>openFB(id);
+
+  document.getElementById('detSheet').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeDet(){
+  document.getElementById('detSheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+
+/* ═══ Feedback ═══ */
+let starR=0,fbId=0;
+function openFB(id){
+  fbId=id;starR=0;updateStars();
+  const t=DATA.find(x=>x.id===id);
+  document.getElementById('fbName').textContent=lang==='en'?t?.nameEn:t?.name;
+  document.getElementById('fbTitle').textContent=L.fbTitle;
+  document.getElementById('fbQuick').textContent=L.fbQuick;
+  document.getElementById('fbSub').textContent=L.fbSub;
+  document.getElementById('fbTA').placeholder=L.fbPlaceholder;
+  document.getElementById('qtags').innerHTML=L.fbTags.map(tag=>`<div class="qt" onclick="tog(this)">${tag}</div>`).join('');
+  document.getElementById('fbTA').value='';
+  document.getElementById('fbSheet').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeFB(){document.getElementById('fbSheet').classList.remove('open');document.getElementById('overlay').classList.remove('on');}
+function rate(n){starR=n;updateStars();}
+function updateStars(){document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<starR));}
+function tog(el){el.classList.toggle('on');}
+function submitFB(){
+  if(!starR){showToast(L.toastFbRate);return;}
+  closeFB();showToast(L.toastFbThanks);
+}
+function closeAll(){closeDet();closeFB();}
+
+/* ═══ HOME render ═══ */
+let hqf='best';
+function renderHome(){
+  const avail=DATA.filter(t=>t.status!=='err');
+  document.getElementById('hTitle').textContent=L.heroTpl.replace('{n}',avail.length);
+  const avg=(avail.reduce((s,t)=>s+t.wait,0)/avail.length).toFixed(1);
+  document.getElementById('hAvg').innerHTML=`${avg}<span style="font-size:11px">${L.minUnit}</span>`;
+  const near=avail[0];
+  document.getElementById('hNear').innerHTML=`${near.dist<1000?near.dist:(near.dist/1000).toFixed(1)}<span style="font-size:11px">${near.dist<1000?'m':'km'}</span>`;
+  document.getElementById('soOk').textContent=DATA.filter(t=>t.status==='ok').length;
+  document.getElementById('soWarn').textContent=DATA.filter(t=>t.status==='warn').length;
+  document.getElementById('soErr').textContent=DATA.filter(t=>t.status==='err').length;
+  document.getElementById('hPickTitle').textContent=L.hPickTitle[hqf];
+  let pd=[...avail];
+  if(hqf==='near')pd.sort((a,b)=>a.dist-b.dist);
+  else if(hqf==='clean')pd.sort((a,b)=>b.paper-a.paper);
+  else if(hqf==='fast')pd.sort((a,b)=>a.wait-b.wait);
+  else pd.sort((a,b)=>b.score-a.score);
+  const pe=document.getElementById('picks');pe.innerHTML='';
+  pd.slice(0,5).forEach((t,i)=>{
+    const d=document.createElement('div');d.className='pick';d.onclick=()=>openDet(t.id);
+    const rnk=lang==='zh'?`第${i+1}名`:`#${i+1}`;
+    d.innerHTML=`<div class="pick-rank">${rnk}</div>
+      <div class="pick-name">${lang==='en'?t.nameEn:t.name}</div>
+      <div class="pick-row"><span>${L.waitLabel}</span><span style="font-weight:700;color:var(--g)">${t.wait}${L.minUnit}</span></div>
+      <div class="pick-row"><span>${L.distLabel}</span><span style="font-weight:700">${dt(t.dist)}</span></div>
+      <div style="font-size:11px;margin-top:3px;color:var(--am)">★ <strong>${t.score}</strong></div>
+      ${i===0?`<span class="pbadge b-best">${L.badgeBest}</span>`:''}`;
+    pe.appendChild(d);
+  });
+  const nb=document.getElementById('nbList');nb.innerHTML='';
+  DATA.filter(t=>t.status!=='err').slice(0,4).forEach(t=>{
+    const c={ok:'var(--g)',warn:'var(--am)',err:'var(--r)'}[t.status];
+    const d=document.createElement('div');d.className='nb';d.onclick=()=>openDet(t.id);
+    d.innerHTML=`<div class="nb-dot" style="background:${c}"></div>
+      <div style="flex:1"><div class="nb-name">${lang==='en'?t.nameEn:t.name}</div>
+      <div class="nb-meta">${dt(t.dist)} · ${L.waitLabel} ${t.wait}${L.minUnit} · ★${t.score}</div></div>
+      <div class="nb-go" onclick="event.stopPropagation();navigate(${t.id})">${L.navigateArrow}</div>`;
+    nb.appendChild(d);
+  });
+}
+function setHQF(el,m){document.querySelectorAll('.qf').forEach(x=>x.classList.remove('on'));el.classList.add('on');hqf=m;renderHome();}
+
+/* ═══ LIST render ═══ */
+let curMode='all';
+function getFiltered(){
+  let list=[...DATA];
+  const f={mrt:x=>x.type==='mrt',park:x=>x.type==='park',pub:x=>x.type==='pub',
+    cvs:x=>x.type==='cvs',gas:x=>x.type==='gas',temple:x=>x.type==='temple',
+    nursing:x=>x.nursing,access:x=>x.accessible,parking:x=>x.parking};
+  if(f[curMode])list=list.filter(f[curMode]);
+  return list.sort((a,b)=>{const w={ok:0,warn:1,err:2};return w[a.status]-w[b.status]||a.dist-b.dist;});
+}
+function renderList(){
+  const el=document.getElementById('listEl');el.innerHTML='';
+  const list=getFiltered();
+  if(!list.length){el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">${L.noResult}</div>`;return;}
+  list.forEach(t=>{
+    const si=sti(t);const bd2=cbadge(t,list);const st=smini(t);
+    const wc=t.wait>10?'mv-err':t.wait>5?'mv-warn':'mv-ok';
+    const pc=t.paper<25?'mv-err':t.paper<50?'mv-warn':'mv-ok';
+    const ex=t.type==='mrt'&&(lang==='en'?t.exitEn:t.exit)?`<div class="rc-exit">🚇 ${lang==='en'?t.exitEn:t.exit}</div>`:'';
+    const pkIcon=t.parking?`<span style="font-size:9px;color:var(--g);font-weight:700;padding:2px 5px;background:var(--gl);border-radius:4px">🅿 ${lang==='zh'?'有停車場':'Parking'}</span>`:'';
+    const stLbl=t.status==='ok'?L.statusOk:t.status==='warn'?L.statusWarn:L.statusErr;
+    const d=document.createElement('div');d.className='rc';
+    d.innerHTML=`<div class="rc-stripe s-${t.status}"></div>
+      <div class="rc-body">
+        <div class="rc-head">
+          <div><div class="rc-name">${lang==='en'?t.nameEn:t.name}</div><div class="rc-addr">${lang==='en'?t.addrEn:t.addr}</div>${ex}</div>
+          <div class="rc-badges">
+            ${bd2?`<span class="badge ${bd2.cls}">${bd2.txt}</span>`:''}
+            <span class="badge b-${t.status==='ok'?'ok':t.status==='warn'?'warn':'err'}">${stLbl}</span>
+          </div>
+        </div>
+        <div class="rc-mets">
+          <div class="met"><div class="mv ${wc}">${t.wait}${L.minUnit}</div><div class="ml">${L.waitLabel}</div></div>
+          <div class="met"><div class="mv">${dt(t.dist)}</div><div class="ml">${L.distLabel}</div></div>
+          <div class="met"><div class="mv ${pc}">${t.paper}%</div><div class="ml">${L.paperLabel}</div></div>
+        </div>
+        <div class="stall-row"><div class="sms">${st.h}</div>
+          <div><div class="stall-n">${st.fr}/${st.tot}</div><div class="stall-l">${L.freeLabel}</div></div>
+        </div>
+        ${pkIcon?`<div style="margin-top:5px">${pkIcon}</div>`:''}
+        ${t.status!=='ok'?`<div class="smsg ${si.cls}">${si.txt}</div>`:''}
+      </div>
+      <div class="rc-acts">
+        <div class="ra" onclick="event.stopPropagation();openDet(${t.id})">${L.detBtn}</div>
+        <div class="ra pri" onclick="event.stopPropagation();navigate(${t.id})">${L.navBtn}</div>
+        <div class="ra ra-fb" onclick="event.stopPropagation();openFB(${t.id})">${L.fbBtn}</div>
+      </div>`;
+    d.onclick=()=>openDet(t.id);
+    el.appendChild(d);
+  });
+}
+function setMode(el,m){document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));el.classList.add('on');curMode=m;renderList();}
+
+/* ═══ FAVORITES ═══ */
+function renderFav(){
+  const el=document.getElementById('favList');el.innerHTML='';
+  DATA.filter(t=>FAVIDS.includes(t.id)).forEach((t,i)=>{
+    const d=document.createElement('div');d.className='fav-card';
+    d.innerHTML=`<div class="fav-top">
+      <div><div class="fav-name">${lang==='en'?t.nameEn:t.name}</div><div class="fav-visit">${L.favLastVisit.replace('{n}',[3,7,14][i])}</div></div>
+      <div class="fav-heart" onclick="showToast(L.toastFavRemoved)">♥</div>
+    </div>
+    <div class="fav-meta">
+      <span>${L.waitLabel} <strong>${t.wait}${L.minUnit}</strong></span>
+      <span>${L.distLabel} <strong>${dt(t.dist)}</strong></span>
+      <span>★ <strong>${t.score}</strong></span>
+    </div>
+    <div class="fav-go" onclick="navigate(${t.id})">${L.favNav}</div>`;
+    el.appendChild(d);
+  });
+}
+
+/* misc */
+function locateMe(){
+  if(mainMap){mainMap.setCenter?.(toInaviCoord(ME));mainMap.setZoom?.(15);}
+  showToast(L.toastLocate);
+}
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show';
+  setTimeout(()=>el.className='toast',2700);
+}
+function renderAll(){
+  renderHome();
+  const cur=document.querySelector('.page.on')?.id?.replace('page-','');
+  if(cur==='list')renderList();
+  if(cur==='fav')renderFav();
+  if(cur==='map')renderLocList();
+}
+
+setInterval(()=>{
+  document.querySelectorAll('.sms .sm').forEach(s=>{
+    if(Math.random()<0.03){const f=Math.random()<0.5;s.className='sm '+(f?'free':'used');}
+  });
+},4000);
+
+/* Boot */
+applyLang();
+renderHome();
+renderList();
+ensureInaviReady(()=>{});
+setTimeout(initMainMap,300);
+</script>
+</body>
+</html>
