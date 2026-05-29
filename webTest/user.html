@@ -385,6 +385,11 @@ body{font-family:var(--fn);background:var(--bg);color:var(--text);
 <div class="page-wrap" style="position:relative;flex:1;overflow:hidden;">
   <div class="toast" id="toast"></div>
   <div class="overlay" id="overlay" onclick="closeAll()"></div>
+  <style>
+  #loginScreen{display:none;}
+  #loginScreen.show{display:flex!important;}
+  #loginName::placeholder,#loginEmail::placeholder{color:rgba(255,255,255,.6);}
+  </style>
 
   <!-- FEEDBACK SHEET -->
   <div class="fb-sheet" id="fbSheet">
@@ -602,22 +607,22 @@ body{font-family:var(--fn);background:var(--bg);color:var(--text);
   <!-- PROFILE -->
   <div class="page" id="page-profile">
     <div class="prof-hd">
-      <div class="avatar">王</div>
+      <div class="avatar" id="profAvatar">王</div>
       <div>
-        <div class="prof-name">王小明</div>
-        <div class="prof-email">ming.wang@example.com</div>
+        <div class="prof-name" id="profNameDisp">王小明</div>
+        <div class="prof-email" id="profEmailDisp">ming.wang@example.com</div>
         <div class="prof-lv" id="profLv">資深使用者</div>
       </div>
     </div>
     <div class="prof-stats">
-      <div class="ps"><div class="ps-val">47</div><div class="ps-lbl" id="psV">使用次數</div></div>
-      <div class="ps"><div class="ps-val">12</div><div class="ps-lbl" id="psF">回饋次數</div></div>
+      <div class="ps"><div class="ps-val" id="statVisits">47</div><div class="ps-lbl" id="psV">使用次數</div></div>
+      <div class="ps"><div class="ps-val" id="statFeedback">12</div><div class="ps-lbl" id="psF">回饋次數</div></div>
       <div class="ps"><div class="ps-val">3</div><div class="ps-lbl" id="psS">收藏數</div></div>
     </div>
     <div class="psec">
       <div class="psec-title" id="psSetT">設定</div>
       <div class="p-rows">
-        <div class="pr" onclick="showToast(L.toastProfileSaved)"><div class="pr-ic">👤</div><div class="pr-body"><div class="pr-label" id="psE">編輯個人資訊</div><div class="pr-sub" id="psES">名稱、頭像</div></div><div class="pr-arr">›</div></div>
+        <div class="pr" onclick="openEditProfile()"><div class="pr-ic">👤</div><div class="pr-body"><div class="pr-label" id="psE">編輯個人資訊</div><div class="pr-sub" id="psES">名稱、頭像</div></div><div class="pr-arr">›</div></div>
         <div class="pr" onclick="showToast(L.toastNotifSaved)"><div class="pr-ic">🔔</div><div class="pr-body"><div class="pr-label" id="psN">通知設定</div><div class="pr-sub" id="psNS">附近廁所警示</div></div><div class="pr-arr">›</div></div>
       </div>
     </div>
@@ -628,8 +633,67 @@ body{font-family:var(--fn);background:var(--bg);color:var(--text);
         <div class="pr" onclick="showToast(L.toastThanks)"><div class="pr-ic">💬</div><div class="pr-body"><div class="pr-label" id="psCt">聯絡我們</div></div><div class="pr-arr">›</div></div>
       </div>
     </div>
-    <div class="psec"><button class="logout" id="psLo" onclick="showToast(L.toastLogout)">登出</button></div>
+    <div class="psec"><button class="logout" id="psLo" onclick="confirmLogout()">登出</button></div>
     <div class="navsp"></div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div class="fb-sheet" id="editProfileSheet" style="border-top-color:var(--g);z-index:510;">
+    <div class="ds-handle"></div>
+    <div class="fb-top">
+      <div class="fb-title">編輯個人資訊</div>
+      <div class="ds-x" onclick="closeEditProfile()">×</div>
+    </div>
+    <div style="padding:0 14px 10px;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;justify-content:center;margin-bottom:4px">
+        <div id="editAvatarPreview" style="width:62px;height:62px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;border:3px solid var(--gm);cursor:pointer;" onclick="cycleAvatarColor()">王</div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:-8px">點擊頭像更換顏色</div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">姓名</div>
+        <input id="editName" type="text" value="王小明" style="width:100%;padding:9px 11px;border:1.5px solid var(--bdr);border-radius:10px;font-size:13px;font-family:var(--fn);color:var(--text);background:var(--g50);outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bdr)'">
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px">Email</div>
+        <input id="editEmail" type="email" value="ming.wang@example.com" style="width:100%;padding:9px 11px;border:1.5px solid var(--bdr);border-radius:10px;font-size:13px;font-family:var(--fn);color:var(--text);background:var(--g50);outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--g)'" onblur="this.style.borderColor='var(--bdr)'">
+      </div>
+      <button onclick="saveProfile()" style="padding:11px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn);">儲存</button>
+    </div>
+  </div>
+
+  <!-- LOGOUT CONFIRM MODAL -->
+  <div class="fb-sheet" id="logoutSheet" style="border-top-color:var(--r);z-index:510;">
+    <div class="ds-handle"></div>
+    <div style="padding:18px 18px 6px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px">👋</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px" id="logoutTitle">確定要登出嗎？</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:18px" id="logoutSub">您的使用紀錄將保留，下次登入可繼續使用。</div>
+      <div style="display:flex;gap:9px;">
+        <button onclick="closeLogout()" style="flex:1;padding:11px;background:var(--g100);color:var(--g600);border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn);">取消</button>
+        <button onclick="doLogout()" style="flex:1;padding:11px;background:var(--r);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fn);">登出</button>
+      </div>
+    </div>
+    <div style="height:14px"></div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" style="display:none;position:absolute;inset:0;background:linear-gradient(160deg,var(--gd),var(--g));z-index:900;flex-direction:column;align-items:center;justify-content:center;">
+    <div style="text-align:center;color:#fff;padding:0 32px;max-width:360px;width:100%;margin:auto;">
+      <div style="width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="28" height="28" fill="#fff" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      </div>
+      <div style="font-size:22px;font-weight:700;margin-bottom:4px">智慧廁所</div>
+      <div style="font-size:12px;opacity:.8;margin-bottom:32px">即時找廁 · iNavi 導引</div>
+      <div style="background:rgba(255,255,255,.12);border-radius:16px;padding:24px;backdrop-filter:blur(8px);">
+        <div style="margin-bottom:12px">
+          <input id="loginName" type="text" placeholder="姓名" style="width:100%;padding:11px 14px;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;font-size:13px;font-family:var(--fn);color:#fff;background:rgba(255,255,255,.15);outline:none;box-sizing:border-box;placeholder-color:#fff;" onfocus="this.style.borderColor='rgba(255,255,255,.8)'" onblur="this.style.borderColor='rgba(255,255,255,.3)'">
+        </div>
+        <div style="margin-bottom:18px">
+          <input id="loginEmail" type="email" placeholder="Email" style="width:100%;padding:11px 14px;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;font-size:13px;font-family:var(--fn);color:#fff;background:rgba(255,255,255,.15);outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='rgba(255,255,255,.8)'" onblur="this.style.borderColor='rgba(255,255,255,.3)'">
+        </div>
+        <button onclick="doLogin()" style="width:100%;padding:13px;background:#fff;color:var(--gd);border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fn);">登入 / 註冊</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -645,7 +709,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--text);
 <script>
 /* ═══ CONFIG ═══ */
 const INAVI_APP_KEY = '38dd3a4506b3f8bf9265977c3b1fbd2d310f16a1';
-const ME = [25.0418, 121.5441]; // [lat,lng]
+const ME = [25.0550, 121.6178]; // [lat,lng] 南港展覽館四樓
 
 /* ═══ i18n ═══ */
 const TXT = {
@@ -1484,9 +1548,119 @@ function updateStars(){document.querySelectorAll('.star').forEach((s,i)=>s.class
 function tog(el){el.classList.toggle('on');}
 function submitFB(){
   if(!starR){showToast(L.toastFbRate);return;}
-  closeFB();showToast(L.toastFbThanks);
+  const ta=document.getElementById('fbTA').value.trim();
+  const tags=[...document.querySelectorAll('.qt.on')].map(q=>q.textContent).join('、');
+  const commentText=ta||(tags?tags:(lang==='zh'?'使用良好':'Good experience.'));
+  const t=DATA.find(x=>x.id===fbId);
+  const userName=document.getElementById('profNameDisp').textContent||'王小明';
+  const userInitial=userName.charAt(0);
+  const now=lang==='zh'?'剛剛':'Just now';
+  // prepend new review into REVS
+  if(!REVS[fbId])REVS[fbId]=[];
+  REVS[fbId].unshift({
+    name:userName,nameEn:userName,
+    stars:starR,
+    date:now,dateEn:now,
+    text:commentText,textEn:commentText,
+    isNew:true
+  });
+  // update feedback count in profile
+  const fc=document.getElementById('statFeedback');
+  if(fc)fc.textContent=parseInt(fc.textContent||'12')+1;
+  closeFB();
+  showToast(L.toastFbThanks);
+  // if detail sheet for same toilet is open, refresh reviews
+  if(document.getElementById('detSheet').classList.contains('open')){
+    const revs=REVS[fbId]||[];
+    document.getElementById('ds-revs').innerHTML=revs.map((r,ri)=>`<div class="rev-item"${ri===0&&r.isNew?' style="background:var(--gll);border-radius:8px;padding:5px 7px;margin:-5px"':''}>
+      <div class="rev-top">
+        <div class="rev-av">${(lang==='en'?r.nameEn:r.name).charAt(0)}</div>
+        <div style="flex:1">
+          <div class="rev-name">${lang==='en'?r.nameEn:r.name}${ri===0&&r.isNew?` <span style="font-size:9px;background:var(--g);color:#fff;padding:1px 5px;border-radius:8px;margin-left:4px">${lang==='zh'?'剛回饋':'New'}</span>`:''}</div>
+          <div class="rev-date">${lang==='en'?r.dateEn:r.date}</div>
+        </div>
+        <div class="rev-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      </div>
+      <div class="rev-text">${lang==='en'?r.textEn:r.text}</div>
+    </div>`).join('');
+  }
 }
-function closeAll(){closeDet();closeFB();}
+function closeAll(){closeDet();closeFB();closeEditProfile();closeLogout();}
+
+/* ═══ EDIT PROFILE ═══ */
+const AVATAR_COLORS=['#1d9e75','#378add','#7c3aed','#ef9f27','#e24b4a','#22c55e','#0ea5e9','#b45309'];
+let avatarColorIdx=0;
+function openEditProfile(){
+  const name=document.getElementById('profNameDisp').textContent;
+  const email=document.getElementById('profEmailDisp').textContent;
+  document.getElementById('editName').value=name;
+  document.getElementById('editEmail').value=email;
+  const av=document.getElementById('editAvatarPreview');
+  av.textContent=name.charAt(0);
+  av.style.background=AVATAR_COLORS[avatarColorIdx];
+  document.getElementById('editProfileSheet').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeEditProfile(){
+  document.getElementById('editProfileSheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+function cycleAvatarColor(){
+  avatarColorIdx=(avatarColorIdx+1)%AVATAR_COLORS.length;
+  const av=document.getElementById('editAvatarPreview');
+  av.style.background=AVATAR_COLORS[avatarColorIdx];
+}
+function saveProfile(){
+  const name=document.getElementById('editName').value.trim()||'王小明';
+  const email=document.getElementById('editEmail').value.trim()||'ming.wang@example.com';
+  const initial=name.charAt(0);
+  const color=AVATAR_COLORS[avatarColorIdx];
+  // update header
+  document.getElementById('profNameDisp').textContent=name;
+  document.getElementById('profEmailDisp').textContent=email;
+  const av=document.getElementById('profAvatar');
+  av.textContent=initial;
+  av.style.background=color;
+  // update greeting
+  document.getElementById('hGreet').textContent=(lang==='zh'?'你好，':'Hello, ')+name;
+  closeEditProfile();
+  showToast(lang==='zh'?'✅ 個人資訊已更新':'✅ Profile updated');
+}
+
+/* ═══ LOGOUT ═══ */
+function confirmLogout(){
+  document.getElementById('logoutSheet').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeLogout(){
+  document.getElementById('logoutSheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+function doLogout(){
+  closeLogout();
+  const ls=document.getElementById('loginScreen');
+  ls.classList.add('show');
+  document.getElementById('loginName').value='';
+  document.getElementById('loginEmail').value='';
+}
+function doLogin(){
+  const name=document.getElementById('loginName').value.trim();
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!name){document.getElementById('loginName').focus();return;}
+  // update profile
+  const initial=name.charAt(0);
+  document.getElementById('profNameDisp').textContent=name;
+  document.getElementById('profEmailDisp').textContent=email||'user@example.com';
+  document.getElementById('profAvatar').textContent=initial;
+  document.getElementById('hGreet').textContent=(lang==='zh'?'你好，':'Hello, ')+name;
+  document.getElementById('editName').value=name;
+  document.getElementById('editEmail').value=email||'user@example.com';
+  // update avatar preview
+  document.getElementById('editAvatarPreview').textContent=initial;
+  document.getElementById('loginScreen').classList.remove('show');
+  showToast(lang==='zh'?`✅ 歡迎回來，${name}！`:`✅ Welcome, ${name}!`);
+  setPage('home');
+}
 
 /* ═══ HOME render ═══ */
 let hqf='best';

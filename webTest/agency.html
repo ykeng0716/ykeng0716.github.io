@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CleanTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00c896;--gd:#00a07a;--gl:#e0faf3;--gll:#f0fdf9;
+  --r:#ff4d4d;--rl:#fff0f0;--am:#f59e0b;--aml:#fffbeb;
+  --bl:#3b82f6;--bll:#eff6ff;--pu:#7c3aed;--pul:#f3f0ff;
+  --mrt:#0ea5e9;--park:#22c55e;--cvs:#f97316;--pub:#7c3aed;--gas:#ef4444;--temple:#b45309;
+  --ink:#0d1117;--ink2:#374151;--ink3:#6b7280;--ink4:#9ca3af;
+  --ln:#e5e7eb;--ln2:#f3f4f6;--surf:#fff;
+  --rr:14px;--r2:10px;--r3:8px;
+  --ff:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+  --sh:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overscroll-behavior:none;}
+body{font-family:var(--ff);background:#ecf0f4;color:var(--ink);max-width:430px;margin:0 auto;min-height:100vh;}
+
+/* SHELL */
+.shell{display:flex;flex-direction:column;height:100dvh;overflow:hidden;position:relative;}
+.page{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:72px;}
+.page::-webkit-scrollbar{display:none;}
+
+/* BOTTOM NAV */
+.bnav{position:absolute;bottom:0;left:0;right:0;height:64px;background:var(--surf);border-top:1px solid var(--ln);display:flex;align-items:center;z-index:50;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 4px;color:var(--ink4);transition:color .15s;position:relative;}
+.bn.on{color:var(--gd);}
+.bn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bn span{font-size:10px;font-weight:500;}
+.bn-red{width:7px;height:7px;background:var(--r);border-radius:50%;position:absolute;top:6px;right:calc(50% - 16px);}
+
+/* TOPBAR */
+.topbar{background:var(--surf);border-bottom:1px solid var(--ln);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tb-l{display:flex;align-items:center;gap:10px;}
+.tb-logo{width:30px;height:30px;border-radius:9px;background:var(--g);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tb-logo svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tb-name{font-size:14px;font-weight:600;}
+.tb-sub{font-size:11px;color:var(--ink3);margin-top:1px;}
+.tb-r{display:flex;align-items:center;gap:6px;}
+.online-pill{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;background:var(--gl);color:var(--gd);}
+.online-dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.lang-btn{font-size:11px;font-weight:600;padding:4px 9px;border-radius:8px;border:1px solid var(--ln);background:var(--ln2);color:var(--ink3);cursor:pointer;font-family:var(--ff);}
+
+/* CAT FILTER */
+.cat-bar{display:flex;gap:6px;padding:8px 14px 6px;overflow-x:auto;flex-shrink:0;}
+.cat-bar::-webkit-scrollbar{display:none;}
+.cf{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1.5px solid var(--ln);background:var(--surf);font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:var(--ff);transition:all .15s;}
+.cf.act-mrt{background:#e0f2fe;border-color:#38bdf8;color:#0369a1;}
+.cf.act-park{background:#dcfce7;border-color:#4ade80;color:#15803d;}
+.cf.act-cvs{background:#fff7ed;border-color:#fb923c;color:#c2410c;}
+.cf.act-pub{background:var(--pul);border-color:#a78bfa;color:var(--pu);}
+.cf.act-gas{background:#fee2e2;border-color:#fca5a5;color:#b91c1c;}
+.cf.act-temple{background:#fef3c7;border-color:#fcd34d;color:#92400e;}
+.ci{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700;flex-shrink:0;}
+.ci-mrt{background:var(--mrt);}
+.ci-park{background:var(--park);}
+.ci-cvs{background:var(--cvs);border-radius:4px;}
+.ci-pub{background:var(--pub);border-radius:3px;}
+.ci-gas{background:var(--gas);border-radius:4px;}
+.ci-temple{background:var(--temple);border-radius:50%;}
+
+/* URGENT BANNER */
+.urg-banner{margin:8px 14px 0;background:var(--rl);border:1px solid #fecaca;border-radius:var(--rr);padding:11px 12px;display:flex;gap:10px;align-items:flex-start;cursor:pointer;}
+.ub-icon{width:34px;height:34px;border-radius:50%;background:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ub-icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;}
+.ub-body{flex:1;}
+.ub-tag{font-size:10px;font-weight:700;color:var(--r);text-transform:uppercase;letter-spacing:.06em;}
+.ub-title{font-size:12px;font-weight:600;color:var(--ink);margin-top:2px;}
+.ub-meta{font-size:11px;color:var(--ink3);margin-top:1px;}
+.ub-arr{font-size:16px;color:var(--r);align-self:center;}
+
+/* SH */
+.sh{padding:13px 14px 7px;display:flex;align-items:center;justify-content:space-between;}
+.sh-t{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;}
+.sh-r{font-size:11px;color:var(--gd);font-weight:500;cursor:pointer;}
+
+/* SCHEDULE */
+.sched{padding:0 14px;display:flex;flex-direction:column;gap:0;}
+.sched-item{display:flex;gap:0;position:relative;}
+.sched-line{display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;padding-top:12px;}
+.sched-dot{width:22px;height:22px;border-radius:50%;border:2.5px solid currentColor;background:#fff;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0;z-index:1;}
+.sched-dot.dot-done{background:var(--ln2);border-color:var(--ln);color:var(--ink4);}
+.sched-dot.dot-active{background:var(--g);border-color:var(--g);color:#fff;}
+.sched-dot.dot-urgent{background:var(--r);border-color:var(--r);color:#fff;}
+.sched-dot.dot-todo{background:#fff;border-color:var(--ln);color:var(--ink4);}
+.sched-dash{flex:1;width:0;border-left:2px dashed var(--ln);margin:3px 0 0;min-height:16px;}
+.sched-dash.dash-done{border-color:#d1d5db;}
+.sched-dash.dash-active{border-color:var(--g);opacity:.5;}
+.sched-card{flex:1;padding:10px 12px 10px 8px;margin-bottom:6px;}
+.sc{background:var(--surf);border:1px solid var(--ln);border-radius:var(--rr);padding:11px 12px;display:flex;gap:11px;cursor:pointer;transition:box-shadow .15s;}
+.sc:hover{box-shadow:var(--sh);}
+.sc.active{border-color:var(--g);background:var(--gll);}
+.sc.done{opacity:.5;}
+.sc-t{min-width:44px;text-align:center;}
+.sc-tv{font-size:13px;font-weight:600;font-family:var(--fm);color:var(--gd);}
+.sc.done .sc-tv{color:var(--ink4);}
+.sc-tl{font-size:9px;color:var(--ink4);margin-top:2px;}
+.sc-div{width:1px;background:var(--ln);flex-shrink:0;}
+.sc-body{flex:1;}
+.sc-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;}
+.sc-loc{font-size:11px;color:var(--ink3);margin-top:2px;}
+.sc-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.tg{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;}
+.tg-g{background:var(--gl);color:var(--gd);}
+.tg-r{background:var(--rl);color:var(--r);}
+.tg-a{background:var(--aml);color:#92400e;}
+.tg-b{background:var(--bll);color:#1d4ed8;}
+.tg-gr{background:var(--ln2);color:var(--ink3);}
+.tg-p{background:var(--pul);color:var(--pu);}
+.sc-rt{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.cb{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;flex-shrink:0;}
+.cb-mrt{background:var(--mrt);}
+.cb-park{background:var(--park);}
+.cb-cvs{background:var(--cvs);border-radius:3px;}
+.cb-pub{background:var(--pub);border-radius:2px;}
+.cb-gas{background:var(--gas);border-radius:3px;}
+.cb-temple{background:var(--temple);border-radius:50%;}
+
+/* MAP */
+.mw{margin:0 14px;border-radius:var(--rr);overflow:hidden;border:1px solid var(--ln);}
+#hmap{height:calc(100vw - 28px);max-height:402px;width:100%;}
+#fmap{height:calc(100dvh - 232px);min-height:320px;width:100%;}
+.mleg{padding:7px 14px;display:flex;gap:10px;flex-wrap:wrap;}
+.ml{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink3);}
+.mldot{width:9px;height:9px;border-radius:50%;}
+.mlsq{width:9px;height:9px;border-radius:2px;}
+
+/* MAP STOP STRIP */
+.map-stops-hdr{padding:8px 14px 4px;display:flex;align-items:center;justify-content:space-between;}
+.map-stop-strip{display:flex;gap:8px;padding:4px 14px 14px;overflow-x:auto;flex-shrink:0;}
+.map-stop-strip::-webkit-scrollbar{display:none;}
+.msc{flex-shrink:0;width:130px;background:var(--surf);border:1.5px solid var(--ln);border-radius:12px;padding:10px 10px 9px;cursor:pointer;transition:box-shadow .15s,border-color .15s;display:flex;flex-direction:column;gap:5px;}
+.msc:hover{box-shadow:var(--sh);}
+.msc.msc-active{border-color:var(--g);background:var(--gll);}
+.msc.msc-urgent{border-color:var(--r);background:var(--rl);}
+.msc.msc-done{opacity:.45;}
+.msc-top{display:flex;align-items:center;justify-content:space-between;}
+.msc-letter{font-size:13px;font-weight:700;font-family:var(--fm);}
+.msc-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+.msc-name{font-size:11px;font-weight:600;color:var(--ink);line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.msc-info{font-size:10px;color:var(--ink3);display:flex;align-items:center;gap:3px;}
+.msc-cat{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700;flex-shrink:0;}
+.steps{display:flex;padding:10px 14px;align-items:center;}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;}
+.sn{width:21px;height:21px;border-radius:50%;border:2px solid var(--ln);background:var(--surf);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;z-index:1;transition:all .2s;}
+.sn.done{background:var(--g);border-color:var(--g);color:#fff;}
+.sn.act{background:var(--bl);border-color:var(--bl);color:#fff;box-shadow:0 0 0 4px rgba(59,130,246,.2);}
+.sl{font-size:9px;color:var(--ink4);margin-top:3px;text-align:center;}
+.step::before{content:'';position:absolute;top:10px;left:-50%;right:50%;height:2px;background:var(--ln);z-index:0;}
+.step:first-child::before{display:none;}
+.step.done::before,.step.done+.step::before{background:var(--g);}
+
+/* CHECKIN */
+.cin-btn{width:100%;padding:11px;border:2px dashed var(--g);border-radius:var(--r2);background:var(--gll);color:var(--gd);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;font-family:var(--ff);}
+.cin-btn.done{border-style:solid;background:var(--g);color:#fff;}
+
+/* CHECKLIST */
+.clist{display:flex;flex-direction:column;gap:5px;}
+.cli{display:flex;align-items:center;gap:9px;padding:9px 11px;background:var(--surf);border:1px solid var(--ln);border-radius:var(--r2);cursor:pointer;}
+.cli.done{background:var(--gll);border-color:var(--gl);}
+.cbox{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--ln);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cli.done .cbox{background:var(--g);border-color:var(--g);}
+.cli.done .cbox::after{content:'✓';color:#fff;font-size:11px;font-weight:700;}
+.ct{font-size:12px;flex:1;}
+.cli.done .ct{color:var(--ink4);text-decoration:line-through;}
+
+/* ANOMALY CHIPS */
+.anom-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.ac{padding:5px 11px;border:1.5px solid var(--ln);border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;background:var(--surf);transition:all .15s;font-family:var(--ff);}
+.ac.on{border-color:var(--r);background:var(--rl);color:var(--r);}
+.anom-note{width:100%;margin-top:8px;padding:9px 11px;border:1.5px solid var(--ln);border-radius:var(--r2);font-size:12px;font-family:var(--ff);color:var(--ink);background:var(--surf);resize:none;outline:none;transition:border-color .15s;}
+.anom-note:focus{border-color:var(--g);}
+.anom-note::placeholder{color:var(--ink4);}
+
+/* PHOTO */
+.pgrid{display:flex;gap:7px;flex-wrap:wrap;}
+.pthumb{width:70px;height:70px;border-radius:var(--r2);border:1.5px dashed var(--ln);background:var(--gll);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:border-color .15s;}
+.pthumb.filled{background:var(--ln2);border-style:solid;}
+.pthumb:hover{border-color:var(--g);}
+.pthumb svg{width:20px;height:20px;stroke:var(--g);fill:none;stroke-width:1.8;}
+.pthumb.filled svg{stroke:var(--gd);}
+.pnum{font-size:9px;color:var(--ink3);}
+
+/* PROG */
+.pbg{background:var(--ln2);height:5px;border-radius:3px;overflow:hidden;}
+.pf{height:5px;background:var(--g);border-radius:3px;transition:width .3s;}
+
+/* SUBMIT */
+.sub-btn{width:100%;padding:13px;background:var(--g);color:#fff;border:none;border-radius:var(--rr);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--ff);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.sub-btn:active{transform:scale(.98);}
+
+/* STATS */
+.sgrid{margin:0 14px;display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.scard{background:var(--surf);border:1px solid var(--ln);border-radius:var(--rr);padding:13px;}
+.snum{font-size:24px;font-weight:600;color:var(--gd);font-family:var(--fm);}
+.slbl{font-size:11px;color:var(--ink3);margin-top:3px;font-weight:500;}
+.ssub{font-size:10px;color:var(--ink4);margin-top:2px;}
+.barwrap{margin:0 14px;background:var(--surf);border:1px solid var(--ln);border-radius:var(--rr);padding:13px;}
+.bars{display:flex;align-items:flex-end;gap:4px;height:55px;}
+.bar{flex:1;background:var(--gl);border-radius:3px 3px 0 0;transition:background .15s;}
+.bar:hover,.bar.cur{background:var(--g);}
+.blbl{text-align:center;font-size:9px;color:var(--ink4);margin-top:3px;}
+.hlist{margin:0 14px;display:flex;flex-direction:column;gap:5px;}
+.hi{background:var(--surf);border:1px solid var(--ln);border-radius:var(--r2);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;}
+.hn{font-size:12px;font-weight:500;}
+.hm{font-size:10px;color:var(--ink3);margin-top:2px;}
+.ht{font-size:13px;font-weight:600;color:var(--gd);font-family:var(--fm);}
+
+/* PROFILE */
+.phero{margin:14px;background:linear-gradient(135deg,var(--gd),var(--g));border-radius:var(--rr);padding:18px;color:#fff;}
+.pav{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;border:2px solid rgba(255,255,255,.35);}
+.pn{font-size:17px;font-weight:600;margin-top:9px;}
+.pr{font-size:11px;opacity:.8;margin-top:2px;}
+.pbs{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;}
+.pb{padding:3px 9px;background:rgba(255,255,255,.2);border-radius:20px;font-size:10px;font-weight:500;}
+.icard{margin:0 14px 10px;background:var(--surf);border:1px solid var(--ln);border-radius:var(--rr);overflow:hidden;}
+.irow{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-bottom:1px solid var(--ln);}
+.irow:last-child{border-bottom:none;}
+.ilbl{font-size:11px;color:var(--ink3);}
+.ival{font-size:12px;font-weight:500;}
+
+/* ===== URGENT SHEET ===== */
+.uo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center;}
+.uo.open{display:flex;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.uo-s{background:var(--surf);border-radius:18px 18px 0 0;width:100%;max-width:430px;padding:18px 18px 28px;max-height:88%;overflow-y:auto;position:relative;}
+.uo-s::-webkit-scrollbar{display:none;}
+.uo-handle{width:34px;height:4px;background:var(--ln);border-radius:2px;margin:0 auto 14px;}
+.uo-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--r);background:var(--rl);padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+.uo-crow{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.uo-title{font-size:17px;font-weight:700;}
+.uo-addr{font-size:11px;color:var(--ink3);margin-top:2px;margin-bottom:12px;}
+.uo-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px;}
+.uom{background:var(--ln2);border-radius:var(--r2);padding:9px;text-align:center;}
+.uomv{font-size:15px;font-weight:700;font-family:var(--fm);}
+.uomv.d{color:var(--r);}
+.uomv.w{color:var(--am);}
+.uomv.ok{color:var(--gd);}
+.uoml{font-size:9px;color:var(--ink3);margin-top:2px;}
+#umap{height:calc(100vw - 28px);max-height:340px;border-radius:var(--rr);overflow:hidden;margin-bottom:12px;}
+.uo-iss{background:var(--aml);border-left:3px solid var(--am);border-radius:0 var(--r3) var(--r3) 0;padding:9px 11px;font-size:11px;color:#92400e;margin-bottom:14px;}
+.uo-acts{display:flex;gap:7px;}
+.uo-acc{flex:2;padding:12px;background:var(--g);color:#fff;border:none;border-radius:var(--rr);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--ff);}
+.uo-dec{flex:1;padding:12px;background:var(--ln2);color:var(--ink3);border:none;border-radius:var(--rr);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--ff);}
+
+/* ===== FLOW OVERLAY (within app) ===== */
+.flow{display:none;position:fixed;inset:0;background:var(--surf);z-index:600;flex-direction:column;overflow:hidden;max-width:430px;left:50%;transform:translateX(-50%);}
+.flow.open{display:flex;}
+.flow-hdr{padding:10px 14px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:9px;flex-shrink:0;background:var(--surf);}
+.fbk{width:32px;height:32px;border-radius:50%;background:var(--ln2);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.fbk svg{width:15px;height:15px;stroke:var(--ink2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ftitle{font-size:14px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.flow-body{flex:1;overflow-y:auto;}
+.flow-body::-webkit-scrollbar{display:none;}
+#fmmap{height:calc(100vw);max-height:430px;}
+.rbar{padding:9px 14px;background:var(--gll);border-bottom:1px solid var(--gl);display:flex;gap:8px;flex-shrink:0;}
+.rbi{flex:1;text-align:center;}
+.rbv{font-size:13px;font-weight:700;font-family:var(--fm);color:var(--gd);}
+.rbl{font-size:9px;color:var(--ink3);}
+.gmb{margin:10px 14px 0;width:calc(100% - 28px);padding:10px;background:var(--bl);color:#fff;border:none;border-radius:var(--rr);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--ff);display:flex;align-items:center;justify-content:center;gap:5px;}
+.sec{padding:0 14px;}
+
+/* COMPLETE */
+.co{display:none;position:fixed;inset:0;background:var(--gd);z-index:900;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px;}
+.co.open{display:flex;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.co-c{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;}
+.co-c svg{width:36px;height:36px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.co-title{color:#fff;font-size:22px;font-weight:700;}
+.co-sub{color:rgba(255,255,255,.75);font-size:12px;text-align:center;line-height:1.6;}
+.co-pts{background:rgba(255,255,255,.15);padding:9px 22px;border-radius:20px;color:#fff;font-size:13px;font-weight:600;}
+.co-btn{padding:13px 30px;background:#fff;color:var(--gd);border:none;border-radius:var(--rr);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--ff);}
+
+/* NEXT URGENT SNACK */
+.nub{display:none;position:absolute;bottom:70px;left:10px;right:10px;background:var(--ink);color:#fff;border-radius:var(--rr);padding:11px 14px;z-index:180;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.25);}
+.nub.show{display:flex;align-items:center;gap:9px;animation:slideUp .3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.nub-body{flex:1;}
+.nub-t{font-size:12px;font-weight:600;}
+.nub-s{font-size:10px;color:rgba(255,255,255,.65);margin-top:2px;}
+.nub-btn{padding:5px 11px;background:var(--r);border-radius:7px;font-size:11px;font-weight:600;color:#fff;flex-shrink:0;}
+
+/* TOAST */
+.toast{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 16px;border-radius:20px;font-size:11px;z-index:999;white-space:nowrap;display:none;pointer-events:none;}
+.toast.show{display:block;animation:ta 2.5s ease forwards;}
+@keyframes ta{0%{opacity:0;transform:translateX(-50%) translateY(-4px)}10%,80%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     I18N DATA
+============================================================ -->
+<script>
+const ZH={
+  online:'上線中',lang_btn:'EN',
+  home:'首頁',map_nav:'地圖',dash:'儀表板',profile:'我的',
+  today_map:'今日任務地圖',today_sched:'今日班表',stops:'共 7 站',
+  active:'進行中',pending:'待辦',done:'完成',urgent_tag:'異常',
+  sla_label:'服務時限',sla_overdue:'已超時',sla_remain:v=>`剩 ${v}`,
+  dist:'距離',eta_label:'預估到達',
+  urg_dispatch:'緊急派工',
+  urg_meta:(d,e)=>`服務時限已超時 · 距離 ${d} · 預估 ${e}`,
+  accept:'確認接單',decline:'拒絕',
+  issue:'異常原因',
+  step_accept:'接單',step_route:'前往',step_checkin:'打卡',step_work:'作業',step_finish:'完工',
+  en_route:'前往中',working:'作業中',
+  arrive_checkin:'到達目的地・點此打卡',checkin_done:t=>`✓ 已到場打卡 ${t}`,
+  checklist_title:'清潔清單',photo_title:'拍照存證',anom_title:'異常回報',
+  progress:'完成進度',
+  submit:'完工提交・同步後台',
+  complete:'任務完成！',synced:'資料已同步至後台系統',time_taken:m=>`本次完成時間：${m} 分鐘`,pts:'＋25 積分獲得',next_stop:'前往下一站',
+  cat_mrt:'捷運',cat_park:'公園',cat_cvs:'便利商店',cat_pub:'公廁',cat_gas:'加油站',cat_temple:'寺廟',
+  me_loc:'我的位置',
+  clean:'清潔',restock:'補貨',check:'確認',inspect:'巡檢',
+  anom_1:'異味嚴重',anom_2:'洗手乳用完',anom_3:'有人打翻東西',anom_4:'沒有衛生紙',anom_5:'地板濕滑',anom_6:'門鎖異常',anom_7:'設備故障',anom_8:'漏水',
+  anom_note:'其他備註…（選填）',
+  photo_add:'拍照',photo_n:n=>`照片 ${n}`,
+  gmaps:'在地圖上規劃路線',
+  toast_checkin:'✓ 到場打卡成功！',
+  toast_done:'🎉 所有項目完成！',
+  toast_gmaps:'已在地圖上顯示路線',
+  toast_next:'任務完成！下一站已就緒',
+  toast_declined:'已拒絕，系統重新分派中…',
+  toast_photo:n=>`📷 照片 ${n} 已上傳`,
+  err_checkin:'⚠️ 請先完成打卡',err_photo:'⚠️ 請至少上傳1張照片',err_max:'最多4張照片',
+  next_urg_t:'新異常！信義公園',next_urg_s:'NH₃超標・服務時限剩 35 分 · 點擊接單',next_urg_b:'查看',
+  dash_title:'我的儀表板',dash_month:'2025 年 5 月',
+  stat_tasks:'本月完成任務',stat_hours:'本月工作時數',stat_sla:'服務時限達成率',stat_avg:'平均完成時間',stat_target:'目標 160h',stat_excellent:'優良',
+  month_title:'近 6 個月工作時數',months:['12月','1月','2月','3月','4月','5月'],
+  urg_orders:'緊急異常單',stat_urg:'本月緊急單',stat_resp:'緊急單平均響應',on_target:'達標',
+  recent:'近期記錄',
+  full_map:'全日任務地圖',loc_list:'點位清單',
+  profile_title:'我的資料',basic:'基本資料',company:'所屬公司',shift:'班務設定',
+  staff_id:'員工編號',name_lbl:'姓名',phone:'聯絡電話',start_date:'到職日期',
+  co_name:'公司名稱',dept:'所屬部門',zone:'服務區域',supervisor:'直屬主管',emergency:'緊急聯繫',
+  shift_type:'今日班別',week_sched:'本週排班',tasks_today:'今日任務數',device:'裝置狀態',
+  role:'資深清潔專員・捷運區組長',top_staff:'績優員工',yr_service:'年服務',
+  morning_shift:'早班 08:00 – 17:00',week_days:'週一 至 週六',
+  gps_ok:'GPS 連線中・電量 78%',
+  map_active:'進行中',map_todo:'待辦',map_urgent:'異常',map_done:'完成',
+};
+const EN={
+  online:'Online',lang_btn:'中文',
+  home:'Home',map_nav:'Map',dash:'Stats',profile:'Profile',
+  today_map:"Today's Map",today_sched:"Today's Schedule",stops:'7 stops',
+  active:'Active',pending:'Pending',done:'Done',urgent_tag:'Urgent',
+  sla_label:'SLA',sla_overdue:'Overdue',sla_remain:v=>`${v} left`,
+  dist:'Distance',eta_label:'ETA',
+  urg_dispatch:'URGENT DISPATCH',
+  urg_meta:(d,e)=>`SLA overdue · ${d} · ETA ${e}`,
+  accept:'Accept Order',decline:'Decline',
+  issue:'Issue',
+  step_accept:'Accept',step_route:'Route',step_checkin:'Check-in',step_work:'Work',step_finish:'Done',
+  en_route:'En route',working:'Working',
+  arrive_checkin:'Arrived – tap to check in',checkin_done:t=>`✓ Checked in ${t}`,
+  checklist_title:'Checklist',photo_title:'Photos',anom_title:'Anomaly Report',
+  progress:'Progress',
+  submit:'Complete & Sync to System',
+  complete:'Mission Complete!',synced:'Data synced to system',time_taken:m=>`Time taken: ${m} min`,pts:'+25 pts earned',next_stop:'Next Mission',
+  cat_mrt:'MRT',cat_park:'Park',cat_cvs:'Convenience',cat_pub:'Public WC',cat_gas:'Gas Station',cat_temple:'Temple',
+  me_loc:'My location',
+  clean:'Clean',restock:'Restock',check:'Check',inspect:'Inspect',
+  anom_1:'Severe odor',anom_2:'Soap empty',anom_3:'Spill incident',anom_4:'No toilet paper',anom_5:'Slippery floor',anom_6:'Door lock fault',anom_7:'Equipment fault',anom_8:'Water leak',
+  anom_note:'Other notes… (optional)',
+  photo_add:'Photo',photo_n:n=>`Photo ${n}`,
+  gmaps:'Show Route on Map',
+  toast_checkin:'✓ Check-in recorded!',
+  toast_done:'🎉 All items done!',
+  toast_gmaps:'Route shown on map',
+  toast_next:'Done! Next stop ready',
+  toast_declined:'Declined, reassigning…',
+  toast_photo:n=>`📷 Photo ${n} uploaded`,
+  err_checkin:'⚠️ Check in first',err_photo:'⚠️ Upload at least 1 photo',err_max:'Max 4 photos',
+  next_urg_t:'New urgent! Xinyi Park',next_urg_s:'NH₃ elevated · SLA 35min left · tap',next_urg_b:'View',
+  dash_title:'My Dashboard',dash_month:'May 2025',
+  stat_tasks:'Tasks done',stat_hours:'Hours worked',stat_sla:'SLA rate',stat_avg:'Avg completion',stat_target:'Target 160h',stat_excellent:'Excellent',
+  month_title:'Last 6 months hours',months:['Dec','Jan','Feb','Mar','Apr','May'],
+  urg_orders:'Urgent Orders',stat_urg:'Urgent orders',stat_resp:'Avg response time',on_target:'On target',
+  recent:'Recent Records',
+  full_map:"Task Map",loc_list:'Locations',
+  profile_title:'My Profile',basic:'Personal Info',company:'Company',shift:'Shift Info',
+  staff_id:'Staff ID',name_lbl:'Name',phone:'Phone',start_date:'Start date',
+  co_name:'Company',dept:'Department',zone:'Zone',supervisor:'Supervisor',emergency:'Emergency',
+  shift_type:"Today's shift",week_sched:'This week',tasks_today:'Tasks today',device:'Device',
+  role:'Senior Cleaner · MRT Zone Lead',top_staff:'Top Staff',yr_service:'yr service',
+  morning_shift:'Morning 08:00 – 17:00',week_days:'Mon – Sat',
+  gps_ok:'GPS online · 78% battery',
+  map_active:'Active',map_todo:'Pending',map_urgent:'Urgent',map_done:'Done',
+};
+let lang='zh';
+function T(key,...args){
+  const d=lang==='zh'?ZH:EN;
+  const v=d[key];
+  if(typeof v==='function') return v(...args);
+  return v??key;
+}
+</script>
+
+<div class="toast" id="toast"></div>
+
+<!-- COMPLETE -->
+<div class="co" id="coOverlay">
+  <div class="co-c"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <div class="co-title" id="coTitle"></div>
+  <div class="co-sub" id="coSub"></div>
+  <div class="co-pts" id="coPts"></div>
+  <button class="co-btn" id="coBtn" onclick="afterComplete()"></button>
+</div>
+
+<div class="shell" id="shell">
+  <div class="toast" id="toast2"></div>
+
+  <!-- NEXT URGENT SNACK -->
+  <div class="nub" id="nub" onclick="openNextUrgent()">
+    <div class="nub-body">
+      <div class="nub-t" id="nubT"></div>
+      <div class="nub-s" id="nubS"></div>
+    </div>
+    <div class="nub-btn" id="nubBtn"></div>
+  </div>
+
+  <!-- URGENT SHEET -->
+  <div class="uo" id="uoOverlay">
+    <div class="uo-s">
+      <div class="uo-handle"></div>
+      <button onclick="document.getElementById('uoOverlay').classList.remove('open')" style="position:absolute;top:14px;right:16px;width:28px;height:28px;border-radius:50%;border:none;background:var(--ln2);cursor:pointer;font-size:15px;color:var(--ink3);display:flex;align-items:center;justify-content:center;font-family:var(--ff);">✕</button>
+      <div class="uo-badge" id="uoBadge"></div>
+      <div class="uo-crow">
+        <div id="uoCat" class="cb"></div>
+        <div id="uoCatLbl" class="tg tg-a" style="font-size:10px;"></div>
+      </div>
+      <div class="uo-title" id="uoTitle"></div>
+      <div class="uo-addr" id="uoAddr"></div>
+      <div class="uo-metrics">
+        <div class="uom"><div class="uomv d" id="uoSlaV"></div><div class="uoml" id="uoSlaL"></div></div>
+        <div class="uom"><div class="uomv ok" id="uoDistV"></div><div class="uoml" id="uoDistL"></div></div>
+        <div class="uom"><div class="uomv w" id="uoEtaV"></div><div class="uoml" id="uoEtaL"></div></div>
+      </div>
+      <div id="umap"></div>
+      <div class="uo-iss"><strong id="uoIssLbl"></strong><span id="uoIssText"></span></div>
+      <div class="uo-acts">
+        <button class="uo-dec" id="uoDecBtn" onclick="declineUrgent()"></button>
+        <button class="uo-acc" id="uoAccBtn" onclick="acceptUrgent()"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOW OVERLAY -->
+  <div class="flow" id="flowOverlay">
+    <div class="flow-hdr">
+      <div class="fbk" onclick="closeFlow()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div style="flex:1;min-width:0;">
+        <div class="ftitle" id="fTitle"></div>
+        <div style="font-size:10px;color:var(--ink3)" id="fSub"></div>
+      </div>
+      <div class="tg tg-a" id="fTag" style="flex-shrink:0;font-size:10px;"></div>
+    </div>
+    <div class="flow-body">
+      <div id="fmmap"></div>
+      <div class="rbar">
+        <div class="rbi"><div class="rbv" id="fDist">–</div><div class="rbl" id="fDistL"></div></div>
+        <div class="rbi"><div class="rbv" id="fEta">–</div><div class="rbl" id="fEtaL"></div></div>
+        <div class="rbi"><div class="rbv" id="fSla" style="color:var(--am)">–</div><div class="rbl" id="fSlaL"></div></div>
+      </div>
+      <button class="gmb" id="gmbBtn" onclick="openGMaps()" style="display:none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        <span id="gmbTxt"></span>
+      </button>
+      <div class="steps" id="flowSteps">
+        <div class="step done"><div class="sn done">✓</div><div class="sl" id="sl1"></div></div>
+        <div class="step"><div class="sn act" id="fs2">2</div><div class="sl" id="sl2"></div></div>
+        <div class="step"><div class="sn" id="fs3">3</div><div class="sl" id="sl3"></div></div>
+        <div class="step"><div class="sn" id="fs4">4</div><div class="sl" id="sl4"></div></div>
+        <div class="step"><div class="sn" id="fs5">5</div><div class="sl" id="sl5"></div></div>
+      </div>
+      <div class="sec" id="cinSec" style="padding-bottom:12px;">
+        <button class="cin-btn" id="cinBtn" onclick="doCheckin()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="cinTxt"></span>
+        </button>
+      </div>
+      <div id="workSec" style="display:none;">
+        <div class="sh"><div class="sh-t" id="clTitle"></div><div class="sh-r" id="clProg">0/5</div></div>
+        <div class="sec"><div class="clist" id="fclist">
+          <div class="cli" onclick="toggleCli(this)"><div class="cbox"></div><div class="ct" data-key="restock_f">補充衛生紙（女廁 3 間）</div><span class="tg tg-b" data-key="restock"></span></div>
+          <div class="cli" onclick="toggleCli(this)"><div class="cbox"></div><div class="ct" data-key="restock_m">補充衛生紙（男廁 2 間）</div><span class="tg tg-b" data-key="restock"></span></div>
+          <div class="cli" onclick="toggleCli(this)"><div class="cbox"></div><div class="ct" data-key="restock_soap">補充洗手乳</div><span class="tg tg-b" data-key="restock"></span></div>
+          <div class="cli" onclick="toggleCli(this)"><div class="cbox"></div><div class="ct" data-key="clean_floor">清潔地板與洗手台</div><span class="tg tg-g" data-key="clean"></span></div>
+          <div class="cli" onclick="toggleCli(this)"><div class="cbox"></div><div class="ct" data-key="check_sensor">確認感測器恢復正常</div><span class="tg tg-gr" data-key="check"></span></div>
+        </div></div>
+        <div class="sec" style="padding-top:6px;padding-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-bottom:4px;"><span id="progLbl"></span><span id="progPct">0%</span></div>
+          <div class="pbg"><div class="pf" id="progBar" style="width:0%"></div></div>
+        </div>
+        <div class="sh"><div class="sh-t" id="photoTitle"></div><div class="sh-r" id="photoCount">0/4</div></div>
+        <div class="sec"><div class="pgrid" id="pgrid">
+          <div class="pthumb" onclick="addPhoto()">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span class="pnum" id="photoAddLbl"></span>
+          </div>
+        </div></div>
+        <div class="sh"><div class="sh-t" id="anomTitle"></div></div>
+        <div class="sec">
+          <div class="anom-chips" id="anomChips"></div>
+          <textarea class="anom-note" id="anomNote" rows="3"></textarea>
+        </div>
+        <div class="sec" style="padding:12px 0 0;">
+          <button class="sub-btn" onclick="submitFlow()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="subTxt"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="page" id="mainPage">
+
+    <!-- HOME -->
+    <div id="pg-home">
+      <div class="topbar">
+        <div class="tb-l">
+          <div class="tb-logo"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div><div class="tb-name">CleanTrack</div><div class="tb-sub" id="dateDisp"></div></div>
+        </div>
+        <div class="tb-r">
+          <div class="online-pill"><div class="online-dot"></div><span id="h-online"></span></div>
+          <button class="lang-btn" id="langBtn" onclick="toggleLang()"></button>
+        </div>
+      </div>
+      <div class="urg-banner" id="urgBanner" onclick="openUrgentById(2)">
+        <div class="ub-icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="ub-body">
+          <div class="ub-tag" id="ub-tag"></div>
+          <div class="ub-title" id="ub-title"></div>
+          <div class="ub-meta" id="ub-meta"></div>
+        </div>
+        <div class="ub-arr">›</div>
+      </div>
+      <div class="cat-bar" id="h-catbar"></div>
+      <div class="sh"><div class="sh-t" id="h-mapt"></div></div>
+      <div class="mw"><div id="hmap"></div></div>
+      <div class="mleg" id="h-mleg"></div>
+      <div class="sh"><div class="sh-t" id="h-schedt"></div><div class="sh-r" id="h-stops"></div></div>
+      <div class="sched" id="h-sched"></div>
+      <div style="height:14px;"></div>
+    </div>
+
+    <!-- MAP PAGE -->
+    <div id="pg-map" style="display:none;">
+      <div class="topbar">
+        <div class="tb-l">
+          <div class="tb-logo" style="background:var(--bl)"><svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><div class="tb-name" id="m-title"></div><div class="tb-sub" id="m-sub"></div></div>
+        </div>
+        <div class="tb-r"><button class="lang-btn" onclick="toggleLang()" id="langBtn2"></button></div>
+      </div>
+      <div class="cat-bar" id="m-catbar" style="border-bottom:1px solid var(--ln);padding-bottom:7px;"></div>
+      <div id="fmap"></div>
+      <div class="mleg" id="m-mleg"></div>
+      <div class="map-stops-hdr">
+        <span class="sh-t" id="m-listT" style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;"></span>
+      </div>
+      <div class="map-stop-strip" id="m-sched"></div>
+    </div>
+
+    <!-- DASH PAGE -->
+    <div id="pg-dash" style="display:none;">
+      <div class="topbar">
+        <div class="tb-l">
+          <div class="tb-logo" style="background:var(--pu)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="14" y="3" width="7" height="7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="3" y="14" width="7" height="7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="14" y="14" width="7" height="7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div><div class="tb-name" id="d-title"></div><div class="tb-sub" id="d-month"></div></div>
+        </div>
+        <div class="tb-r"><button class="lang-btn" onclick="toggleLang()" id="langBtn3"></button></div>
+      </div>
+      <div class="sh"><div class="sh-t" id="d-statt"></div></div>
+      <div class="sgrid">
+        <div class="scard"><div class="snum">48</div><div class="slbl" id="d-s1"></div><div class="ssub" style="color:var(--gd)">▲ +12%</div></div>
+        <div class="scard"><div class="snum">132h</div><div class="slbl" id="d-s2"></div><div class="ssub" id="d-target"></div></div>
+        <div class="scard"><div class="snum">98%</div><div class="slbl" id="d-s3"></div><div class="ssub" style="color:var(--gd)" id="d-excel"></div></div>
+        <div class="scard"><div class="snum">18m</div><div class="slbl" id="d-s4"></div><div class="ssub" style="color:var(--gd)">▼ -2m</div></div>
+      </div>
+      <div class="sh" style="margin-top:6px;"><div class="sh-t" id="d-montht"></div></div>
+      <div class="barwrap">
+        <div style="font-size:11px;font-weight:600;color:var(--ink2);margin-bottom:10px;" id="d-monthtitle"></div>
+        <div class="bars" id="dbars"></div>
+        <div style="display:flex;gap:4px;" id="dblbls"></div>
+      </div>
+      <div class="sh" style="margin-top:6px;"><div class="sh-t" id="d-urgt"></div></div>
+      <div class="sgrid" style="margin-bottom:8px;">
+        <div class="scard"><div class="snum" style="color:var(--r)">7</div><div class="slbl" id="d-u1"></div><div class="ssub">7/7</div></div>
+        <div class="scard"><div class="snum">12m</div><div class="slbl" id="d-u2"></div><div class="ssub" style="color:var(--gd)" id="d-ontarget"></div></div>
+      </div>
+      <div class="sh"><div class="sh-t" id="d-recent"></div></div>
+      <div class="hlist" id="d-hlist"></div>
+      <div style="height:14px;"></div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="pg-profile" style="display:none;">
+      <div class="topbar">
+        <div class="tb-l">
+          <div class="tb-logo" style="background:#0d9488"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" fill="none" stroke="#fff" stroke-width="2"/></svg></div>
+          <div><div class="tb-name" id="p-title"></div></div>
+        </div>
+        <div class="tb-r"><button class="lang-btn" onclick="toggleLang()" id="langBtn4"></button></div>
+      </div>
+      <div class="phero">
+        <div class="pav">林</div>
+        <div class="pn">林志明</div>
+        <div class="pr" id="p-role"></div>
+        <div class="pbs">
+          <span class="pb">★ <span id="p-top"></span></span>
+          <span class="pb">98% <span id="p-sla-lbl"></span></span>
+          <span class="pb">2<span id="p-yr"></span></span>
+        </div>
+      </div>
+      <div class="sh"><div class="sh-t" id="p-basic"></div></div>
+      <div class="icard">
+        <div class="irow"><span class="ilbl" id="p-id-lbl"></span><span class="ival" style="font-family:var(--fm)">CT-2847</span></div>
+        <div class="irow"><span class="ilbl" id="p-name-lbl"></span><span class="ival" id="p-name-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-ph-lbl"></span><span class="ival">0921-234-567</span></div>
+        <div class="irow"><span class="ilbl" id="p-sd-lbl"></span><span class="ival" id="p-sd-val"></span></div>
+      </div>
+      <div class="sh"><div class="sh-t" id="p-co-t"></div></div>
+      <div class="icard">
+        <div class="irow"><span class="ilbl" id="p-cn-lbl"></span><span class="ival" id="p-cn-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-dept-lbl"></span><span class="ival" id="p-dept-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-zone-lbl"></span><span class="ival" id="p-zone-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-sup-lbl"></span><span class="ival" id="p-sup-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-em-lbl"></span><span class="ival" style="color:var(--bl)">02-2345-6789 #101</span></div>
+      </div>
+      <div class="sh"><div class="sh-t" id="p-sh-t"></div></div>
+      <div class="icard">
+        <div class="irow"><span class="ilbl" id="p-st-lbl"></span><span class="ival" id="p-st-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-ws-lbl"></span><span class="ival" id="p-ws-val"></span></div>
+        <div class="irow"><span class="ilbl" id="p-td-lbl"></span><span class="ival"><span style="color:var(--gd);font-weight:700">2</span> / 5</span></div>
+        <div class="irow"><span class="ilbl" id="p-dev-lbl"></span><span class="ival" style="color:var(--gd)" id="p-dev-val"></span></div>
+      </div>
+      <div style="height:14px;"></div>
+    </div>
+
+  </div><!-- end mainPage -->
+
+  <nav class="bnav">
+    <div class="bn on" id="bn-home" onclick="switchPage('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span id="nav-home"></span>
+    </div>
+    <div class="bn" id="bn-map" onclick="switchPage('map')">
+      <svg viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+      <span id="nav-map"></span>
+      <div class="bn-red"></div>
+    </div>
+    <div class="bn" id="bn-dash" onclick="switchPage('dash')">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span id="nav-dash"></span>
+    </div>
+    <div class="bn" id="bn-profile" onclick="switchPage('profile')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span id="nav-profile"></span>
+    </div>
+  </nav>
+</div><!-- end shell -->
+
+<script>
+/* ============================================================
+   DATA
+============================================================ */
+const ME=[25.040,121.548];
+const TASKS=[
+  {id:0,name:{zh:'忠孝復興站 B1',en:'Zhongxiao Fuxing B1'},lat:25.0418,lng:121.5441,status:'done',cat:'mrt',elapsed:{zh:'09:15 完成・22分',en:'Done 09:15 · 22min'}},
+  {id:1,name:{zh:'大安森林公園北側',en:'Daan Park North'},lat:25.0332,lng:121.5362,status:'active',cat:'park',dist:'680m',eta:{zh:'8分',en:'8min'},sla:{zh:'22分',en:'22min'},issue:null},
+  {id:2,name:{zh:'7-ELEVEN 忠孝',en:'7-ELEVEN Zhongxiao'},lat:25.0408,lng:121.5469,status:'urgent',cat:'cvs',dist:'450m',eta:{zh:'6分',en:'6min'},sla:'overdue',issue:{zh:'門鎖感測器故障，服務時限已超時 5 分鐘',en:'Door lock sensor fault, SLA overdue 5min'}},
+  {id:3,name:{zh:'信義公園',en:'Xinyi Park'},lat:25.0318,lng:121.5648,status:'todo',cat:'park',dist:'1.8km',eta:{zh:'22分',en:'22min'},sla:{zh:'35分',en:'35min'},issue:{zh:'NH₃超標 42ppm，使用次數高峰',en:'NH₃ 42ppm elevated, peak usage'}},
+  {id:4,name:{zh:'市政府廁所 B1',en:'City Hall WC B1'},lat:25.0376,lng:121.5625,status:'todo',cat:'pub',dist:'3.2km',eta:{zh:'45分',en:'45min'},sla:{zh:'60分',en:'60min'},issue:null},
+  {id:5,name:{zh:'東門站廁所',en:'Dongmen Station WC'},lat:25.0338,lng:121.5265,status:'done',cat:'mrt',elapsed:{zh:'10:42 完成・18分',en:'Done 10:42 · 18min'}},
+  {id:6,name:{zh:'台亞石油 忠孝加油站',en:'Taiya Gas Station Zhongxiao'},lat:25.0425,lng:121.5530,status:'todo',cat:'gas',dist:'0.9km',eta:{zh:'11分',en:'11min'},sla:{zh:'50分',en:'50min'},issue:null},
+  {id:7,name:{zh:'行天宮',en:'Xingtian Temple'},lat:25.0572,lng:121.5333,status:'todo',cat:'temple',dist:'2.1km',eta:{zh:'25分',en:'25min'},sla:{zh:'70分',en:'70min'},issue:null},
+];
+const CAT_ICON={mrt:'捷',park:'公',cvs:'便',pub:'廁',gas:'油',temple:'廟'};
+const CAT_COLOR={mrt:'#0ea5e9',park:'#22c55e',cvs:'#f97316',pub:'#7c3aed',gas:'#ef4444',temple:'#b45309'};
+const CAT_SHAPE={mrt:'circle',park:'circle',cvs:'square',pub:'square',gas:'square',temple:'circle'};
+const HIST=[
+  {name:{zh:'忠孝復興站 B1',en:'Zhongxiao Fuxing B1'},meta:{zh:'今天 09:15・清潔',en:'Today 09:15 · Clean'},time:'22m',color:''},
+  {name:{zh:'東門站廁所',en:'Dongmen Station WC'},meta:{zh:'今天 10:42・補貨',en:'Today 10:42 · Restock'},time:'18m',color:''},
+  {name:{zh:'信義公園廁所',en:'Xinyi Park WC'},meta:{zh:'昨天 15:30・清潔',en:'Yesterday 15:30 · Clean'},time:'25m',color:''},
+  {name:{zh:'7-ELEVEN 天母店',en:'7-ELEVEN Tianmu'},meta:{zh:'昨天 11:00・異常',en:'Yesterday 11:00 · Urgent'},time:'35m',color:'var(--r)'},
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+const INAVI_APP_KEY='38dd3a4506b3f8bf9265977c3b1fbd2d310f16a1';
+let maps={},mapMks={home:[],full:[]},mapLayers={urgent:[],flow:[]};
+let inaviReady=false,inaviLoading=false,inaviQueue=[];
+let activeCats=new Set(['mrt','park','cvs','pub','gas','temple']);
+let checkinDone=false,flowCheckCount=0,flowPhotoCount=0;
+let currentTask=null,fMapInst=null,fMapInited=false,currentFlowLine=null,startTime=null;
+let urgMapInst=null;
+let declinedId=null;
+
+/* ============================================================
+   I18N RENDER
+============================================================ */
+function renderLang(){
+  // nav
+  document.getElementById('nav-home').textContent=T('home');
+  document.getElementById('nav-map').textContent=T('map_nav');
+  document.getElementById('nav-dash').textContent=T('dash');
+  document.getElementById('nav-profile').textContent=T('profile');
+  ['langBtn','langBtn2','langBtn3','langBtn4'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=T('lang_btn');});
+  document.getElementById('h-online').textContent=T('online');
+  // date
+  const d=new Date();
+  document.getElementById('dateDisp').textContent=lang==='zh'
+    ?d.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'})
+    :d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  // urgent banner
+  document.getElementById('ub-tag').textContent=T('urg_dispatch');
+  document.getElementById('ub-title').textContent=lang==='zh'?'7-ELEVEN 忠孝復興店 – 門鎖異常':'7-ELEVEN Zhongxiao – door lock fault';
+  document.getElementById('ub-meta').textContent=T('urg_meta','450m',lang==='zh'?'6分':'6min');
+  // home
+  document.getElementById('h-mapt').textContent=T('today_map');
+  document.getElementById('h-schedt').textContent=T('today_sched');
+  document.getElementById('h-stops').textContent=T('stops');
+  renderCatBar('h-catbar');
+  renderMapLegend('h-mleg');
+  renderSchedule('h-sched');
+  // map page
+  document.getElementById('m-title').textContent=T('full_map');
+  document.getElementById('m-sub').textContent=lang==='zh'?'7 個任務點位':'7 task locations';
+  renderCatBar('m-catbar');
+  renderMapLegend('m-mleg');
+  document.getElementById('m-listT').textContent=T('loc_list');
+  renderMapList();
+  // dash
+  document.getElementById('d-title').textContent=T('dash_title');
+  document.getElementById('d-month').textContent=T('dash_month');
+  document.getElementById('d-statt').textContent=lang==='zh'?'本月統計':'Monthly Stats';
+  document.getElementById('d-s1').textContent=T('stat_tasks');
+  document.getElementById('d-s2').textContent=T('stat_hours');
+  document.getElementById('d-s3').textContent=T('stat_sla');
+  document.getElementById('d-s4').textContent=T('stat_avg');
+  document.getElementById('d-target').textContent=T('stat_target');
+  document.getElementById('d-excel').textContent=T('stat_excellent');
+  document.getElementById('d-montht').textContent=lang==='zh'?'每月時數':'Monthly Hours';
+  document.getElementById('d-monthtitle').textContent=T('month_title');
+  document.getElementById('d-urgt').textContent=T('urg_orders');
+  document.getElementById('d-u1').textContent=T('stat_urg');
+  document.getElementById('d-u2').textContent=T('stat_resp');
+  document.getElementById('d-ontarget').textContent=T('on_target');
+  document.getElementById('d-recent').textContent=T('recent');
+  renderDashBars();
+  renderHistList();
+  // profile
+  document.getElementById('p-title').textContent=T('profile_title');
+  document.getElementById('p-role').textContent=T('role');
+  document.getElementById('p-top').textContent=T('top_staff');
+  document.getElementById('p-sla-lbl').textContent=T('sla_label');
+  document.getElementById('p-yr').textContent=T('yr_service');
+  document.getElementById('p-basic').textContent=T('basic');
+  document.getElementById('p-id-lbl').textContent=T('staff_id');
+  document.getElementById('p-name-lbl').textContent=T('name_lbl');
+  document.getElementById('p-name-val').textContent=lang==='zh'?'林志明':'Lin Zhiming';
+  document.getElementById('p-ph-lbl').textContent=T('phone');
+  document.getElementById('p-sd-lbl').textContent=T('start_date');
+  document.getElementById('p-sd-val').textContent=lang==='zh'?'2023 年 4 月 1 日':'Apr 1, 2023';
+  document.getElementById('p-co-t').textContent=T('company');
+  document.getElementById('p-cn-lbl').textContent=T('co_name');
+  document.getElementById('p-cn-val').textContent=lang==='zh'?'綠清環境服務股份有限公司':'Green Clean Co., Ltd.';
+  document.getElementById('p-dept-lbl').textContent=T('dept');
+  document.getElementById('p-dept-val').textContent=lang==='zh'?'捷運清潔事業部':'MRT Cleaning Div.';
+  document.getElementById('p-zone-lbl').textContent=T('zone');
+  document.getElementById('p-zone-val').textContent=lang==='zh'?'台北市大安・信義區':'Da\'an · Xinyi Dist.';
+  document.getElementById('p-sup-lbl').textContent=T('supervisor');
+  document.getElementById('p-sup-val').textContent=lang==='zh'?'陳雅婷 督導':'Supervisor Chen';
+  document.getElementById('p-em-lbl').textContent=T('emergency');
+  document.getElementById('p-sh-t').textContent=T('shift');
+  document.getElementById('p-st-lbl').textContent=T('shift_type');
+  document.getElementById('p-st-val').textContent=T('morning_shift');
+  document.getElementById('p-ws-lbl').textContent=T('week_sched');
+  document.getElementById('p-ws-val').textContent=T('week_days');
+  document.getElementById('p-td-lbl').textContent=T('tasks_today');
+  document.getElementById('p-dev-lbl').textContent=T('device');
+  document.getElementById('p-dev-val').textContent=T('gps_ok');
+  // flow UI labels (if open)
+  renderFlowLabels();
+  // anomaly chips
+  renderAnomChips();
+  // urgent sheet
+  document.getElementById('anomNote').placeholder=T('anom_note');
+}
+
+function toggleLang(){
+  lang=lang==='zh'?'en':'zh';
+  // Reinit maps to switch tile language
+  if(maps.home){try{maps.home.remove?.();}catch(e){}maps.home=null;mapMks.home=[];}
+  if(maps.full){try{maps.full.remove?.();}catch(e){}maps.full=null;mapMks.full=[];}
+  // flow map and urgent map will recreate on next open
+  if(fMapInst){try{fMapInst.remove?.();}catch(e){}fMapInst=null;fMapInited=false;currentFlowLine=null;mapLayers.flow=[];}
+  if(urgMapInst){try{urgMapInst.remove?.();}catch(e){}urgMapInst=null;mapLayers.urgent=[];}
+  renderLang();
+  setTimeout(initHomeMap,80);
+  // If map page is active, reinit full map
+  const mapPageVisible=document.getElementById('pg-map').style.display!=='none';
+  if(mapPageVisible) setTimeout(initFullMap,80);
+}
+
+/* ============================================================
+   CAT BAR
+============================================================ */
+function renderCatBar(containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML='';
+  const cats=[
+    {key:'mrt',icon:'ci ci-mrt',lbl:'cat_mrt'},
+    {key:'park',icon:'ci ci-park',lbl:'cat_park'},
+    {key:'cvs',icon:'ci ci-cvs',lbl:'cat_cvs'},
+    {key:'pub',icon:'ci ci-pub',lbl:'cat_pub'},
+    {key:'gas',icon:'ci ci-gas',lbl:'cat_gas'},
+    {key:'temple',icon:'ci ci-temple',lbl:'cat_temple'},
+  ];
+  cats.forEach(c=>{
+    const btn=document.createElement('div');
+    btn.className='cf '+(activeCats.has(c.key)?`act-${c.key}`:'');
+    btn.dataset.cat=c.key;
+    btn.innerHTML=`<div class="${c.icon}">${CAT_ICON[c.key]}</div>${T(c.lbl)}`;
+    btn.onclick=()=>{
+      activeCats.has(c.key)?activeCats.delete(c.key):activeCats.add(c.key);
+      updateMapVis();
+      renderCatBar('h-catbar');
+      renderCatBar('m-catbar');
+    };
+    el.appendChild(btn);
+  });
+}
+
+/* ============================================================
+   MAP LEGEND
+============================================================ */
+function renderMapLegend(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.innerHTML=`
+    <div class="ml"><div class="mldot" style="background:#3b82f6"></div>${T('me_loc')}</div>
+    <div class="ml"><div class="mldot" style="background:var(--g)"></div>${T('map_active')}</div>
+    <div class="ml"><div class="mldot" style="background:var(--am)"></div>${T('map_todo')}</div>
+    <div class="ml"><div class="mldot" style="background:var(--r)"></div>${T('map_urgent')}</div>
+    <div class="ml"><div class="mldot" style="background:#d1d5db"></div>${T('map_done')}</div>
+    <div class="ml"><div style="width:18px;height:3px;background:#3b82f6;border-radius:2px;opacity:.9"></div>${lang==='zh'?'前往中':'En route'}</div>
+    <div class="ml"><div style="width:18px;height:2px;background:#f97316;border-radius:2px;opacity:.7;border-top:1px dashed #f97316"></div>${lang==='zh'?'待辦路線':'Upcoming'}</div>
+    <div class="ml"><div style="width:18px;height:2px;background:#9ca3af;border-radius:2px"></div>${lang==='zh'?'已完成路線':'Completed'}</div>
+  `;
+}
+
+/* ============================================================
+   SCHEDULE
+============================================================ */
+const SCHED_DATA=[
+  {time:'09:15',timeLabel:'done',name:{zh:'忠孝復興站 B1',en:'Zhongxiao Fuxing B1'},loc:{zh:'台北市大安區忠孝東路四段',en:'Zhongxiao E. Rd Sec.4'},tags:[{key:'clean',cls:'tg-gr'},{key:'done_tag',text:'✓',cls:'tg-gr'}],status:'done',cat:'mrt',pri:null,eta:null,taskId:0},
+  {time:'10:42',timeLabel:'done',name:{zh:'東門站廁所',en:'Dongmen Station WC'},loc:{zh:'台北市大安區信義路二段',en:'Xinyi Rd Sec.2'},tags:[{key:'restock',cls:'tg-gr'},{key:'done_tag',text:'✓',cls:'tg-gr'}],status:'done',cat:'mrt',pri:null,eta:null,taskId:5},
+  {time:'12:30',timeLabel:'active',name:{zh:'大安森林公園北側',en:'Daan Park North'},loc:{zh:'台北市大安區新生南路',en:'Xinsheng S. Rd'},tags:[{key:'restock',cls:'tg-b'},{key:'sla_22',cls:'tg-a'}],status:'active',cat:'park',pri:{text:'active',cls:'tg-g'},eta:{zh:'8分',en:'8min'},taskId:1,onclick:()=>openFlow(1)},
+  {time:'──',timeLabel:'urgent_tag',name:{zh:'7-ELEVEN 忠孝',en:'7-ELEVEN Zhongxiao'},loc:{zh:'台北市大安區忠孝東路四段',en:'Zhongxiao E. Rd Sec.4'},tags:[{key:'door_fault',cls:'tg-r'},{key:'sla_overdue',cls:'tg-r'}],status:'urgent',cat:'cvs',pri:{text:'urgent_tag',cls:'tg-r'},eta:null,taskId:2,onclick:()=>openUrgentById(2)},
+  {time:'14:00',timeLabel:'pending',name:{zh:'信義公園',en:'Xinyi Park'},loc:{zh:'台北市信義區信義路五段',en:'Xinyi Rd Sec.5'},tags:[{key:'clean',cls:'tg-g'},{key:'sla_40',cls:'tg-a'}],status:'todo',cat:'park',pri:{text:'MID',cls:'tg-a'},eta:{zh:'22分',en:'22min'},taskId:3},
+  {time:'15:00',timeLabel:'pending',name:{zh:'台亞石油 忠孝加油站',en:'Taiya Gas Station Zhongxiao'},loc:{zh:'台北市大安區忠孝東路四段',en:'Zhongxiao E. Rd Sec.4'},tags:[{key:'inspect',cls:'tg-gr'}],status:'todo',cat:'gas',pri:{text:'LOW',cls:'tg-gr'},eta:{zh:'11分',en:'11min'},taskId:6},
+  {time:'15:30',timeLabel:'pending',name:{zh:'行天宮',en:'Xingtian Temple'},loc:{zh:'台北市中山區民權東路二段',en:'Minquan E. Rd Sec.2'},tags:[{key:'clean',cls:'tg-g'}],status:'todo',cat:'temple',pri:{text:'LOW',cls:'tg-gr'},eta:{zh:'25分',en:'25min'},taskId:7},
+  {time:'16:00',timeLabel:'pending',name:{zh:'市政府廁所',en:'City Hall WC'},loc:{zh:'台北市信義區市府路一號 B1',en:'City Hall Rd No.1 B1'},tags:[{key:'inspect',cls:'tg-gr'}],status:'todo',cat:'pub',pri:{text:'LOW',cls:'tg-gr'},eta:{zh:'45分',en:'45min'},taskId:4},
+];
+const TAG_TEXT={
+  clean:()=>T('clean'),restock:()=>T('restock'),check:()=>T('check'),inspect:()=>T('inspect'),
+  done_tag:()=>'✓',
+  door_fault:()=>lang==='zh'?'門鎖異常':'Door fault',
+  sla_22:()=>T('sla_remain',lang==='zh'?'22分':'22min'),
+  sla_40:()=>T('sla_remain',lang==='zh'?'40分':'40min'),
+  sla_overdue:()=>T('sla_overdue'),
+  active:()=>T('active'),urgent_tag:()=>T('urgent_tag'),
+};
+const TIMELABEL_TEXT={
+  done:()=>T('done'),active:()=>T('active'),urgent_tag:()=>T('urgent_tag'),pending:()=>T('pending'),
+};
+
+function focusHomeMapTask(taskId){
+  const entry=mapMks.home.find(e=>e.task.id===taskId);
+  if(!entry||!maps.home) return;
+  // close all infos first
+  mapMks.home.forEach(e=>e.info?.setMap());
+  maps.home.setCenter?.(taskCoord(entry.task));
+  maps.home.setZoom?.(16);
+  entry.info?.setMap(maps.home);
+  // scroll home map into view
+  const mapEl=document.getElementById('hmap');
+  mapEl?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function renderSchedule(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.innerHTML='';
+  SCHED_DATA.forEach((s,idx)=>{
+    const isLast=idx===SCHED_DATA.length-1;
+    const dotCls=s.status==='done'?'dot-done':s.status==='active'?'dot-active':s.status==='urgent'?'dot-urgent':'dot-todo';
+    const dashCls=s.status==='done'?'dash-done':s.status==='active'?'dash-active':'';
+    const dotSymbol=s.status==='done'?'✓':s.status==='urgent'?'!':s.status==='active'?'●':'○';
+    const cardBorder=s.status==='active'?'border-color:var(--g);background:var(--gll)':s.status==='urgent'?'border-color:var(--r);background:var(--rl)':s.status==='done'?'opacity:.55':'';
+    const tagsHtml=s.tags.map(tg=>`<span class="tg ${tg.cls}">${tg.text||TAG_TEXT[tg.key]?.()}</span>`).join('');
+    const priHtml=s.pri?`<span class="tg ${s.pri.cls}">${TAG_TEXT[s.pri.text]?.()??s.pri.text}</span>`:'';
+    const etaHtml=s.eta?`<span style="font-size:10px;color:var(--ink3)">ETA ${s.eta[lang]}</span>`:'';
+
+    const item=document.createElement('div');
+    item.className='sched-item';
+    item.innerHTML=`
+      <div class="sched-line">
+        <div style="font-size:10px;font-weight:600;color:${s.status==='urgent'?'var(--r)':s.status==='done'?'var(--ink4)':s.status==='active'?'var(--gd)':'var(--ink3)'};font-family:var(--fm);min-height:16px;text-align:center;line-height:1.2;">${s.time}</div>
+        <div class="sched-dot ${dotCls}">${dotSymbol}</div>
+        ${!isLast?`<div class="sched-dash ${dashCls}"></div>`:''}
+      </div>
+      <div class="sched-card" style="${isLast?'padding-bottom:4px':''}">
+        <div class="sc ${s.status==='done'?'done':s.status==='active'?'active':''}" style="${cardBorder};${s.onclick?'cursor:pointer':''}">
+          <div class="sc-body">
+            <div class="sc-name">
+              <div class="cb cb-${s.cat}">${CAT_ICON[s.cat]}</div>
+              ${s.name[lang]}
+            </div>
+            <div class="sc-loc">${s.loc[lang]}</div>
+            <div class="sc-tags">${tagsHtml}</div>
+          </div>
+          ${(priHtml||etaHtml)?`<div class="sc-rt">${priHtml}${etaHtml}</div>`:''}
+        </div>
+      </div>
+    `;
+    if(s.onclick){
+      item.querySelector('.sc').addEventListener('click',()=>{
+        focusHomeMapTask(s.taskId);
+        s.onclick();
+      });
+    } else {
+      // pan map to this task
+      item.querySelector('.sc').addEventListener('click',()=>focusHomeMapTask(s.taskId));
+    }
+    el.appendChild(item);
+  });
+}
+
+function renderMapList(){
+  const el=document.getElementById('m-sched');
+  if(!el) return;
+  el.innerHTML='';
+  const items=[
+    {letter:'A',color:'var(--g)',status:'active',labelKey:'active',cat:'park',name:{zh:'大安森林公園',en:'Daan Park'},eta:{zh:'8分',en:'8min'},dist:'680m',onclick:()=>openFlow(1)},
+    {letter:'B',color:'var(--r)',status:'urgent',labelKey:'urgent_tag',cat:'cvs',name:{zh:'7-ELEVEN 忠孝',en:'7-ELEVEN Zhongxiao'},eta:null,dist:null,sla_overdue:true,onclick:()=>openUrgentById(2)},
+    {letter:'C',color:'var(--am)',status:'todo',labelKey:'pending',cat:'park',name:{zh:'信義公園',en:'Xinyi Park'},eta:{zh:'22分',en:'22min'},dist:'1.8km',onclick:null},
+    {letter:'D',color:'var(--am)',status:'todo',labelKey:'pending',cat:'gas',name:{zh:'台亞石油 忠孝加油站',en:'Taiya Gas Station'},eta:{zh:'11分',en:'11min'},dist:'0.9km',onclick:null},
+    {letter:'E',color:'var(--am)',status:'todo',labelKey:'pending',cat:'temple',name:{zh:'行天宮',en:'Xingtian Temple'},eta:{zh:'25分',en:'25min'},dist:'2.1km',onclick:null},
+    {letter:'F',color:'var(--am)',status:'todo',labelKey:'pending',cat:'pub',name:{zh:'市政府廁所 B1',en:'City Hall WC B1'},eta:{zh:'45分',en:'45min'},dist:'3.2km',onclick:null},
+  ];
+  items.forEach(it=>{
+    const div=document.createElement('div');
+    div.className='msc'+(it.status==='active'?' msc-active':it.status==='urgent'?' msc-urgent':it.status==='done'?' msc-done':'');
+    if(it.onclick) div.onclick=it.onclick;
+
+    const badgeText=it.status==='active'?T('active'):it.status==='urgent'?T('urgent_tag'):it.status==='done'?T('done'):T('pending');
+    const badgeStyle=it.status==='active'?'background:var(--gl);color:var(--gd)':it.status==='urgent'?'background:var(--rl);color:var(--r)':it.status==='done'?'background:var(--ln2);color:var(--ink4)':'background:var(--aml);color:#92400e';
+    const catBr=CAT_SHAPE[it.cat]==='square'?'3px':'50%';
+    const infoText=it.sla_overdue?T('sla_overdue'):it.eta?`${it.dist} · ETA ${it.eta[lang]}`:'';
+
+    div.innerHTML=`
+      <div class="msc-top">
+        <span class="msc-letter" style="color:${it.color}">${it.letter}</span>
+        <span class="msc-badge" style="${badgeStyle}">${badgeText}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;margin:1px 0;">
+        <div class="msc-cat" style="background:${CAT_COLOR[it.cat]};border-radius:${catBr}">${CAT_ICON[it.cat]}</div>
+        <div class="msc-name">${it.name[lang]}</div>
+      </div>
+      <div class="msc-info">${infoText}</div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+let dbarsInited=false;
+function renderDashBars(){
+  const bars=document.getElementById('dbars'),lbls=document.getElementById('dblbls');
+  if(!bars) return;
+  if(!dbarsInited){
+    const data=[108,125,142,138,155,132];
+    const max=Math.max(...data);
+    data.forEach((v,i)=>{
+      const b=document.createElement('div');
+      b.className='bar'+(i===5?' cur':'');
+      b.style.height=Math.round(v/max*100)+'%';
+      bars.appendChild(b);
+      const l=document.createElement('div');
+      l.className='blbl';l.style.flex='1';
+      l.dataset.i=i;
+      lbls.appendChild(l);
+    });
+    dbarsInited=true;
+  }
+  const months=T('months');
+  lbls.querySelectorAll('.blbl').forEach(l=>l.textContent=months[l.dataset.i]);
+}
+
+function renderHistList(){
+  const el=document.getElementById('d-hlist');
+  if(!el) return;
+  el.innerHTML='';
+  HIST.forEach(h=>{
+    const div=document.createElement('div');
+    div.className='hi';
+    div.innerHTML=`<div><div class="hn">${h.name[lang]}</div><div class="hm">${h.meta[lang]}</div></div><div class="ht" style="${h.color?'color:'+h.color:''}">${h.time}</div>`;
+    el.appendChild(div);
+  });
+}
+
+/* ============================================================
+   MAP
+============================================================ */
+function initInaviMaps(){
+  inaviReady=!!window.inavi?.maps?.Map;
+  inaviLoading=false;
+  if(!inaviReady){
+    toast('iNavi map SDK is not ready');
+    return;
+  }
+  const q=[...inaviQueue];
+  inaviQueue=[];
+  q.forEach(fn=>fn());
+}
+window.initInaviMaps=initInaviMaps;
+window.initMap=initInaviMaps;
+
+function ensureInaviReady(fn){
+  if(window.inavi?.maps?.Map){
+    inaviReady=true;
+    fn();
+    return;
+  }
+  inaviQueue.push(fn);
+  if(inaviLoading) return;
+  inaviLoading=true;
+  const script=document.createElement('script');
+  script.id='inavi-map-sdk';
+  script.async=true;
+  script.src=`https://gmaps.inavi.com/v1/sdk/web/${encodeURIComponent(INAVI_APP_KEY)}?callback=initMap`;
+  script.onerror=()=>{inaviLoading=false;toast('iNavi map SDK load failed');};
+  document.head.appendChild(script);
+}
+
+function toInaviCoord(latLng){return [latLng[1],latLng[0]];}
+function taskCoord(task){return [task.lng,task.lat];}
+function midCoord(task){return [(ME[1]+task.lng)/2,(ME[0]+task.lat)/2];}
+
+function makeIconElement(html){
+  const el=document.createElement('div');
+  el.innerHTML=html;
+  return el.firstElementChild;
+}
+
+function makeMapIcon(task){
+  let html;
+  if(task.status==='urgent'){
+    html=`<div style="display:flex;flex-direction:column;align-items:center;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--r);border:3px solid #fff;box-shadow:0 2px 8px rgba(255,77,77,.5),0 0 0 4px rgba(255,77,77,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;">!</div>
+      <div style="width:6px;height:6px;background:var(--r);border-radius:50%;margin-top:2px;opacity:.7;"></div>
+    </div>`;
+  } else if(task.status==='done'){
+    html=`<div style="display:flex;flex-direction:column;align-items:center;">
+      <div style="width:26px;height:26px;border-radius:50%;background:#9ca3af;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;">✓</div>
+      <div style="width:5px;height:5px;background:#9ca3af;border-radius:50%;margin-top:2px;opacity:.6;"></div>
+    </div>`;
+  } else {
+    const col=task.status==='active'?'var(--g)':CAT_COLOR[task.cat];
+    const icon=CAT_ICON[task.cat];
+    html=`<div style="display:flex;flex-direction:column;align-items:center;">
+      <div style="width:30px;height:30px;border-radius:50%;background:${col};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">${icon}</div>
+      <div style="width:5px;height:5px;background:${col};border-radius:50%;margin-top:2px;opacity:.6;"></div>
+    </div>`;
+  }
+  return makeIconElement(html);
+}
+
+function makeMeIcon(){
+  return makeIconElement(`<div style="display:flex;flex-direction:column;align-items:center;">
+    <div style="width:26px;height:26px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 2px 8px rgba(59,130,246,.5),0 0 0 5px rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;">
+      <div style="width:8px;height:8px;border-radius:50%;background:#fff;"></div>
+    </div>
+  </div>`);
+}
+
+function makeSmallMeIcon(){
+  return makeIconElement(`<div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 1px 5px rgba(59,130,246,.4);display:flex;align-items:center;justify-content:center;">
+    <div style="width:6px;height:6px;border-radius:50%;background:#fff;"></div>
+  </div>`);
+}
+
+function makeInfo(content,position){
+  if(!window.inavi?.maps?.InfoWindow) return null;
+  return new inavi.maps.InfoWindow({position,content});
+}
+
+function addMarker(map,position,icon,infoContent,open=false){
+  const marker=new inavi.maps.Marker({map,position});
+  if(icon) marker.setIcon(icon);
+  const info=infoContent?makeInfo(infoContent,position):null;
+  if(info){
+    marker.setInfoWindow?.(info);
+    marker.on?.('click',()=>info.setMap(map));
+    if(open) info.setMap(map);
+  }
+  return {marker,info};
+}
+
+function addPolyline(map,path,color,weight=2,opacity=.6,dashArray=''){
+  const style=makeLineStyle(color,weight,opacity,dashArray);
+  const line=new inavi.maps.Polyline({
+    map,
+    path,
+    style,
+  });
+  return line;
+}
+
+function makeLineStyle(color,weight=2,opacity=.6,dashArray=''){
+  const lineDasharray=Array.isArray(dashArray)
+    ?dashArray
+    :String(dashArray).split(/\s+/).filter(Boolean).map(Number).filter(Number.isFinite);
+  const style={
+    lineColor:color,
+    lineWidth:weight,
+    lineOpacity:opacity,
+  };
+  if(lineDasharray.length>=2) style.lineDasharray=lineDasharray.slice(0,2);
+  return style;
+}
+
+function clearLayerRefs(refs){
+  refs.forEach(item=>{
+    try{item.info?.setMap();}catch(e){}
+    try{item.marker?.setMap();}catch(e){}
+    try{item.line?.setMap();}catch(e){}
+  });
+  refs.length=0;
+}
+
+function extractRouteCoordinates(data){
+  if(Array.isArray(data.coordinates)) return data.coordinates;
+  if(data.routes?.coordinates) return data.routes.coordinates;
+  if(Array.isArray(data.routes)&&data.routes[0]?.coordinates) return data.routes[0].coordinates;
+  if(data.geometry?.coordinates) return data.geometry.coordinates;
+  return null;
+}
+
+function extractRouteStats(data){
+  const r=Array.isArray(data.routes)?data.routes[0]:data.routes;
+  return r||{};
+}
+
+function fitMap(map,points,zoomFallback){
+  if(points.length>1 && map.fitCoordinates){
+    map.fitCoordinates(points,{padding:28,duration:0});
+    return;
+  }
+  if(points[0]) map.setCenter?.(points[0]);
+  if(zoomFallback!=null) map.setZoom?.(zoomFallback);
+}
+
+function initHomeMap(){
+  if(maps.home) return;
+  ensureInaviReady(()=>{
+    if(maps.home) return;
+    const el=document.getElementById('hmap');
+    if(!el || !el.offsetWidth || !el.offsetHeight){
+      setTimeout(initHomeMap,120);
+      return;
+    }
+    const m=new inavi.maps.Map({container:'hmap',center:[121.545,25.037],zoom:14,language:lang==='en'?'en':'ko'});
+    addMarker(m,toInaviCoord(ME),makeMeIcon());
+    TASKS.forEach(t=>{
+      const infoHtml=t.status==='done'
+        ?`<div style="font-size:11px;padding:2px 4px;"><b>${t.name[lang]}</b><br><span style="color:#22c55e">✓ ${t.elapsed?t.elapsed[lang]:T('done')}</span></div>`
+        :`<div style="font-size:11px;padding:2px 4px;"><b>${t.name[lang]}</b>${t.eta?`<br>ETA ${t.eta[lang]}`:''}${t.sla&&t.sla!=='overdue'?`<br>SLA ${t.sla[lang]}`:t.sla==='overdue'?`<br><span style='color:#ff4d4d'>${T('sla_overdue')}</span>`:''}</div>`;
+      const {marker,info}=addMarker(m,taskCoord(t),makeMapIcon(t),infoHtml);
+      mapMks.home.push({mk:marker,info,task:t});
+    });
+    maps.home=m;
+    fitMap(m,[toInaviCoord(ME),...TASKS.map(taskCoord)],13);
+    updateMapVis();
+    // Draw real routes after map is ready
+    drawHomeRoutes(m);
+  });
+}
+
+async function fetchRoute(fromLat,fromLng,toLat,toLng){
+  try{
+    const url=`https://gmaps.inavi.com/maps/v3.0/appkeys/${encodeURIComponent(INAVI_APP_KEY)}/route-normal-tw`;
+    const body={startX:String(fromLng),startY:String(fromLat),endX:String(toLng),endY:String(toLat),traffic:1};
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const text=await res.text();
+    let data; try{data=JSON.parse(text);}catch(e){return null;}
+    if(!res.ok) return null;
+    const coords=extractRouteCoordinates(data);
+    if(!coords?.length) return null;
+    const points=coords.filter(c=>Array.isArray(c)&&Number.isFinite(Number(c[0]))&&Number.isFinite(Number(c[1]))).map(c=>[Number(c[0]),Number(c[1])]);
+    return points.length?points:null;
+  }catch(e){return null;}
+}
+
+async function drawHomeRoutes(m){
+  const ordered=[...TASKS].sort((a,b)=>{
+    const rank={done:0,active:1,urgent:2,todo:3};
+    return (rank[a.status]??3)-(rank[b.status]??3);
+  });
+
+  const doneTasks=ordered.filter(t=>t.status==='done');
+  const activeTask=ordered.find(t=>t.status==='active');
+  const todoTasks=ordered.filter(t=>t.status==='todo'||t.status==='urgent');
+
+  const segments=[];
+  for(let i=0;i<doneTasks.length-1;i++){
+    segments.push({fLat:doneTasks[i].lat,fLng:doneTasks[i].lng,tLat:doneTasks[i+1].lat,tLng:doneTasks[i+1].lng,style:'done',
+      fallback:[[doneTasks[i].lng,doneTasks[i].lat],[doneTasks[i+1].lng,doneTasks[i+1].lat]]});
+  }
+  if(doneTasks.length&&activeTask){
+    const last=doneTasks[doneTasks.length-1];
+    segments.push({fLat:last.lat,fLng:last.lng,tLat:activeTask.lat,tLng:activeTask.lng,style:'done',
+      fallback:[[last.lng,last.lat],[activeTask.lng,activeTask.lat]]});
+  }
+  if(activeTask){
+    segments.push({fLat:ME[0],fLng:ME[1],tLat:activeTask.lat,tLng:activeTask.lng,style:'active',
+      fallback:[[ME[1],ME[0]],[activeTask.lng,activeTask.lat]]});
+  }
+  if(activeTask&&todoTasks.length){
+    segments.push({fLat:activeTask.lat,fLng:activeTask.lng,tLat:todoTasks[0].lat,tLng:todoTasks[0].lng,style:'future',
+      fallback:[[activeTask.lng,activeTask.lat],[todoTasks[0].lng,todoTasks[0].lat]]});
+  }
+  for(let i=0;i<todoTasks.length-1;i++){
+    segments.push({fLat:todoTasks[i].lat,fLng:todoTasks[i].lng,tLat:todoTasks[i+1].lat,tLng:todoTasks[i+1].lng,style:'future',
+      fallback:[[todoTasks[i].lng,todoTasks[i].lat],[todoTasks[i+1].lng,todoTasks[i+1].lat]]});
+  }
+
+  const results=await Promise.all(segments.map(seg=>fetchRoute(seg.fLat,seg.fLng,seg.tLat,seg.tLng)));
+
+  // make sure map still exists
+  if(!maps.home) return;
+
+  results.forEach((points,i)=>{
+    const pts=points||segments[i].fallback; // use straight line fallback if API failed
+    if(!pts?.length) return;
+    const style=segments[i].style;
+    if(style==='done'){
+      addPolyline(m,pts,'#9ca3af',3,.55);
+    } else if(style==='active'){
+      addPolyline(m,pts,'#3b82f6',7,.18);
+      addPolyline(m,pts,'#3b82f6',3.5,.95);
+    } else {
+      addPolyline(m,pts,'#f97316',3,.7,'6 5');
+    }
+  });
+}
+
+function initFullMap(){
+  if(maps.full) return;
+  ensureInaviReady(()=>{
+    if(maps.full) return;
+    const m=new inavi.maps.Map({container:'fmap',center:[121.545,25.037],zoom:13,language:lang==='en'?'en':'ko'});
+    addMarker(m,toInaviCoord(ME),makeMeIcon(),T('me_loc'),true);
+    TASKS.forEach(t=>{
+      const content=`<b>${t.name[lang]}</b>${t.eta?`<br>${T('eta_label')}: ${t.eta[lang]}`:''}${t.sla&&t.sla!=='overdue'?`<br>${T('sla_label')}: ${t.sla[lang]}`:t.sla==='overdue'?`<br>${T('sla_label')}: ${T('sla_overdue')}`:''}`;
+      const {marker,info}=addMarker(m,taskCoord(t),makeMapIcon(t),content);
+      mapMks.full.push({mk:marker,info,task:t});
+    });
+    const pts=TASKS.filter(t=>t.status!=='done').map(taskCoord);
+    maps.full=m;
+    fitMap(m,[toInaviCoord(ME),...pts],13);
+    updateMapVis();
+  });
+}
+
+function updateMapVis(){
+  ['home','full'].forEach(mk=>{
+    mapMks[mk].forEach(({mk:marker,info,task})=>{
+      const visible=task.status==='done'||activeCats.has(task.cat);
+      marker.setVisible?.(visible);
+      if(!visible) info?.setMap();
+    });
+  });
+}
+
+function initUrgMap(task){
+  return new Promise(resolve=>{
+    ensureInaviReady(()=>{
+      if(urgMapInst){urgMapInst.remove();urgMapInst=null;mapLayers.urgent=[];}
+      urgMapInst=new inavi.maps.Map({container:'umap',center:midCoord(task),zoom:15,language:lang==='en'?'en':'ko'});
+      mapLayers.urgent.push(addMarker(urgMapInst,toInaviCoord(ME),makeSmallMeIcon()));
+      mapLayers.urgent.push(addMarker(urgMapInst,taskCoord(task),makeMapIcon(task),task.name[lang],true));
+      setTimeout(()=>{fitMap(urgMapInst,[toInaviCoord(ME),taskCoord(task)],15);resolve();},150);
+    });
+  });
+}
+
+function initFlowMap(task){
+  ensureInaviReady(()=>{
+    if(!fMapInited){
+      fMapInited=true;
+      fMapInst=new inavi.maps.Map({container:'fmmap',center:[121.545,25.037],zoom:15,language:lang==='en'?'en':'ko'});
+    }
+    clearLayerRefs(mapLayers.flow);
+    fMapInst.setCenter?.(midCoord(task));
+    fMapInst.setZoom?.(15);
+    mapLayers.flow.push(addMarker(fMapInst,toInaviCoord(ME),makeSmallMeIcon()));
+    mapLayers.flow.push(addMarker(fMapInst,taskCoord(task),makeMapIcon(task),task.name[lang],true));
+    currentFlowLine=addPolyline(fMapInst,[toInaviCoord(ME),taskCoord(task)],'#ff4d4d',3,.75);
+    mapLayers.flow.push({line:currentFlowLine});
+    setTimeout(()=>fitMap(fMapInst,[toInaviCoord(ME),taskCoord(task)],15),150);
+  });
+}
+
+/* ============================================================
+   URGENT SHEET
+============================================================ */
+function openUrgentById(taskId){
+  const task=TASKS[taskId];
+  document.getElementById('uoBadge').textContent=T('urg_dispatch');
+  const catBadge=document.getElementById('uoCat');
+  catBadge.className=`cb cb-${task.cat}`;
+  catBadge.textContent=CAT_ICON[task.cat];
+  document.getElementById('uoCatLbl').textContent=task.name[lang];
+  document.getElementById('uoTitle').textContent=task.name[lang];
+  document.getElementById('uoAddr').textContent=taskId===2?'台北市大安區忠孝東路四段 227 號 B1':'台北市信義區信義路五段';
+  const slaEl=document.getElementById('uoSlaV');
+  slaEl.textContent=task.sla==='overdue'?T('sla_overdue'):task.sla[lang];
+  slaEl.className='uomv '+(task.sla==='overdue'?'d':'w');
+  document.getElementById('uoSlaL').textContent=T('sla_label');
+  document.getElementById('uoDistV').textContent=task.dist;
+  document.getElementById('uoDistL').textContent=T('dist');
+  document.getElementById('uoEtaV').textContent=task.eta[lang];
+  document.getElementById('uoEtaL').textContent=T('eta_label');
+  document.getElementById('uoIssLbl').textContent=T('issue')+'：';
+  document.getElementById('uoIssText').textContent=task.issue?task.issue[lang]:'';
+  document.getElementById('uoDecBtn').textContent=T('decline');
+  document.getElementById('uoAccBtn').textContent='✓ '+T('accept');
+  document.getElementById('uoOverlay')._taskId=taskId;
+  document.getElementById('uoOverlay').classList.add('open');
+  setTimeout(()=>initUrgMap(task).then(()=>openUrgRouteOnMap(task)),120);
+}
+
+function declineUrgent(){
+  const taskId=document.getElementById('uoOverlay')._taskId||2;
+  declinedId=taskId;
+  document.getElementById('uoOverlay').classList.remove('open');
+  toast(T('toast_declined'));
+  setTimeout(()=>{
+    const nextId=taskId===2?3:2;
+    showNextUrgSnack(nextId);
+  },1800);
+}
+
+function showNextUrgSnack(nextId){
+  const task=TASKS[nextId];
+  document.getElementById('nubT').textContent=T('next_urg_t');
+  document.getElementById('nubS').textContent=T('next_urg_s');
+  document.getElementById('nubBtn').textContent=T('next_urg_b');
+  const nb=document.getElementById('nub');
+  nb._nextId=nextId;
+  nb.classList.add('show');
+  setTimeout(()=>nb.classList.remove('show'),9000);
+}
+
+function openNextUrgent(){
+  const nb=document.getElementById('nub');
+  nb.classList.remove('show');
+  openUrgentById(nb._nextId||3);
+}
+
+function acceptUrgent(){
+  const taskId=document.getElementById('uoOverlay')._taskId||2;
+  document.getElementById('uoOverlay').classList.remove('open');
+  openFlow(taskId);
+}
+
+/* ============================================================
+   FLOW
+============================================================ */
+function renderAnomChips(){
+  const el=document.getElementById('anomChips');
+  if(!el) return;
+  const keys=['anom_1','anom_2','anom_3','anom_4','anom_5','anom_6','anom_7','anom_8'];
+  const onStates=Array.from(el.querySelectorAll('.ac.on')).map(c=>c.dataset.key);
+  el.innerHTML='';
+  keys.forEach(k=>{
+    const d=document.createElement('div');
+    d.className='ac'+(onStates.includes(k)?' on':'');
+    d.dataset.key=k;
+    d.textContent=T(k);
+    d.onclick=function(){this.classList.toggle('on');};
+    el.appendChild(d);
+  });
+}
+
+function renderFlowLabels(){
+  const ids={sl1:'step_accept',sl2:'step_route',sl3:'step_checkin',sl4:'step_work',sl5:'step_finish'};
+  Object.entries(ids).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=T(key);});
+  const cin=document.getElementById('cinTxt');
+  if(cin&&!checkinDone) cin.textContent=T('arrive_checkin');
+  const gm=document.getElementById('gmbTxt');if(gm) gm.textContent=T('gmaps');
+  const fl=document.getElementById('fDistL');if(fl) fl.textContent=T('dist');
+  const fe=document.getElementById('fEtaL');if(fe) fe.textContent=T('eta_label');
+  const fs=document.getElementById('fSlaL');if(fs) fs.textContent=T('sla_label');
+  const cl=document.getElementById('clTitle');if(cl) cl.textContent=T('checklist_title');
+  const pt=document.getElementById('photoTitle');if(pt) pt.textContent=T('photo_title');
+  const at=document.getElementById('anomTitle');if(at) at.textContent=T('anom_title');
+  const pl=document.getElementById('progLbl');if(pl) pl.textContent=T('progress');
+  const sb=document.getElementById('subTxt');if(sb) sb.textContent=T('submit');
+  const pa=document.getElementById('photoAddLbl');if(pa) pa.textContent=T('photo_add');
+  document.getElementById('anomNote').placeholder=T('anom_note');
+  // checklist item texts
+  const clTexts={
+    restock_f:{zh:'補充衛生紙（女廁 3 間）',en:'Restock paper – female ×3'},
+    restock_m:{zh:'補充衛生紙（男廁 2 間）',en:'Restock paper – male ×2'},
+    restock_soap:{zh:'補充洗手乳',en:'Refill hand soap'},
+    clean_floor:{zh:'清潔地板與洗手台',en:'Clean floors & sinks'},
+    check_sensor:{zh:'確認感測器恢復正常',en:'Verify sensor status'},
+  };
+  document.querySelectorAll('#fclist .ct[data-key]').forEach(el=>{
+    const v=clTexts[el.dataset.key];
+    if(v) el.textContent=v[lang];
+  });
+  document.querySelectorAll('#fclist .tg[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(T(k)) el.textContent=T(k);
+  });
+}
+
+function openFlow(taskId){
+  const task=TASKS[taskId];
+  currentTask=task;
+  checkinDone=false; flowCheckCount=0; flowPhotoCount=0;
+  startTime=new Date();
+  document.getElementById('fTitle').textContent=task.name[lang];
+  document.getElementById('fSub').textContent=(task.dist||'')+' · '+T('en_route');
+  const ftag=document.getElementById('fTag');
+  ftag.textContent=T('en_route'); ftag.className='tg tg-a';
+  document.getElementById('fDist').textContent=task.dist||'–';
+  document.getElementById('fEta').textContent=task.eta?task.eta[lang]:'–';
+  const slaEl=document.getElementById('fSla');
+  const slaText=task.sla==='overdue'?T('sla_overdue'):(task.sla?task.sla[lang]:'–');
+  slaEl.textContent=slaText;
+  slaEl.style.color=task.sla==='overdue'?'var(--r)':'var(--am)';
+  // reset steps
+  ['fs2','fs3','fs4','fs5'].forEach((id,i)=>{const n=document.getElementById(id);n.className='sn'+(i===0?' act':'');n.textContent=i+2;});
+  document.querySelectorAll('#flowSteps .step').forEach((s,i)=>s.className='step'+(i===0?' done':''));
+  // reset checkin
+  const cb=document.getElementById('cinBtn');cb.className='cin-btn';
+  document.getElementById('cinTxt').textContent=T('arrive_checkin');
+  document.getElementById('cinSec').style.display='block';
+  document.getElementById('workSec').style.display='none';
+  // reset checklist
+  document.querySelectorAll('#fclist .cli').forEach(c=>c.classList.remove('done'));
+  document.getElementById('clProg').textContent='0/5';
+  document.getElementById('progPct').textContent='0%';
+  document.getElementById('progBar').style.width='0%';
+  // reset photos
+  document.getElementById('pgrid').innerHTML=`<div class="pthumb" onclick="addPhoto()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--g)" stroke-width="1.8" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg><span class="pnum">${T('photo_add')}</span></div>`;
+  document.getElementById('photoCount').textContent='0/4';
+  // reset anomaly
+  document.getElementById('anomNote').value='';
+  document.querySelectorAll('#anomChips .ac').forEach(c=>c.classList.remove('on'));
+  // render labels
+  renderFlowLabels();
+  renderAnomChips();
+  document.getElementById('flowOverlay').classList.add('open');
+  setTimeout(()=>{initFlowMap(task); openRouteOnMap(task);},150);
+}
+
+function closeFlow(){
+  document.getElementById('flowOverlay').classList.remove('open');
+}
+
+function doCheckin(){
+  if(checkinDone) return;
+  checkinDone=true;
+  const btn=document.getElementById('cinBtn');
+  btn.className='cin-btn done';
+  const time=new Date().toLocaleTimeString(lang==='zh'?'zh-TW':'en-US',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('cinTxt').textContent=T('checkin_done',time);
+  // advance steps
+  document.getElementById('fs3').className='sn done'; document.getElementById('fs3').textContent='✓';
+  document.getElementById('fs4').className='sn act';
+  document.querySelectorAll('#flowSteps .step')[2].classList.add('done');
+  const ftag=document.getElementById('fTag');
+  ftag.textContent=T('working'); ftag.className='tg tg-g';
+  document.getElementById('fSub').textContent=lang==='zh'?'已到場打卡 · 開始作業':'Checked in · Working';
+  document.getElementById('cinSec').style.display='none';
+  document.getElementById('workSec').style.display='block';
+  toast(T('toast_checkin'));
+}
+
+function toggleCli(el){
+  el.classList.toggle('done');
+  flowCheckCount=document.querySelectorAll('#fclist .cli.done').length;
+  const total=5;
+  document.getElementById('clProg').textContent=flowCheckCount+'/'+total;
+  const pct=Math.round(flowCheckCount/total*100);
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progBar').style.width=pct+'%';
+  if(flowCheckCount===total){
+    document.getElementById('fs4').className='sn done'; document.getElementById('fs4').textContent='✓';
+    document.getElementById('fs5').className='sn act';
+    document.querySelectorAll('#flowSteps .step')[3].classList.add('done');
+    toast(T('toast_done'));
+  }
+}
+
+function addPhoto(){
+  if(flowPhotoCount>=4){toast(T('err_max'));return;}
+  flowPhotoCount++;
+  document.getElementById('photoCount').textContent=flowPhotoCount+'/4';
+  const grid=document.getElementById('pgrid');
+  const d=document.createElement('div');
+  d.className='pthumb filled';
+  d.innerHTML=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gd)" stroke-width="1.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span class="pnum">${T('photo_n',flowPhotoCount)}</span>`;
+  grid.appendChild(d);
+  toast(T('toast_photo',flowPhotoCount));
+}
+
+function submitFlow(){
+  if(!checkinDone){toast(T('err_checkin'));return;}
+  if(flowPhotoCount<1){toast(T('err_photo'));return;}
+  const elapsed=startTime?Math.max(1,Math.round((new Date()-startTime)/60000)):18;
+  document.getElementById('fs5').className='sn done'; document.getElementById('fs5').textContent='✓';
+  document.querySelectorAll('#flowSteps .step')[4].classList.add('done');
+  document.getElementById('flowOverlay').classList.remove('open');
+  // show complete overlay
+  const co=document.getElementById('coOverlay');
+  document.getElementById('coTitle').textContent=T('complete');
+  document.getElementById('coSub').textContent=T('synced')+'\n'+T('time_taken',elapsed);
+  document.getElementById('coPts').textContent=T('pts');
+  document.getElementById('coBtn').textContent=T('next_stop');
+  co.classList.add('open');
+}
+
+function afterComplete(){
+  document.getElementById('coOverlay').classList.remove('open');
+  switchPage('home');
+  toast(T('toast_next'));
+}
+
+function openGMaps(){
+  if(!currentTask) return;
+  openRouteOnMap(currentTask);
+}
+
+async function openUrgRouteOnMap(task){
+  try{
+    await new Promise(resolve=>ensureInaviReady(resolve));
+    const url=`https://gmaps.inavi.com/maps/v3.0/appkeys/${encodeURIComponent(INAVI_APP_KEY)}/route-normal-tw`;
+    const body={startX:String(ME[1]),startY:String(ME[0]),endX:String(task.lng),endY:String(task.lat),traffic:1};
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const text=await res.text();
+    let data; try{data=JSON.parse(text);}catch(e){return;}
+    if(!res.ok) return;
+    const coords=extractRouteCoordinates(data);
+    if(!coords?.length) return;
+    const points=coords.filter(c=>Array.isArray(c)&&Number.isFinite(Number(c[0]))&&Number.isFinite(Number(c[1]))).map(c=>[Number(c[0]),Number(c[1])]);
+    if(!points.length) return;
+    // remove existing dashed line and add solid route
+    clearLayerRefs(mapLayers.urgent);
+    mapLayers.urgent=[];
+    mapLayers.urgent.push(addMarker(urgMapInst,toInaviCoord(ME),makeSmallMeIcon()));
+    mapLayers.urgent.push(addMarker(urgMapInst,taskCoord(task),makeMapIcon(task),task.name[lang],true));
+    const line=addPolyline(urgMapInst,points,'#ff4d4d',3,.9);
+    mapLayers.urgent.push({line});
+    fitMap(urgMapInst,points,15);
+  }catch(err){console.log('urg route err',err);}
+}
+
+async function openRouteOnMap(task){
+  const btn=document.getElementById('gmbBtn');
+  const label=document.getElementById('gmbTxt');
+  const oldText=label?.textContent||'';
+  if(btn) btn.disabled=true;
+  if(label) label.textContent=lang==='zh'?'規劃中...':'Routing...';
+
+  try{
+    await new Promise(resolve=>ensureInaviReady(resolve));
+    if(!fMapInst) initFlowMap(task);
+
+    const url=`https://gmaps.inavi.com/maps/v3.0/appkeys/${encodeURIComponent(INAVI_APP_KEY)}/route-normal-tw`;
+    const body={
+      startX:String(ME[1]),
+      startY:String(ME[0]),
+      endX:String(task.lng),
+      endY:String(task.lat),
+      traffic:1,
+    };
+    console.log(body)
+    const res=await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body),
+    });
+    console.log(res);
+    const text=await res.text();
+    let data;
+    try{data=JSON.parse(text);}catch(e){data={__raw_response:text};}
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const coords=extractRouteCoordinates(data);
+    if(!coords?.length) throw new Error('No route coordinates');
+    const points=coords
+      .filter(c=>Array.isArray(c)&&Number.isFinite(Number(c[0]))&&Number.isFinite(Number(c[1])))
+      .map(c=>[Number(c[0]),Number(c[1])]);
+    if(!points.length) throw new Error('No valid route coordinates');
+
+    if(currentFlowLine?.setPath){
+      currentFlowLine.setPath(points);
+      currentFlowLine.setStyle?.(makeLineStyle('#ff4d4d',4,.9));
+    }else{
+      currentFlowLine=addPolyline(fMapInst,points,'#ff4d4d',4,.9);
+      mapLayers.flow.push({line:currentFlowLine});
+    }
+    fitMap(fMapInst,points,15);
+
+    const stats=extractRouteStats(data);
+    if(stats.distance!=null) document.getElementById('fDist').textContent=(stats.distance/1000).toFixed(1)+'km';
+    if(stats.spend_time!=null) document.getElementById('fEta').textContent=Math.max(1,Math.round(stats.spend_time/60))+(lang==='zh'?'分':'min');
+    toast(T('toast_gmaps'));
+  }catch(err){
+    console.log(err);
+    toast((lang==='zh'?'路線規劃失敗：':'Route failed: ')+err.message);
+  }finally{
+    if(btn) btn.disabled=false;
+    if(label) label.textContent=oldText||T('gmaps');
+  }
+}
+
+/* ============================================================
+   PAGE
+============================================================ */
+function switchPage(name){
+  ['home','map','dash','profile'].forEach(p=>{
+    document.getElementById('pg-'+p).style.display=p===name?'block':'none';
+    document.getElementById('bn-'+p).classList.toggle('on',p===name);
+  });
+  document.getElementById('mainPage').scrollTop=0;
+  if(name==='map'&&!maps.full){setTimeout(initFullMap,80);}
+  if(name==='map'&&maps.full){setTimeout(()=>fitMap(maps.full,[toInaviCoord(ME),...TASKS.filter(t=>t.status!=='done').map(taskCoord)],13),80);}
+  renderLang();
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function toast(msg){
+  // use shell-level toast
+  const el=document.getElementById('toast2');
+  el.textContent=msg; el.className='toast show';
+  setTimeout(()=>el.className='toast',2700);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderLang();
+ensureInaviReady(()=>{});
+setTimeout(initHomeMap,100);
+setTimeout(()=>openUrgentById(2),1600);
+</script>
+</body>
+</html>
