@@ -359,9 +359,103 @@ textarea.fi{resize:vertical;min-height:60px;}
 <div class="mfoot"><button class="btn" onclick="cM('m-vd')"><span data-zh="取消" data-en="Cancel">取消</span></button><button class="btn pri" onclick="savV()"><span data-zh="儲存" data-en="Save">儲存</span></button></div>
 </div></div>
 
+<!-- PROFILE MODAL -->
+<div class="mbg" id="m-profile" onclick="if(event.target===this)cM('m-profile')">
+<div class="mbox wide"><div class="mh"><div class="mttl">個人檔案</div><button class="mx" onclick="cM('m-profile')">✕</button></div>
+<div class="mbody">
+  <div style="background:var(--bg);border-radius:9px;overflow:hidden;margin-bottom:14px">
+    <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--bd);"><div style="font-size:14px;font-weight:700;">基本資料</div><button class="btn sm" onclick="toast('編輯功能開啟')">編輯</button></div>
+    <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">姓名</div><div style="font-size:14px;font-weight:600">andyss</div></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">電子信箱</div><div style="font-size:14px;font-weight:600">andy.yuan@justxtar.com</div></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">行動電話</div><div style="font-size:14px;font-weight:600">0953123456</div></div>
+    </div>
+    <div style="height:1px;background:var(--bd);margin:0 16px"></div>
+    <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">公司別</div><div style="font-size:14px;font-weight:600">國光-台中</div></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">所屬區域</div><div style="font-size:13px;font-weight:600;line-height:1.5">宜蘭、屏東、嘉義、台中、新竹、桃園、台北、基隆</div></div>
+    </div>
+  </div>
+  <div style="background:var(--bg);border-radius:9px;overflow:hidden">
+    <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--bd);"><div style="font-size:14px;font-weight:700;">帳號設定</div><button class="btn sm" onclick="toast('密碼變更email已寄出')">變更密碼</button></div>
+    <div style="padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:12px 20px;align-items:center;">
+      <div><span style="padding:4px 12px;background:var(--gl);color:var(--gd);border-radius:100px;font-size:13px;font-weight:700;">啟用</span></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:3px">帳號</div><div style="font-size:14px;font-weight:600">andy</div></div>
+    </div>
+    <div style="height:1px;background:var(--bd);margin:0 16px"></div>
+    <div style="padding:14px 16px;">
+      <div style="font-size:12px;color:var(--mu);margin-bottom:6px">權限群組</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${['admin','technician','assistant','supervisor','quality','operator','procurement'].map(r=>`<span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">${r}</span>`).join('')}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mfoot"><button class="btn" onclick="cM('m-profile')">關閉</button></div>
+</div></div>
+
+<!-- ALERT DETAIL MODAL -->
+<div class="mbg" id="m-alert-detail" onclick="if(event.target===this)cM('m-alert-detail')">
+<div class="mbox wide"><div class="mh"><div class="mttl" id="mad-title">廁所詳情</div><button class="mx" onclick="cM('m-alert-detail')">✕</button></div>
+<div class="mbody" id="mad-body"></div>
+<div class="mfoot">
+  <button class="btn" onclick="cM('m-alert-detail')">關閉</button>
+  <button class="btn" id="mad-view-btn" onclick="">查看地圖</button>
+  <button class="btn pri" id="mad-dp-btn" onclick="">🚀 立即派工</button>
+</div>
+</div></div>
+
+<!-- PROFILE MODAL -->
+<div class="mbg" id="m-profile" onclick="if(event.target===this)cM('m-profile')">
+<div class="mbox wide"><div class="mh"><div class="mttl">個人檔案</div><button class="mx" onclick="cM('m-profile')">✕</button></div>
+<div class="mbody">
+  <div style="background:var(--bg);border-radius:9px;overflow:hidden;margin-bottom:14px">
+    <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--bd)"><div style="font-size:14px;font-weight:700">基本資料</div><button class="btn sm" onclick="toast('編輯功能開啟')">編輯</button></div>
+    <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">姓名</div><div style="font-size:14px;font-weight:600">andyss</div></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">電子信箱</div><div style="font-size:13px;font-weight:600">andy.yuan@justxtar.com</div></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">行動電話</div><div style="font-size:14px;font-weight:600">0953123456</div></div>
+    </div>
+    <div style="height:1px;background:var(--bd);margin:0 16px"></div>
+    <div style="padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">公司別</div><div style="font-size:14px;font-weight:600">國光-台中</div></div>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:4px">所屬區域</div><div style="font-size:13px;font-weight:600;line-height:1.6">宜蘭、屏東、嘉義、台中、新竹、桃園、台北、基隆</div></div>
+    </div>
+  </div>
+  <div style="background:var(--bg);border-radius:9px;overflow:hidden">
+    <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;background:var(--bd)"><div style="font-size:14px;font-weight:700">帳號設定</div><button class="btn sm" onclick="toast('密碼變更 Email 已寄出')">變更密碼</button></div>
+    <div style="padding:14px 16px;display:flex;align-items:center;gap:14px">
+      <span style="padding:4px 14px;background:var(--gl);color:var(--gd);border-radius:100px;font-size:13px;font-weight:700">啟用</span>
+      <div><div style="font-size:12px;color:var(--mu);margin-bottom:3px">帳號</div><div style="font-size:14px;font-weight:600">andy</div></div>
+    </div>
+    <div style="height:1px;background:var(--bd);margin:0 16px"></div>
+    <div style="padding:14px 16px">
+      <div style="font-size:12px;color:var(--mu);margin-bottom:7px">權限群組</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">admin</span>
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">technician</span>
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">assistant</span>
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">supervisor</span>
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">quality</span>
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">operator</span>
+        <span style="padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--bl);color:#1d4ed8">procurement</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mfoot"><button class="btn" onclick="cM('m-profile')">關閉</button></div>
+</div></div>
+
+<!-- ALERT DETAIL MODAL -->
+<div class="mbg" id="m-alert-detail" onclick="if(event.target===this)cM('m-alert-detail')">
+<div class="mbox wide"><div class="mh"><div class="mttl" id="mad-title">廁所詳情</div><button class="mx" onclick="cM('m-alert-detail')">✕</button></div>
+<div class="mbody" id="mad-body" style="padding:0"></div>
+<div class="mfoot" id="mad-foot"></div>
+</div></div>
+
 <!-- TOPBAR -->
 <header class="topbar">
-  <div class="logo" style="font-size:18px;font-weight:900;letter-spacing:-.01em;color:var(--gd)">Just<span style="color:var(--g)">Toilet</span></div>
+  <div class="logo" style="font-size:18px;font-weight:900;letter-spacing:-.01em;color:var(--gd)">Just<span style="color:var(--g)">Toi</span></div>
   <div class="tb-c">
     <div class="apill" id="apill" onclick="go('alerts')"><span class="blink"></span><span id="ptxt">7 個異常</span></div>
   </div>
@@ -398,8 +492,9 @@ textarea.fi{resize:vertical;min-height:60px;}
       <button class="sbtn" id="si-vendors" onclick="go('vendors')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>清潔公司<span class="snum b">5</span></button>
       <button class="sbtn" id="si-staff" onclick="go('staff')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>人員管理<span class="snum g" id="sb-sn">52</span></button>
       <button class="sbtn" id="si-schedule" onclick="go('schedule')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>排班管理</button>
+      <button class="sbtn" id="si-accounts" onclick="go('accounts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 10a2 2 0 100 4 2 2 0 000-4z"/><path d="M14 10h4M14 14h4"/></svg>帳號管理</button>
     </div>
-    <div class="sbfoot"><div class="sbav">PM</div><div><div style="font-size:13px;font-weight:700;">系統管理員</div><div style="font-size:11px;color:var(--mu)">捷運公司</div></div></div>
+    <div class="sbfoot" style="cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--gl)'" onmouseout="this.style.background=''" onclick="oProfile()"><div class="sbav">PM</div><div style="flex:1"><div style="font-size:13px;font-weight:700;">系統管理員</div><div style="font-size:11px;color:var(--mu)">捷運公司</div></div><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--mu)" stroke-width="2" style="flex-shrink:0;opacity:.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
   </aside>
 
   <!-- CONTENT AREA -->
@@ -676,6 +771,43 @@ textarea.fi{resize:vertical;min-height:60px;}
         </div>
       </div>
     </div>
+
+
+    <!-- ACCOUNTS -->
+    <div id="pg-accounts" class="pg" style="overflow-y:auto;">
+      <div style="padding:18px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
+          <div style="font-size:15px;font-weight:800">帳號管理</div>
+          <button class="btn pri" onclick="oNewAccount()">＋ 新增帳號</button>
+        </div>
+        <div style="background:var(--s);border-radius:11px;border:1px solid var(--bd);margin-bottom:16px;">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--bd);font-size:14px;font-weight:700;">角色權限定義</div>
+          <div style="padding:14px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;" id="roles-grid"></div>
+        </div>
+        <div style="background:var(--s);border-radius:11px;border:1px solid var(--bd);overflow:hidden;">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;">
+            <div style="font-size:14px;font-weight:700;">系統帳號列表</div>
+            <div class="sbox" style="margin-left:auto"><svg viewBox="0 0 24 24" fill="none" stroke="var(--mu)" stroke-width="1.8" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="acct-search" placeholder="搜尋帳號…" oninput="filterAccounts(this.value)" style="width:140px;border:none;outline:none;font-size:14px;font-family:var(--fn);background:transparent;color:var(--tx)"></div>
+          </div>
+          <div class="twrap"><table><thead><tr><th>帳號</th><th>姓名</th><th>電子信箱</th><th>公司</th><th>角色群組</th><th>狀態</th><th>建立時間</th><th>操作</th></tr></thead><tbody id="acct-tbody"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW ACCOUNT MODAL -->
+    <div class="mbg" id="m-acct" onclick="if(event.target===this)cM('m-acct')">
+    <div class="mbox wide"><div class="mh"><div class="mttl" id="m-acct-title">新增帳號</div><button class="mx" onclick="cM('m-acct')">✕</button></div>
+    <div class="mbody">
+      <div class="fr"><div class="fgg"><label class="fl">帳號 *</label><input class="fi" id="ac-un" placeholder="username"></div><div class="fgg"><label class="fl">姓名 *</label><input class="fi" id="ac-nm" placeholder="真實姓名"></div></div>
+      <div class="fr"><div class="fgg"><label class="fl">電子信箱</label><input class="fi" id="ac-em" placeholder="name@company.com" type="email"></div><div class="fgg"><label class="fl">行動電話</label><input class="fi" id="ac-ph" placeholder="0912-345-678"></div></div>
+      <div class="fr"><div class="fgg"><label class="fl">公司</label><input class="fi" id="ac-co" placeholder="公司名稱"></div><div class="fgg"><label class="fl">所屬區域</label><input class="fi" id="ac-zn" placeholder="台北、新北…"></div></div>
+      <div class="fg"><label class="fl" style="margin-bottom:6px;display:block">角色權限（可多選）</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px;border:1.5px solid var(--bd2);border-radius:8px;background:var(--bg);" id="ac-roles-pick"></div>
+      </div>
+      <div class="fr"><div class="fgg"><label class="fl">初始密碼 *</label><input class="fi" id="ac-pw" type="password" placeholder="至少8字元"></div><div class="fgg"><label class="fl">狀態</label><select class="fi" id="ac-st"><option value="active">啟用</option><option value="inactive">停用</option></select></div></div>
+    </div>
+    <div class="mfoot"><button class="btn" onclick="cM('m-acct')">取消</button><button class="btn pri" onclick="saveAccount()">儲存</button></div>
+    </div></div>
 
   </div><!-- /CA -->
 </div><!-- /layout -->
@@ -978,7 +1110,7 @@ function isOpen(t){
   return h>=open && h<close;
 }
 // ── NAVIGATION ──
-const PAGES=['dashboard','map','toilets','alerts','dispatch','ai','vendors','staff','schedule'];
+const PAGES=['dashboard','map','toilets','alerts','dispatch','ai','vendors','staff','schedule','accounts'];
 const FLEX_PG=new Set(['map','toilets','alerts','dispatch','ai','staff']);
 const ADDLBL={
   get toilets(){return T_('＋ 新增廁所','＋ Add Toilet');},
@@ -1023,6 +1155,7 @@ function go(p){
   if(p==='ai'){initAI();}
   if(p==='vendors') rVC();
   if(p==='schedule') initSC();
+  if(p==='accounts'){buildRolesGrid();rAccounts();}
   cDrawer();
 }
 
@@ -1367,7 +1500,7 @@ function rT(){
       return `<span class="bdg" style="background:${bg};color:${col};white-space:nowrap">${label} ${waitLbl}</span>`;
     })()}</td>
     <td><div class="tacts">
-      <button class="ib" onclick="oDrawer(${t.id})" title="查看"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      <button class="ib" onclick="oToiletDetail(${t.id})" title="查看詳情"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
       <button class="ib" onclick="oDP(${t.id})" title="派工"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></button>
       <button class="ib" onclick="oTT(${t.id})" title="編輯"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
       <button class="ib del" onclick="delT(${t.id})" title="刪除"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
@@ -1449,7 +1582,7 @@ function rAL(){
       <div class="abtns">
         <button class="btn pri sm" onclick="oDP(${t.id})">${dp?(LANG==='en'?'Re-assign':'手動重新指派'):(LANG==='en'?'Manual Dispatch':'手動派工')}</button>
         ${nst.map(s=>`<button class="btn sm" onclick="qDP(${t.id},${s.id},'${s.name}')" title="手動覆蓋指派">${LANG==='en'?'Reassign':'手動改派'} ${s.name}</button>`).join('')}
-        <button class="btn sm" onclick="oDrawer(${t.id})">${LANG==='en'?'Details':'詳情'}</button>
+        <button class="btn sm" onclick="oAlertDetail(${t.id})">${LANG==='en'?'Details':'詳情'}</button>
       </div>
       ${dispInfo}
     </div>`;
@@ -2570,6 +2703,310 @@ function initAutoDispatch(){
     });
     offset+=Math.round(2+Math.random()*5);
   });
+}
+
+// ── TOILET DETAIL MODAL (from list eye button) ──
+function oToiletDetail(tid){
+  const t=T.find(x=>x.id===tid);
+  if(!t)return;
+  const dp=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+  const v=V.find(x=>x.id===t.vid);
+  const nc=n=>n>40?'#991b1b':n>25?'#92400e':'var(--gd)';
+  const pc=p=>p<25?'#991b1b':p<50?'#92400e':'var(--gd)';
+  const fcs=LANG==='en'?[{l:'Accessible',v:t.ac},{l:'Family Restroom',v:t.fm},{l:'Nursing Room',v:t.nr},{l:'24 Hours',v:t.h24}]:[{l:'無障礙',v:t.ac},{l:'親子廁',v:t.fm},{l:'哺乳室',v:t.nr},{l:'24小時',v:t.h24}];
+
+  document.getElementById('mad-title').innerHTML=`${EMOJ[t.cat]} ${tname(t)} <span style="font-size:13px;font-weight:500;color:var(--mu);margin-left:6px">廁所詳情</span>`;
+
+  document.getElementById('mad-body').innerHTML=`
+    <!-- Status bar -->
+    <div style="padding:12px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:${t.s==='err'?'var(--rl)':t.s==='warn'?'var(--al)':'var(--gl)'}22">
+      <span style="padding:4px 14px;border-radius:100px;font-size:13px;font-weight:700;background:${t.s==='err'?'var(--rl)':t.s==='warn'?'var(--al)':'var(--gl)'};color:${t.s==='err'?'#991b1b':t.s==='warn'?'#92400e':'var(--gd)'}">${t.s==='err'?'異常':t.s==='warn'?'預警':'正常'}</span>
+      <span style="font-size:13px;color:var(--mu)">${CN(t.cat)} · ${t.fl}${t.ex?' · '+t.ex:''}</span>
+      <span style="font-size:13px;color:var(--mu);margin-left:auto;font-size:12px">${t.addr||''}</span>
+    </div>
+
+    <!-- Sensor readings -->
+    <div style="padding:16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-bottom:1px solid var(--bd)">
+      <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center;border:1.5px solid ${t.nh>40?'var(--rm)':t.nh>25?'#fcd34d':'var(--bd)'}">
+        <div style="font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">NH₃ 臭味指數</div>
+        <div style="font-size:28px;font-weight:900;color:${nc(t.nh)};line-height:1">${t.nh}<span style="font-size:14px;font-weight:500">ppm</span></div>
+        <div style="margin-top:8px;height:6px;background:var(--bd2);border-radius:3px;overflow:hidden"><div style="width:${Math.min(t.nh/80*100,100)}%;height:6px;border-radius:3px;background:${nc(t.nh)}"></div></div>
+        <div style="font-size:11px;margin-top:4px;color:${nc(t.nh)}">${t.nh>40?'⚠ 嚴重超標':t.nh>25?'⚠ 偏高':'✓ 正常'}</div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center;border:1.5px solid ${t.pp<25?'var(--rm)':t.pp<50?'#fcd34d':'var(--bd)'}">
+        <div style="font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">衛生紙餘量</div>
+        <div style="font-size:28px;font-weight:900;color:${pc(t.pp)};line-height:1">${t.pp}<span style="font-size:14px;font-weight:500">%</span></div>
+        <div style="margin-top:8px;height:6px;background:var(--bd2);border-radius:3px;overflow:hidden"><div style="width:${t.pp}%;height:6px;border-radius:3px;background:${pc(t.pp)}"></div></div>
+        <div style="font-size:11px;margin-top:4px;color:${pc(t.pp)}">${t.pp<25?'⚠ 嚴重不足':t.pp<50?'⚠ 偏低':'✓ 充足'}</div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center;border:1.5px solid ${t.sp<25?'var(--rm)':t.sp<50?'#fcd34d':'var(--bd)'}">
+        <div style="font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">洗手乳餘量</div>
+        <div style="font-size:28px;font-weight:900;color:${pc(t.sp)};line-height:1">${t.sp}<span style="font-size:14px;font-weight:500">%</span></div>
+        <div style="margin-top:8px;height:6px;background:var(--bd2);border-radius:3px;overflow:hidden"><div style="width:${t.sp}%;height:6px;border-radius:3px;background:${pc(t.sp)}"></div></div>
+        <div style="font-size:11px;margin-top:4px;color:${pc(t.sp)}">${t.sp<25?'⚠ 嚴重不足':t.sp<50?'⚠ 偏低':'✓ 充足'}</div>
+      </div>
+    </div>
+
+    <!-- Info grid -->
+    <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;border-bottom:1px solid var(--bd)">
+      <!-- Left: location & stats -->
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">位置資訊</div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          ${[
+            ['類型', CN(t.cat)],
+            ['樓層', t.fl],
+            ['最近出口', t.ex||'—'],
+            ['地址', t.addr||'—'],
+            ['停車位', t.pk?'✓ 有停車位':'✗ 無停車位'],
+            ['營業時間', tHours(t)],
+            ['目前狀態', isOpen(t)?'● 營業中':'● 已打烊'],
+          ].map(([l,v2])=>`<div style="display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px">
+            <span style="color:var(--mu)">${l}</span>
+            <span style="font-weight:600;text-align:right;max-width:200px">${v2}</span>
+          </div>`).join('')}
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">設施</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${fcs.map(f=>`<span style="padding:3px 10px;border-radius:7px;font-size:12px;font-weight:600;background:${f.v?'var(--bl)':'var(--bg)'};color:${f.v?'#1d4ed8':'var(--mu)'};${f.v?'':'text-decoration:line-through'}">${f.l}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: dispatch + vendor + stats -->
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">即時數據</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px">
+          <div style="background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--bd)"><div style="font-size:11px;color:var(--mu);margin-bottom:2px">今日使用</div><div style="font-size:18px;font-weight:800">${t.us}<span style="font-size:11px;font-weight:400"> 次</span></div></div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--bd)"><div style="font-size:11px;color:var(--mu);margin-bottom:2px">等候時間</div><div style="font-size:18px;font-weight:800;color:${t.wt>10?'#991b1b':t.wt>5?'#92400e':'var(--gd)'}">${t.wt}<span style="font-size:11px;font-weight:400"> 分</span></div></div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--bd)"><div style="font-size:11px;color:var(--mu);margin-bottom:2px">評分</div><div style="font-size:18px;font-weight:800;color:${t.sc>=80?'var(--gd)':t.sc>=60?'#92400e':'#991b1b'}">${t.sc}<span style="font-size:11px;font-weight:400"> 分</span></div></div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px 12px;border:1px solid var(--bd)"><div style="font-size:11px;color:var(--mu);margin-bottom:2px">狀態</div><div style="font-size:14px;font-weight:800;color:${t.s==='err'?'#991b1b':t.s==='warn'?'#92400e':'var(--gd)'}">${t.s==='err'?'異常':t.s==='warn'?'預警':'正常'}</div></div>
+        </div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">派工狀況</div>
+        ${dp?`<div style="background:var(--gl);border-radius:9px;padding:12px 14px;border:1px solid var(--gm);margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--gd);margin-bottom:5px">✅ 派工中</div>
+          <div style="font-size:13px;margin-bottom:3px">清潔員：<strong>${dp.cl}</strong></div>
+          <div style="font-size:13px;margin-bottom:3px">任務：${tpName(dp.tp)}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--gd)">預計 ${dp.eta} 分鐘到達</div>
+          ${dp.dt?`<div style="font-size:12px;color:var(--mu);margin-top:4px">派遣時間：${dp.dt}</div>`:''}
+        </div>`:`<div style="background:var(--al);border-radius:9px;padding:12px 14px;border:1px solid #fcd34d;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:600;color:#92400e">⚠ 尚未指派清潔員</div>
+          <div style="font-size:12px;color:var(--mu);margin-top:3px">點擊下方「立即派工」指派人員</div>
+        </div>`}
+
+        ${v?`<div style="font-size:11px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">負責清潔公司</div>
+        <div style="background:var(--bg);border-radius:9px;padding:11px 13px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${v.color};flex-shrink:0"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">${v.name}</div><div style="font-size:12px;color:var(--mu)">${v.contact} · ${v.cphone}</div></div>
+          <div style="font-size:11px;color:var(--mu)">SLA ${v.sla}分</div>
+        </div>`:''}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('mad-foot').innerHTML=`
+    <button class="btn" onclick="cM('m-alert-detail')">關閉</button>
+    <button class="btn" onclick="cM('m-alert-detail');go('map');setTimeout(()=>oDrawer(${t.id}),400)">🗺 查看地圖</button>
+    <button class="btn pri" onclick="cM('m-alert-detail');oDP(${t.id})">🚀 立即派工</button>
+  `;
+  oM('m-alert-detail');
+}
+
+// ── PROFILE ──
+function oProfile(){oM('m-profile');}
+
+// ── ALERT DETAIL MODAL ──
+function oAlertDetail(tid){
+  const t=T.find(x=>x.id===tid);
+  if(!t)return;
+  const dp=TASKS.find(d=>d.tid===t.id&&d.st==='active');
+  const nc=n=>n>40?'color:#991b1b':n>25?'color:#92400e':'color:var(--gd)';
+  const pc=p=>p<25?'color:#991b1b':p<50?'color:#92400e':'color:var(--gd)';
+  const v=V.find(x=>x.id===t.vid);
+  document.getElementById('mad-title').textContent=`${EMOJ[t.cat]} ${tname(t)} — 詳情`;
+  document.getElementById('mad-body').innerHTML=`
+    <div style="padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <span style="padding:4px 12px;border-radius:100px;font-size:13px;font-weight:700;background:${t.s==='err'?'var(--rl)':t.s==='warn'?'var(--al)':'var(--gl)'};color:${t.s==='err'?'#991b1b':t.s==='warn'?'#92400e':'var(--gd)'}">${t.s==='err'?'異常':t.s==='warn'?'預警':'正常'}</span>
+      <span style="font-size:13px;color:var(--mu)">${CN(t.cat)} · ${t.fl} · ${t.ex||''}</span>
+      <span style="font-size:13px;color:var(--mu);margin-left:auto">${t.addr||''}</span>
+    </div>
+    <div style="padding:14px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-bottom:1px solid var(--bd)">
+      <div style="background:var(--bg);border-radius:9px;padding:12px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">NH₃ 臭味指數</div>
+        <div style="font-size:24px;font-weight:800;${nc(t.nh)}">${t.nh}ppm</div>
+        <div style="font-size:11px;color:var(--mu);margin-top:2px">${t.nh>40?'⚠ 嚴重超標':t.nh>25?'注意':''}</div>
+      </div>
+      <div style="background:var(--bg);border-radius:9px;padding:12px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">衛生紙餘量</div>
+        <div style="font-size:24px;font-weight:800;${pc(t.pp)}">${t.pp}%</div>
+        <div style="height:6px;background:var(--bd2);border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:6px;border-radius:3px;background:${t.pp<25?'var(--r)':t.pp<50?'var(--a)':'var(--g)'};width:${t.pp}%"></div></div>
+      </div>
+      <div style="background:var(--bg);border-radius:9px;padding:12px;text-align:center;border:1px solid var(--bd)">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">洗手乳餘量</div>
+        <div style="font-size:24px;font-weight:800;${pc(t.sp)}">${t.sp}%</div>
+        <div style="height:6px;background:var(--bd2);border-radius:3px;margin-top:6px;overflow:hidden"><div style="height:6px;border-radius:3px;background:${t.sp<25?'var(--r)':t.sp<50?'var(--a)':'var(--g)'};width:${t.sp}%"></div></div>
+      </div>
+    </div>
+    <div style="padding:14px 20px;display:grid;grid-template-columns:1fr 1fr;gap:14px;border-bottom:1px solid var(--bd)">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">位置資訊</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">類型</span><span style="font-weight:600">${CN(t.cat)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">樓層</span><span style="font-weight:600">${t.fl}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">最近出口</span><span style="font-weight:600">${t.ex||'—'}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">停車位</span><span style="font-weight:600">${t.pk?'✓ 有':'✗ 無'}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">營業時間</span><span style="font-weight:600">${tHours(t)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">目前狀態</span><span style="font-weight:600;color:${isOpen(t)?'var(--gd)':'#991b1b'}">${isOpen(t)?'● 營業中':'● 已打烊'}</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">派工狀況</div>
+        ${dp?`<div style="background:var(--gl);border-radius:8px;padding:11px 13px;border:1px solid var(--gm)">
+          <div style="font-size:13px;font-weight:700;color:var(--gd);margin-bottom:3px">✅ 已派工中</div>
+          <div style="font-size:13px;margin-bottom:4px">清潔員：<strong>${dp.cl}</strong></div>
+          <div style="font-size:13px;margin-bottom:4px">任務：${tpName(dp.tp)}</div>
+          <div style="font-size:13px;color:var(--gd);font-weight:700">預計 ${dp.eta} 分鐘到達</div>
+          <div style="font-size:12px;color:var(--mu);margin-top:3px">派遣時間：${dp.dt}</div>
+        </div>`:`<div style="background:var(--al);border-radius:8px;padding:11px 13px;border:1px solid var(--bd)"><div style="font-size:13px;font-weight:600;color:#92400e">⚠ 尚未指派清潔員</div><div style="font-size:12px;color:var(--mu);margin-top:3px">請點擊下方按鈕立即派工</div></div>`}
+        <div style="margin-top:10px">
+          <div style="font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">設施</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${t.ac?'<span style="padding:2px 9px;border-radius:7px;background:var(--bl);color:#1d4ed8;font-size:12px;font-weight:600">無障礙</span>':''}
+            ${t.fm?'<span style="padding:2px 9px;border-radius:7px;background:var(--bl);color:#1d4ed8;font-size:12px;font-weight:600">親子廁</span>':''}
+            ${t.nr?'<span style="padding:2px 9px;border-radius:7px;background:var(--bl);color:#1d4ed8;font-size:12px;font-weight:600">哺乳室</span>':''}
+            ${t.h24?'<span style="padding:2px 9px;border-radius:7px;background:var(--gl);color:var(--gd);font-size:12px;font-weight:600">24H</span>':''}
+          </div>
+        </div>
+      </div>
+    </div>
+    ${v?`<div style="padding:13px 20px;font-size:13px;color:var(--mu)">負責公司：<strong style="color:var(--tx)">${v.name}</strong> · 聯絡人：${v.contact} · ${v.cphone}</div>`:''}
+  `;
+  document.getElementById('mad-foot').innerHTML=`
+    <button class="btn" onclick="cM('m-alert-detail')">關閉</button>
+    <button class="btn" onclick="cM('m-alert-detail');go('map');setTimeout(()=>oDrawer(${t.id}),300)">查看地圖</button>
+    <button class="btn pri" onclick="cM('m-alert-detail');oDP(${t.id})">🚀 立即派工</button>
+  `;
+  oM('m-alert-detail');
+}
+
+// ── ACCOUNTS ──
+const ROLES_DEF=[
+  {key:'admin',label:'系統管理員',desc:'全系統最高權限，可管理帳號、設定、資料',color:'#991b1b',bg:'var(--rl)'},
+  {key:'supervisor',label:'主管',desc:'可查看所有報表、審核派工、管理人員',color:'#92400e',bg:'var(--al)'},
+  {key:'operator',label:'操作員',desc:'可處理告警、執行派工、更新廁所狀態',color:'#1d4ed8',bg:'var(--bl)'},
+  {key:'technician',label:'技術員',desc:'可查看感測數據、提報維修、查看地圖',color:'var(--gd)',bg:'var(--gl)'},
+  {key:'quality',label:'品管員',desc:'可查看廁所評分、填寫巡檢表單、匯出報表',color:'#5b52cc',bg:'#f5f3ff'},
+  {key:'assistant',label:'助理',desc:'可查看儀表板及廁所清單（唯讀）',color:'var(--mu)',bg:'var(--bg)'},
+  {key:'procurement',label:'採購',desc:'可查看廠商資料、合約資訊、費用報表',color:'#185fa5',bg:'#eff6ff'},
+];
+
+let ACCOUNTS=[
+  {id:1,username:'andy',name:'andyss',email:'andy.yuan@justxtar.com',phone:'0953123456',company:'國光-台中',zone:'宜蘭、屏東、嘉義、台中',roles:['admin','technician','assistant','supervisor','quality','operator','procurement'],status:'active',created:'2024-01-15'},
+  {id:2,username:'alice',name:'Alice Chen',email:'alice@justxtar.com',phone:'0912-234-567',company:'綠清環境服務',zone:'台北、新北',roles:['supervisor','operator'],status:'active',created:'2024-03-01'},
+  {id:3,username:'bob',name:'Bob Wang',email:'bob@justxtar.com',phone:'0923-345-678',company:'大安清潔隊',zone:'大安、信義',roles:['operator','technician'],status:'active',created:'2024-04-12'},
+  {id:4,username:'carol',name:'Carol Lin',email:'carol@justxtar.com',phone:'0934-456-789',company:'統一環境科技',zone:'全台',roles:['quality','assistant'],status:'inactive',created:'2024-06-20'},
+  {id:5,username:'david',name:'David Zhang',email:'david@justxtar.com',phone:'0945-567-890',company:'信義清潔工程',zone:'信義、中正',roles:['procurement'],status:'active',created:'2025-01-08'},
+];
+let nextAid=6;
+
+function rAccounts(list){
+  list=list||ACCOUNTS;
+  document.getElementById('acct-tbody').innerHTML=list.map(a=>`<tr>
+    <td style="font-weight:700">${a.username}</td>
+    <td>${a.name}</td>
+    <td style="font-size:13px;color:var(--mu)">${a.email}</td>
+    <td style="font-size:13px">${a.company}</td>
+    <td><div style="display:flex;gap:3px;flex-wrap:wrap">${a.roles.map(r=>{const rd=ROLES_DEF.find(x=>x.key===r);return`<span style="padding:1px 7px;border-radius:100px;font-size:11px;font-weight:600;background:${rd?rd.bg:'var(--bg)'};color:${rd?rd.color:'var(--mu)'}">${rd?rd.label:r}</span>`;}).join('')}</div></td>
+    <td><span style="padding:3px 9px;border-radius:100px;font-size:12px;font-weight:700;background:${a.status==='active'?'var(--gl)':'var(--bg)'};color:${a.status==='active'?'var(--gd)':'var(--mu)'}">${a.status==='active'?'啟用':'停用'}</span></td>
+    <td style="font-size:12px;color:var(--mu)">${a.created}</td>
+    <td><div class="tacts">
+      <button class="ib" onclick="editAccount(${a.id})" title="編輯"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="ib" onclick="toggleAcctStatus(${a.id})" title="${a.status==='active'?'停用':'啟用'}"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/>${a.status==='active'?'<path d="M15 9l-6 6M9 9l6 6"/>':`<polyline points="20 6 9 12 20 18"/>`}</svg></button>
+      <button class="ib del" onclick="delAccount(${a.id})" title="刪除"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg></button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function filterAccounts(q){
+  q=q.toLowerCase();
+  rAccounts(ACCOUNTS.filter(a=>a.username.toLowerCase().includes(q)||a.name.toLowerCase().includes(q)||a.email.toLowerCase().includes(q)));
+}
+
+function oNewAccount(){
+  document.getElementById('m-acct-title').textContent='新增帳號';
+  ['ac-un','ac-nm','ac-em','ac-ph','ac-co','ac-zn','ac-pw'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ac-st').value='active';
+  buildRolePicker([]);
+  oNewAccount._eid=null;
+  oM('m-acct');
+}
+
+function editAccount(id){
+  const a=ACCOUNTS.find(x=>x.id===id);if(!a)return;
+  document.getElementById('m-acct-title').textContent='編輯帳號';
+  document.getElementById('ac-un').value=a.username;
+  document.getElementById('ac-nm').value=a.name;
+  document.getElementById('ac-em').value=a.email;
+  document.getElementById('ac-ph').value=a.phone||'';
+  document.getElementById('ac-co').value=a.company||'';
+  document.getElementById('ac-zn').value=a.zone||'';
+  document.getElementById('ac-st').value=a.status;
+  document.getElementById('ac-pw').value='';
+  buildRolePicker(a.roles);
+  oNewAccount._eid=id;
+  oM('m-acct');
+}
+
+function buildRolePicker(selected){
+  document.getElementById('ac-roles-pick').innerHTML=ROLES_DEF.map(r=>{
+    const on=selected.includes(r.key);
+    return `<label style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;border:1.5px solid ${on?r.color:'var(--bd2)'};background:${on?r.bg:'var(--s)'};cursor:pointer;font-size:12px;font-weight:600;color:${on?r.color:'var(--mu)'};transition:all .1s">
+      <input type="checkbox" value="${r.key}" ${on?'checked':''} style="display:none" onchange="syncRolePicker(this,'${r.key}')">
+      ${r.label}
+    </label>`;
+  }).join('');
+}
+
+function syncRolePicker(cb,key){
+  const rd=ROLES_DEF.find(x=>x.key===key);
+  if(!rd)return;
+  const lbl=cb.closest('label');
+  if(cb.checked){lbl.style.borderColor=rd.color;lbl.style.background=rd.bg;lbl.style.color=rd.color;}
+  else{lbl.style.borderColor='var(--bd2)';lbl.style.background='var(--s)';lbl.style.color='var(--mu)';}
+}
+
+function saveAccount(){
+  const un=document.getElementById('ac-un').value.trim();
+  const nm=document.getElementById('ac-nm').value.trim();
+  if(!un||!nm){toast('請填寫帳號與姓名');return;}
+  const roles=[...document.querySelectorAll('#ac-roles-pick input:checked')].map(c=>c.value);
+  const data={username:un,name:nm,email:document.getElementById('ac-em').value.trim(),phone:document.getElementById('ac-ph').value.trim(),company:document.getElementById('ac-co').value.trim(),zone:document.getElementById('ac-zn').value.trim(),roles,status:document.getElementById('ac-st').value,created:new Date().toISOString().slice(0,10)};
+  if(oNewAccount._eid){const i=ACCOUNTS.findIndex(a=>a.id===oNewAccount._eid);if(i>=0)ACCOUNTS[i]={...ACCOUNTS[i],...data};toast('帳號已更新');}
+  else{ACCOUNTS.push({id:nextAid++,...data});toast('帳號已新增');}
+  cM('m-acct');rAccounts();
+}
+
+function toggleAcctStatus(id){
+  const a=ACCOUNTS.find(x=>x.id===id);if(!a)return;
+  a.status=a.status==='active'?'inactive':'active';
+  toast(a.status==='active'?`✅ ${a.name} 已啟用`:`🔒 ${a.name} 已停用`);rAccounts();
+}
+
+function delAccount(id){
+  const a=ACCOUNTS.find(x=>x.id===id);if(!a)return;
+  if(!confirm(`確定刪除帳號「${a.username}」？`))return;
+  ACCOUNTS=ACCOUNTS.filter(x=>x.id!==id);toast('帳號已刪除');rAccounts();
+}
+
+function buildRolesGrid(){
+  document.getElementById('roles-grid').innerHTML=ROLES_DEF.map(r=>`<div style="background:${r.bg};border-radius:9px;padding:11px 13px;border:1px solid ${r.color}22">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+      <span style="padding:2px 9px;border-radius:100px;font-size:12px;font-weight:700;background:${r.bg};color:${r.color};border:1px solid ${r.color}44">${r.label}</span>
+    </div>
+    <div style="font-size:12px;color:var(--mu);line-height:1.4">${r.desc}</div>
+  </div>`).join('');
 }
 
 window.addEventListener('load',function(){
